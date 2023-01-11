@@ -9,6 +9,7 @@ import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -34,9 +35,12 @@ public class RobotContainer {
                 // Turning is controlled by the X axis of the right stick.
                 new RunCommand(
                         () -> m_robotDrive.drive(
-                                MathUtil.applyDeadband(-m_driverController.getLeftY(), OIConstants.kControllerDeadband),
-                                MathUtil.applyDeadband(-m_driverController.getLeftX(), OIConstants.kControllerDeadband),
-                                MathUtil.applyDeadband(-m_driverController.getRightX(),
+                                MathUtil.applyDeadband(-m_driverController.getLeftY(), OIConstants.kControllerDeadband)
+                                        * DriveConstants.kMaxSpeedMetersPerSecond,
+                                MathUtil.applyDeadband(-m_driverController.getLeftX(), OIConstants.kControllerDeadband)
+                                        * DriveConstants.kMaxSpeedMetersPerSecond,
+                                MathUtil.applyDeadband(-m_driverController.getRightX()
+                                        * DriveConstants.kMaxAngularSpeedRadiansPerSecond,
                                         OIConstants.kControllerDeadband),
                                 false),
                         m_robotDrive));
