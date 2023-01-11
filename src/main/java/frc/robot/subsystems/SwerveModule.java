@@ -11,9 +11,9 @@ import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.wpilibj.Encoder;
-import frc.robot.Robot;
-import frc.robot.Constants.ModuleConstants;
 import edu.wpi.first.wpilibj.motorcontrol.Spark;
+import frc.robot.Constants.ModuleConstants;
+import frc.robot.Robot;
 
 public class SwerveModule {
   private final Spark m_driveMotor;
