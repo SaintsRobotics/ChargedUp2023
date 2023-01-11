@@ -23,34 +23,30 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveModule m_frontLeft = new SwerveModule(
       DriveConstants.kFrontLeftDriveMotorPort,
       DriveConstants.kFrontLeftTurningMotorPort,
-      DriveConstants.kFrontLeftDriveEncoderPorts,
-      DriveConstants.kFrontLeftTurningEncoderPorts,
-      DriveConstants.kFrontLeftDriveEncoderReversed,
-      DriveConstants.kFrontLeftTurningEncoderReversed);
+      DriveConstants.kFrontLeftTurningEncoderPort,
+      DriveConstants.kFrontLeftDriveMotorReversed,
+      DriveConstants.kFrontLeftTurningEncoderOffset);
 
   private final SwerveModule m_rearLeft = new SwerveModule(
       DriveConstants.kRearLeftDriveMotorPort,
       DriveConstants.kRearLeftTurningMotorPort,
-      DriveConstants.kRearLeftDriveEncoderPorts,
-      DriveConstants.kRearLeftTurningEncoderPorts,
-      DriveConstants.kRearLeftDriveEncoderReversed,
-      DriveConstants.kRearLeftTurningEncoderReversed);
+      DriveConstants.kRearLeftTurningEncoderPort,
+      DriveConstants.kRearLeftDriveMotorReversed,
+      DriveConstants.kRearLeftTurningEncoderOffset);
 
   private final SwerveModule m_frontRight = new SwerveModule(
       DriveConstants.kFrontRightDriveMotorPort,
       DriveConstants.kFrontRightTurningMotorPort,
-      DriveConstants.kFrontRightDriveEncoderPorts,
-      DriveConstants.kFrontRightTurningEncoderPorts,
-      DriveConstants.kFrontRightDriveEncoderReversed,
-      DriveConstants.kFrontRightTurningEncoderReversed);
+      DriveConstants.kFrontRightTurningEncoderPort,
+      DriveConstants.kFrontRightDriveMotorReversed,
+      DriveConstants.kFrontRightTurningEncoderOffset);
 
   private final SwerveModule m_rearRight = new SwerveModule(
       DriveConstants.kRearRightDriveMotorPort,
       DriveConstants.kRearRightTurningMotorPort,
-      DriveConstants.kRearRightDriveEncoderPorts,
-      DriveConstants.kRearRightTurningEncoderPorts,
-      DriveConstants.kRearRightDriveEncoderReversed,
-      DriveConstants.kRearRightTurningEncoderReversed);
+      DriveConstants.kRearRightTurningEncoderPort,
+      DriveConstants.kRearRightDriveMotorReversed,
+      DriveConstants.kRearRightTurningEncoderOffset);
 
   private final Gyro m_gyro = new ADXRS450_Gyro();
   private double m_gyroAngle;
@@ -146,14 +142,6 @@ public class DriveSubsystem extends SubsystemBase {
         * Robot.kDefaultPeriod;
   }
 
-  /** Resets the drive encoders to currently read a position of 0. */
-  public void resetEncoders() {
-    m_frontLeft.resetEncoders();
-    m_rearLeft.resetEncoders();
-    m_frontRight.resetEncoders();
-    m_rearRight.resetEncoders();
-  }
-
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.reset();
@@ -166,14 +154,5 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getHeading() {
     return m_gyro.getRotation2d().getDegrees();
-  }
-
-  /**
-   * Returns the turn rate of the robot.
-   *
-   * @return The turn rate of the robot, in degrees per second
-   */
-  public double getTurnRate() {
-    return m_gyro.getRate() * (DriveConstants.kGyroReversed ? -1.0 : 1.0);
   }
 }

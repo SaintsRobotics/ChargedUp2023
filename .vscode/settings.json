@@ -27,7 +27,10 @@
   ],
   "java.test.defaultConfig": "WPIlibUnitTests",
   "cSpell.words": [
+    "AHRS",
+    "Brushless",
     "Deadband",
+    "odometry",
     "teleop",
     "wpilibj"
   ]
