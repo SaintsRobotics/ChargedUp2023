@@ -48,6 +48,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kRearRightDriveMotorReversed,
       DriveConstants.kRearRightTurningEncoderOffset);
 
+  //TODO Install and implement NavX vendordep
   private final Gyro m_gyro = new ADXRS450_Gyro();
   private double m_gyroAngle;
 
@@ -155,4 +156,15 @@ public class DriveSubsystem extends SubsystemBase {
   public double getHeading() {
     return m_gyro.getRotation2d().getDegrees();
   }
+
+  /**
+   * Makes lower inputs smaller which allows for finer joystick control.
+	 * 
+	 * @param input The number to apply odd square to.
+	 * @return The odd squared number.
+   */
+  public static double oddSquare(double input) {
+    //TODO Move this to a Util file as more utility methods are created
+		return input * Math.abs(input);
+	}
 }
