@@ -55,7 +55,10 @@ public class RobotContainer {
                         m_robotDrive));
 
 
-        m_chooser.addOption("BlueHangerTwoObjectAuton", "BlueHanger TwoObjectAuton");
+        m_chooser.addOption("BluBottemTwoObject", "BlueBottem TwoObject");
+        m_chooser.addOption("BlueTopTwoObject", "BlueTop TwoObject");
+        m_chooser.addOption("BlueMidBackCharger", "BlueMid BackCharger");
+        m_chooser.addOption("BuleMidFrontCharger", "BlueMid FrontCharger");
     }
 
         
@@ -83,16 +86,52 @@ public class RobotContainer {
         else{
                 return null;
         }
-        
-        SequentialCommandGroup twoObjectDropoff = new SequentialCommandGroup(
+        //Path to drop off loaded object and grab another, straight line, bottem of feild
+        SequentialCommandGroup twoObjectDropOff = new SequentialCommandGroup(
                 new ParallelCommandGroup(
-                        new PathWeaverCommand(m_robotDrive, path[0] + "twoObjectAuton1", true)
+                        new PathWeaverCommand(m_robotDrive, path[0] + "TwoObject1", true)
+                        //System.out.println("Pause to grab object");
                 ),
                 new ParallelCommandGroup(
-                        new PathWeaverCommand(m_robotDrive, path[0] + "twoObjectAuton2", false)
+                        new PathWeaverCommand(m_robotDrive, path[0] + "TwoObject2", false)
+                        //System.out.print("Pause to drop off obj")
                 )
         );
+        //Drops off object then Path to get on charger from the midddle, not leaving the zone
+        SequentialCommandGroup GetOnChargerBack = new SequentialCommandGroup(
+                new ParallelCommandGroup(
+                        //Pause to place loaded object
+                        new PathWeaverCommand(m_robotDrive, path[0] + "BackCharger1", true)
+                        
+        )); 
+        //Drops off object, moves over charger to 
+        SequentialCommandGroup GetOnChargerFront = new SequentialCommandGroup(
+                new ParallelCommandGroup(
+                        //Pause to place loaded object
+                        new PathWeaverCommand(m_robotDrive, path[0] + "FrontCharger1", true)),
+                
+                new ParallelCommandGroup(
+                        //Pull up arm
+                        new PathWeaverCommand(m_robotDrive, path[0] + "FrontCharger2", false)
+                )
+        
 
-        return twoObjectDropoff;
+                        
+        ); 
+
+        
+
+
+        switch (path[1]) {
+                case("TwoObject"):
+                        return twoObjectDropOff;
+                case("BackCharger"):
+                        return GetOnChargerBack;
+                
+                case("FrontCharger"):
+                        return GetOnChargerFront;
+        }
+        return null;
+       
     }
 }
