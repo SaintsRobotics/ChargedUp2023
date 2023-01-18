@@ -73,7 +73,7 @@ public class SwerveModule {
     m_distance += m_state.speedMetersPerSecond * Robot.kDefaultPeriod;
     return Robot.isReal()
         ? new SwerveModulePosition(m_driveMotor.getEncoder().getPosition(),
-            new Rotation2d(m_turningEncoder.getPosition()))
+            new Rotation2d(m_turningEncoder.getAbsolutePosition()))
         : new SwerveModulePosition(m_distance, m_state.angle);
   }
 
@@ -83,11 +83,11 @@ public class SwerveModule {
    * @param desiredState Desired state with speed and angle.
    */
   public void setDesiredState(SwerveModuleState desiredState) {
-    m_state = SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.getPosition()));
+    m_state = SwerveModuleState.optimize(desiredState, new Rotation2d(m_turningEncoder.getAbsolutePosition()));
 
-    final double driveOutput = desiredState.speedMetersPerSecond / DriveConstants.kMaxSpeedMetersPerSecond;
+    final double driveOutput = m_state.speedMetersPerSecond / DriveConstants.kMaxSpeedMetersPerSecond;
 
-    final double turnOutput = m_turningPIDController.calculate(m_turningEncoder.getPosition(),
+    final double turnOutput = m_turningPIDController.calculate(m_turningEncoder.getAbsolutePosition(),
         m_state.angle.getRadians());
 
     m_driveMotor.set(driveOutput);
