@@ -20,47 +20,63 @@ import frc.robot.subsystems.DriveSubsystem;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
 
-    private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
-     */
-    public RobotContainer() {
-        configureButtonBindings();
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
+  public RobotContainer() {
+    configureButtonBindings();
 
-        m_robotDrive.setDefaultCommand(
-                // The left stick controls translation of the robot.
-                // Turning is controlled by the X axis of the right stick.
-                new RunCommand(
-                        () -> m_robotDrive.drive(
-                                DriveSubsystem.oddSquare(MathUtil.applyDeadband(-m_driverController.getLeftY(), OIConstants.kControllerDeadband))
-                                        * DriveConstants.kMaxSpeedMetersPerSecond,
-                                DriveSubsystem.oddSquare(MathUtil.applyDeadband(-m_driverController.getLeftX(), OIConstants.kControllerDeadband))
-                                        * DriveConstants.kMaxSpeedMetersPerSecond,
-                                DriveSubsystem.oddSquare(MathUtil.applyDeadband(-m_driverController.getRightX(), OIConstants.kControllerDeadband))
-                                        * DriveConstants.kMaxAngularSpeedRadiansPerSecond,
-                                false),
-                        m_robotDrive));
-    }
+    m_robotDrive.setDefaultCommand(
+        // The left stick controls translation of the robot.
+        // Turning is controlled by the X axis of the right stick.
+        new RunCommand(
+            () -> m_robotDrive.drive(
+                inputScaling(MathUtil.applyDeadband(
+                    -m_driverController.getLeftY(),
+                    OIConstants.kControllerDeadband))
+                    * DriveConstants.kMaxSpeedMetersPerSecond,
+                inputScaling(MathUtil.applyDeadband(
+                    -m_driverController.getLeftX(),
+                    OIConstants.kControllerDeadband))
+                    * DriveConstants.kMaxSpeedMetersPerSecond,
+                inputScaling(MathUtil.applyDeadband(
+                    -m_driverController.getRightX(),
+                    OIConstants.kControllerDeadband))
+                    * DriveConstants.kMaxAngularSpeedRadiansPerSecond,
+                false),
+            m_robotDrive));
+  }
 
-    /**
-     * Use this method to define your button->command mappings. Buttons can be
-     * created by instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of
-     * its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
-     * {@link XboxController}), and then calling passing it to a
-     * {@link JoystickButton}.
-     */
-    private void configureButtonBindings() {
-    }
+  /**
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of
+   * its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
+   * {@link XboxController}), and then calling passing it to a
+   * {@link JoystickButton}.
+   */
+  private void configureButtonBindings() {
+  }
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        return null;
-    }
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    return null;
+  }
+
+  /**
+   * Makes lower inputs smaller which allows for finer joystick control.
+   * 
+   * @param input The number to apply input scaling to.
+   * @return The scaled number.
+   */
+  private double inputScaling(double input) {
+    return input * Math.abs(input);
+  }
 }

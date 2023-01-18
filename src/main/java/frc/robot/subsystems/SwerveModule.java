@@ -31,7 +31,7 @@ public class SwerveModule {
   private double m_distance;
 
   /**
-   * Constructs a SwerveModule.
+   * Constructs a {@link SwerveModule}.
    *
    * @param driveMotorChannel     The channel of the drive motor.
    * @param turningMotorChannel   The channel of the turning motor.

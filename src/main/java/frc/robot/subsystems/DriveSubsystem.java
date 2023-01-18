@@ -48,7 +48,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kRearRightDriveMotorReversed,
       DriveConstants.kRearRightTurningEncoderOffset);
 
-  //TODO Install and implement NavX vendordep
+  // TODO Install and implement NavX vendordep
   private final Gyro m_gyro = new ADXRS450_Gyro();
   private double m_gyroAngle;
 
@@ -64,7 +64,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final Field2d m_field = new Field2d();
 
-  /** Creates a new DriveSubsystem. */
+  /** Creates a new {@link DriveSubsystem}. */
   public DriveSubsystem() {
     SmartDashboard.putData("Field", m_field);
   }
@@ -139,6 +139,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.setDesiredState(desiredStates[2]);
     m_rearRight.setDesiredState(desiredStates[3]);
 
+    // Takes the integral of the rotation speed to find the current angle for the
+    // simulator
     m_gyroAngle += DriveConstants.kDriveKinematics.toChassisSpeeds(desiredStates).omegaRadiansPerSecond
         * Robot.kDefaultPeriod;
   }
@@ -156,15 +158,4 @@ public class DriveSubsystem extends SubsystemBase {
   public double getHeading() {
     return m_gyro.getRotation2d().getDegrees();
   }
-
-  /**
-   * Makes lower inputs smaller which allows for finer joystick control.
-	 * 
-	 * @param input The number to apply odd square to.
-	 * @return The odd squared number.
-   */
-  public static double oddSquare(double input) {
-    //TODO Move this to a Util file as more utility methods are created
-		return input * Math.abs(input);
-	}
 }
