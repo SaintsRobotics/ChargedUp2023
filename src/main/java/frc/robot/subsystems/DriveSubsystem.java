@@ -80,6 +80,8 @@ public class DriveSubsystem extends SubsystemBase {
         });
 
     m_field.setRobotPose(m_odometry.getPoseMeters());
+
+    SmartDashboard.putNumber("gyro angle", m_gyro.getAngle());
   }
 
   /**
