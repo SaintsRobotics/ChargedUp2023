@@ -16,7 +16,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.subsystems.DriveSubsystem;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
+
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import frc.robot.commands.PathWeaverCommand;
 
 /*
@@ -89,45 +90,43 @@ public class RobotContainer {
     }
 
     // Path to drop off loaded object and grab another, straight line, feild
-    SmartDashboard.putString("Check in", "1");
+    SmartDashboard.putStringArray("Check In 1", path);
     SequentialCommandGroup twoObjectDropOff = new SequentialCommandGroup(
-        new ParallelCommandGroup(
-            new PathWeaverCommand(m_robotDrive, path[0] + "TwoObject1", true)
-       
-        ),
-        new ParallelCommandGroup(
-            new PathWeaverCommand(m_robotDrive, path[0] + "TwoObject2", false)
-        // System.out.print("Pause to drop off obj")
-        ));
+        new PathWeaverCommand(m_robotDrive, path[0] + "TwoObject1", true),
+        
+        
+        new PathWeaverCommand(m_robotDrive, path[0] + "TwoObject2", false));
     // Drops off object then Path to get on charger from the middle, not leaving
     // the zone
     SequentialCommandGroup GetOnChargerBack = new SequentialCommandGroup(
-        new ParallelCommandGroup(
+        new ParallelDeadlineGroup(
             // Pause to place loaded object
             new PathWeaverCommand(m_robotDrive, path[0] + "BackCharger1", true)
 
         ));
     // Drops off object, moves over charger to
     SequentialCommandGroup GetOnChargerFront = new SequentialCommandGroup(
-        new ParallelCommandGroup(
+        new ParallelDeadlineGroup(
             // Pause to place loaded object
              new PathWeaverCommand(m_robotDrive, path[0] + "FrontCharger1", true)),
 
-        new ParallelCommandGroup(
+        new ParallelDeadlineGroup(
             // Pull up arm
             new PathWeaverCommand(m_robotDrive, path[0] + "FrontCharger2", false)));
-        SmartDashboard.putString("Check IN", "2");
-     switch (path[1]) {
+    SmartDashboard.putString("Check In Start", path[0] + path[1]);
+    switch (path[1]) {
       case ("TwoObject"):
-        SmartDashboard.putString("Check in", "3");
+        SmartDashboard.putString("Check in Two object drop off", "Returning Correctly");
         return twoObjectDropOff;
       case ("BackCharger"):
         return GetOnChargerBack;
 
       case ("FrontCharger"):
         return GetOnChargerFront;
+      default:
+      
+        return null;
      }
-     SmartDashboard.putString("Fail", " ");
-     return null;
+    
   }
 }

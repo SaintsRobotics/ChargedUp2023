@@ -1,4 +1,5 @@
 
+
 package frc.robot.commands;
 
 import java.io.IOException;
@@ -45,7 +46,7 @@ public class PathWeaverCommand extends CommandBase {
 
 		try {
 			m_trajectory = TrajectoryUtil.fromPathweaverJson(
-					Filesystem.getDeployDirectory().toPath().resolve(".pathplanner/deploy/pathplanner/generatedJSON/" + trajectoryJSON + ".wpilib.json"));
+					Filesystem.getDeployDirectory().toPath().resolve("src/main/deploy/pathplanner" + trajectoryJSON + ".wpilib.json"));
 		} catch (IOException ex) {
 			DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
 		}
