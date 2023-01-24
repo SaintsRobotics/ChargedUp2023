@@ -5,20 +5,19 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.subsystems.DriveSubsystem;
-
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import frc.robot.commands.PathWeaverCommand;
+import frc.robot.subsystems.DriveSubsystem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -35,7 +34,6 @@ public class RobotContainer {
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
-
   public RobotContainer() {
     configureButtonBindings();
 
@@ -44,19 +42,19 @@ public class RobotContainer {
         // Turning is controlled by the X axis of the right stick.
         new RunCommand(
             () -> m_robotDrive.drive(
-                DriveSubsystem.oddSquare(MathUtil.applyDeadband(
+                inputScaling(MathUtil.applyDeadband(
                     -m_driverController.getLeftY(),
                     OIConstants.kControllerDeadband))
                     * DriveConstants.kMaxSpeedMetersPerSecond,
-                DriveSubsystem.oddSquare(MathUtil.applyDeadband(
+                inputScaling(MathUtil.applyDeadband(
                     -m_driverController.getLeftX(),
                     OIConstants.kControllerDeadband))
                     * DriveConstants.kMaxSpeedMetersPerSecond,
-                DriveSubsystem.oddSquare(MathUtil.applyDeadband(
+                inputScaling(MathUtil.applyDeadband(
                     -m_driverController.getRightX(),
                     OIConstants.kControllerDeadband))
                     * DriveConstants.kMaxAngularSpeedRadiansPerSecond,
-                false),
+                !m_driverController.getRightBumper()),
             m_robotDrive));
 
     m_chooser.addOption("BlueBottemTwoObject", "BlueBottemTwoObject");
@@ -74,6 +72,8 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+    new JoystickButton(m_driverController, XboxController.Button.kStart.value)
+        .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
   }
 
   /**
@@ -90,20 +90,18 @@ public class RobotContainer {
     }
 
     // Path to drop off loaded object and grab another, straight line, feild
-    
-    SequentialCommandGroup BottemTwoObjectDropOff = new SequentialCommandGroup(
-      new ParallelDeadlineGroup(
-        new PathWeaverCommand(m_robotDrive, path + "1", true)),
 
-      new ParallelDeadlineGroup(  
-        new PathWeaverCommand(m_robotDrive, path + "2", false))
-    );
+    SequentialCommandGroup BottemTwoObjectDropOff = new SequentialCommandGroup(
+        new ParallelDeadlineGroup(
+            new PathWeaverCommand(m_robotDrive, path + "1", true)),
+
+        new ParallelDeadlineGroup(
+            new PathWeaverCommand(m_robotDrive, path + "2", false)));
 
     SequentialCommandGroup TopTwoObjectDropOff = new SequentialCommandGroup(
-      new ParallelDeadlineGroup(
-        new PathWeaverCommand(m_robotDrive, path + "1", true)),
-        new PathWeaverCommand(m_robotDrive, path + "2", false)
-    );
+        new ParallelDeadlineGroup(
+            new PathWeaverCommand(m_robotDrive, path + "1", true)),
+        new PathWeaverCommand(m_robotDrive, path + "2", false));
     // Drops off object then Path to get on charger from the middle, not leaving
     // the zone
     SequentialCommandGroup GetOnChargerBack = new SequentialCommandGroup(
@@ -116,27 +114,33 @@ public class RobotContainer {
     SequentialCommandGroup GetOnChargerFront = new SequentialCommandGroup(
         new ParallelDeadlineGroup(
             // Pause to place loaded object
-             new PathWeaverCommand(m_robotDrive, path + "1", true)),
+            new PathWeaverCommand(m_robotDrive, path + "1", true)),
 
         new ParallelDeadlineGroup(
             // Pull up arm
             new PathWeaverCommand(m_robotDrive, path + "2", false)));
-  
+
     switch (path) {
       case ("BlueBottemTwoObject"):
         return BottemTwoObjectDropOff;
       case ("BlueMidBackCharger"):
         return GetOnChargerBack;
-
-      case("BlueTopTwoObject"):
+      case ("BlueTopTwoObject"):
         return TopTwoObjectDropOff;
-
       case ("BlueFrontBackCharger"):
         return GetOnChargerFront;
       default:
-      
         return null;
-     }
-    
+    }
+  }
+
+  /**
+   * Makes lower inputs smaller which allows for finer joystick control.
+   * 
+   * @param input The number to apply input scaling to.
+   * @return The scaled number.
+   */
+  private double inputScaling(double input) {
+    return input * Math.abs(input);
   }
 }

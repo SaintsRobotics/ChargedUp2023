@@ -4,6 +4,8 @@
 
 package frc.robot.subsystems;
 
+import com.kauailabs.navx.frc.AHRS;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -11,8 +13,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.ADXRS450_Gyro;
-import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -48,8 +48,7 @@ public class DriveSubsystem extends SubsystemBase {
       DriveConstants.kRearRightDriveMotorReversed,
       DriveConstants.kRearRightTurningEncoderOffset);
 
-  //TODO Install and implement NavX vendordep
-  private final Gyro m_gyro = new ADXRS450_Gyro();
+  private final AHRS m_gyro = new AHRS();
   private double m_gyroAngle;
 
   private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
@@ -64,7 +63,7 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final Field2d m_field = new Field2d();
 
-  /** Creates a new DriveSubsystem. */
+  /** Creates a new {@link DriveSubsystem}. */
   public DriveSubsystem() {
     SmartDashboard.putData("Field", m_field);
   }
@@ -81,6 +80,8 @@ public class DriveSubsystem extends SubsystemBase {
         });
 
     m_field.setRobotPose(m_odometry.getPoseMeters());
+
+    SmartDashboard.putNumber("gyro angle", m_gyro.getAngle());
   }
 
   /**
@@ -121,7 +122,8 @@ public class DriveSubsystem extends SubsystemBase {
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot, m_gyro.getRotation2d())
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot,
+                Robot.isReal() ? m_gyro.getRotation2d() : new Rotation2d(m_gyroAngle))
             : new ChassisSpeeds(xSpeed, ySpeed, rot));
     setModuleStates(swerveModuleStates);
   }
@@ -139,6 +141,8 @@ public class DriveSubsystem extends SubsystemBase {
     m_rearLeft.setDesiredState(desiredStates[2]);
     m_rearRight.setDesiredState(desiredStates[3]);
 
+    // Takes the integral of the rotation speed to find the current angle for the
+    // simulator
     m_gyroAngle += DriveConstants.kDriveKinematics.toChassisSpeeds(desiredStates).omegaRadiansPerSecond
         * Robot.kDefaultPeriod;
   }
@@ -146,25 +150,6 @@ public class DriveSubsystem extends SubsystemBase {
   /** Zeroes the heading of the robot. */
   public void zeroHeading() {
     m_gyro.reset();
+    m_gyroAngle = 0;
   }
-
-  /**
-   * Returns the heading of the robot.
-   *
-   * @return the robot's heading in degrees, from -180 to 180
-   */
-  public double getHeading() {
-    return m_gyro.getRotation2d().getDegrees();
-  }
-
-  /**
-   * Makes lower inputs smaller which allows for finer joystick control.
-	 * 
-	 * @param input The number to apply odd square to.
-	 * @return The odd squared number.
-   */
-  public static double oddSquare(double input) {
-    //TODO Move this to a Util file as more utility methods are created
-		return input * Math.abs(input);
-	}
 }
