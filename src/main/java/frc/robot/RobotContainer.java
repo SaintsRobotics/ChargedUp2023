@@ -10,7 +10,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
@@ -89,46 +88,21 @@ public class RobotContainer {
       return null;
     }
 
-    // Path to drop off loaded object and grab another, straight line, feild
-
-    SequentialCommandGroup BottemTwoObjectDropOff = new SequentialCommandGroup(
-        new ParallelDeadlineGroup(
-            new PathWeaverCommand(m_robotDrive, path + "1", true)),
-
-        new ParallelDeadlineGroup(
-            new PathWeaverCommand(m_robotDrive, path + "2", false)));
-
-    SequentialCommandGroup TopTwoObjectDropOff = new SequentialCommandGroup(
-        new ParallelDeadlineGroup(
-            new PathWeaverCommand(m_robotDrive, path + "1", true)),
-        new PathWeaverCommand(m_robotDrive, path + "2", false));
-    // Drops off object then Path to get on charger from the middle, not leaving
-    // the zone
-    SequentialCommandGroup GetOnChargerBack = new SequentialCommandGroup(
-        new ParallelDeadlineGroup(
-            // Pause to place loaded object
-            new PathWeaverCommand(m_robotDrive, path + "1", true)
-
-        ));
-    // Drops off object, moves over charger to
-    SequentialCommandGroup GetOnChargerFront = new SequentialCommandGroup(
-        new ParallelDeadlineGroup(
-            // Pause to place loaded object
-            new PathWeaverCommand(m_robotDrive, path + "1", true)),
-
-        new ParallelDeadlineGroup(
-            // Pull up arm
-            new PathWeaverCommand(m_robotDrive, path + "2", false)));
-
     switch (path) {
       case ("BlueBottemTwoObject"):
-        return BottemTwoObjectDropOff;
+        return new SequentialCommandGroup(
+            new PathWeaverCommand(m_robotDrive, path + "1", true),
+            new PathWeaverCommand(m_robotDrive, path + "2", false));
       case ("BlueMidBackCharger"):
-        return GetOnChargerBack;
+        return new PathWeaverCommand(m_robotDrive, path + "1", true);
       case ("BlueTopTwoObject"):
-        return TopTwoObjectDropOff;
-      case ("BlueFrontBackCharger"):
-        return GetOnChargerFront;
+        return new SequentialCommandGroup(
+            new PathWeaverCommand(m_robotDrive, path + "1", true),
+            new PathWeaverCommand(m_robotDrive, path + "2", false));
+      case ("BlueMidFrontCharger"):
+        return new SequentialCommandGroup(
+            new PathWeaverCommand(m_robotDrive, path + "1", true),
+            new PathWeaverCommand(m_robotDrive, path + "2", false));
       default:
         return null;
     }
