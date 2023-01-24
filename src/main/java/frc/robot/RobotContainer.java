@@ -56,7 +56,7 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
-    m_chooser.addOption("BlueBottemTwoObject", "BlueBottemTwoObject");
+    m_chooser.addOption("BlueBottomTwoObject", "BlueBottomTwoObject");
     m_chooser.addOption("BlueTopTwoObject", "BlueTopTwoObject");
     m_chooser.addOption("BlueMidBackCharger", "BlueMidBackCharger");
     m_chooser.addOption("BlueMidFrontCharger", "BlueMidFrontCharger");
@@ -89,7 +89,7 @@ public class RobotContainer {
     }
 
     switch (path) {
-      case ("BlueBottemTwoObject"):
+      case ("BlueBottomTwoObject"):
         return new SequentialCommandGroup(
             new PathWeaverCommand(m_robotDrive, path + "1", true),
             new PathWeaverCommand(m_robotDrive, path + "2", false));
