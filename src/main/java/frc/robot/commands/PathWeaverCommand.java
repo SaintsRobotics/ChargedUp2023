@@ -46,7 +46,7 @@ public class PathWeaverCommand extends CommandBase {
 
 		try {
 			m_trajectory = TrajectoryUtil.fromPathweaverJson(
-					Filesystem.getDeployDirectory().toPath().resolve("src/main/deploy/pathplanner" + trajectoryJSON + ".wpilib.json"));
+					Filesystem.getDeployDirectory().toPath().resolve("pathplanner/generatedJSON/" + trajectoryJSON + ".wpilib.json"));
 		} catch (IOException ex) {
 			DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
 		}

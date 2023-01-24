@@ -5,7 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.DriverStation;
+
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -59,10 +59,10 @@ public class RobotContainer {
                 false),
             m_robotDrive));
 
-    m_chooser.addOption("BlueBottemTwoObject", "BlueBottem TwoObject");
-    m_chooser.addOption("BlueTopTwoObject", "BlueTop TwoObject");
-    m_chooser.addOption("BlueMidBackCharger", "BlueMid BackCharger");
-    m_chooser.addOption("BlueMidFrontCharger", "BlueMid FrontCharger");
+    m_chooser.addOption("BlueBottemTwoObject", "BlueBottemTwoObject");
+    m_chooser.addOption("BlueTopTwoObject", "BlueTopTwoObject");
+    m_chooser.addOption("BlueMidBackCharger", "BlueMidBackCharger");
+    m_chooser.addOption("BlueMidFrontCharger", "BlueMidFrontCharger");
     SmartDashboard.putData(m_chooser);
   }
 
@@ -82,46 +82,56 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    String[] path;
+    String path;
     if (m_chooser.getSelected() != null) {
-      path = m_chooser.getSelected().split(" ");
+      path = m_chooser.getSelected();
     } else {
       return null;
     }
 
     // Path to drop off loaded object and grab another, straight line, feild
-    SmartDashboard.putStringArray("Check In 1", path);
-    SequentialCommandGroup twoObjectDropOff = new SequentialCommandGroup(
-        new PathWeaverCommand(m_robotDrive, path[0] + "TwoObject1", true),
-        
-        
-        new PathWeaverCommand(m_robotDrive, path[0] + "TwoObject2", false));
+    
+    SequentialCommandGroup BottemTwoObjectDropOff = new SequentialCommandGroup(
+      new ParallelDeadlineGroup(
+        new PathWeaverCommand(m_robotDrive, path + "1", true)),
+
+      new ParallelDeadlineGroup(  
+        new PathWeaverCommand(m_robotDrive, path + "2", false))
+    );
+
+    SequentialCommandGroup TopTwoObjectDropOff = new SequentialCommandGroup(
+      new ParallelDeadlineGroup(
+        new PathWeaverCommand(m_robotDrive, path + "1", true)),
+        new PathWeaverCommand(m_robotDrive, path + "2", false)
+    );
     // Drops off object then Path to get on charger from the middle, not leaving
     // the zone
     SequentialCommandGroup GetOnChargerBack = new SequentialCommandGroup(
         new ParallelDeadlineGroup(
             // Pause to place loaded object
-            new PathWeaverCommand(m_robotDrive, path[0] + "BackCharger1", true)
+            new PathWeaverCommand(m_robotDrive, path + "1", true)
 
         ));
     // Drops off object, moves over charger to
     SequentialCommandGroup GetOnChargerFront = new SequentialCommandGroup(
         new ParallelDeadlineGroup(
             // Pause to place loaded object
-             new PathWeaverCommand(m_robotDrive, path[0] + "FrontCharger1", true)),
+             new PathWeaverCommand(m_robotDrive, path + "1", true)),
 
         new ParallelDeadlineGroup(
             // Pull up arm
-            new PathWeaverCommand(m_robotDrive, path[0] + "FrontCharger2", false)));
-    SmartDashboard.putString("Check In Start", path[0] + path[1]);
-    switch (path[1]) {
-      case ("TwoObject"):
-        SmartDashboard.putString("Check in Two object drop off", "Returning Correctly");
-        return twoObjectDropOff;
-      case ("BackCharger"):
+            new PathWeaverCommand(m_robotDrive, path + "2", false)));
+  
+    switch (path) {
+      case ("BlueBottemTwoObject"):
+        return BottemTwoObjectDropOff;
+      case ("BlueMidBackCharger"):
         return GetOnChargerBack;
 
-      case ("FrontCharger"):
+      case("BlueTopTwoObject"):
+        return TopTwoObjectDropOff;
+
+      case ("BlueFrontBackCharger"):
         return GetOnChargerFront;
       default:
       
