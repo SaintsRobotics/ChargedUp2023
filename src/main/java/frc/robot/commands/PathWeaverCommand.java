@@ -1,4 +1,6 @@
-
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.commands;
 
@@ -46,7 +48,8 @@ public class PathWeaverCommand extends CommandBase {
 
 		try {
 			m_trajectory = TrajectoryUtil.fromPathweaverJson(
-					Filesystem.getDeployDirectory().toPath().resolve("pathplanner/generatedJSON/" + trajectoryJSON + ".wpilib.json"));
+					Filesystem.getDeployDirectory().toPath()
+							.resolve("pathplanner/generatedJSON/" + trajectoryJSON + ".wpilib.json"));
 		} catch (IOException ex) {
 			DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
 		}
