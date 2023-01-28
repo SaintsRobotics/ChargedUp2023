@@ -33,6 +33,7 @@
     "odometry",
     "pathplanner",
     "teleop",
+    "wpilib",
     "wpilibj"
   ]
 }
