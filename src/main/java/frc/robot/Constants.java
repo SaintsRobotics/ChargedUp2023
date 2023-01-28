@@ -58,6 +58,12 @@ public final class Constants {
 
     public static final double kMaxSpeedMetersPerSecond = 3.66;
     public static final double kMaxAngularSpeedRadiansPerSecond = 8.76;
+    public static final double kMaxAngularAccelerationRadiansPerSecondSquared = 7;
+
+    public static final double kPTranslationController = 5;
+
+    public static final double kPRotController = 6;
+    public static final double kDRotController = 0.9;
   }
 
   public static final class ModuleConstants {

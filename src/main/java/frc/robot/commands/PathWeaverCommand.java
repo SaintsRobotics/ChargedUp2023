@@ -15,7 +15,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SwerveControllerCommand;
-import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -54,8 +53,13 @@ public class PathWeaverCommand extends CommandBase {
 			DriverStation.reportError("Unable to open trajectory: " + trajectoryJSON, ex.getStackTrace());
 		}
 
-		final ProfiledPIDController rotPID = new ProfiledPIDController(6, 0, 0.9,
-				new TrapezoidProfile.Constraints(Constants.DriveConstants.kMaxAngularSpeedRadiansPerSecond, 7));
+		final ProfiledPIDController rotPID = new ProfiledPIDController(
+				DriveConstants.kPRotController,
+				0,
+				DriveConstants.kDRotController,
+				new TrapezoidProfile.Constraints(
+						DriveConstants.kMaxAngularSpeedRadiansPerSecond,
+						DriveConstants.kMaxAngularAccelerationRadiansPerSecondSquared));
 		rotPID.enableContinuousInput(-Math.PI, Math.PI);
 
 		// This doesn't require the subsystem because PathWeaverCommand requires it.
@@ -63,8 +67,8 @@ public class PathWeaverCommand extends CommandBase {
 				m_trajectory,
 				m_subsystem::getPose,
 				DriveConstants.kDriveKinematics,
-				new PIDController(5, 0, 0),
-				new PIDController(5, 0, 0),
+				new PIDController(DriveConstants.kPTranslationController, 0, 0),
+				new PIDController(DriveConstants.kPTranslationController, 0, 0),
 				rotPID,
 				m_subsystem::setModuleStates);
 	}
