@@ -73,5 +73,6 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
 
     public static final double kControllerDeadband = 0.2;
+    public static final double kSlowModeScalar = 0.8;    
   }
 }
