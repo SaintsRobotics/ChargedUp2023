@@ -60,6 +60,8 @@ public class RobotContainer {
     m_chooser.addOption("BlueTopTwoObject", "BlueTopTwoObject");
     m_chooser.addOption("BlueMidBackCharger", "BlueMidBackCharger");
     m_chooser.addOption("BlueMidFrontCharger", "BlueMidFrontCharger");
+    m_chooser.addOption("BlueTopCharger", "BlueTopCharger");
+    m_chooser.addOption("BlueBottomCharger", "BlueBottomCharger");
     SmartDashboard.putData(m_chooser);
   }
 
@@ -103,6 +105,12 @@ public class RobotContainer {
         return new SequentialCommandGroup(
             new PathWeaverCommand(m_robotDrive, path + "1", true),
             new PathWeaverCommand(m_robotDrive, path + "2", false));
+      case ("BlueTopCharger"):
+        return new SequentialCommandGroup(
+                new PathWeaverCommand(m_robotDrive, path + "1", true));
+      case ("BlueBottomCharger"):
+        return new SequentialCommandGroup(
+                new PathWeaverCommand(m_robotDrive, path + "1", true));
       default:
         return null;
     }
