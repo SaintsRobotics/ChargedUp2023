@@ -39,19 +39,22 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
+        // Holding left trigger engages slow mode
         new RunCommand(
             () -> m_robotDrive.drive(
-                inputScaling(MathUtil.applyDeadband(
+                MathUtil.applyDeadband(
                     -m_driverController.getLeftY(),
-                    OIConstants.kControllerDeadband))
-                    * DriveConstants.kMaxSpeedMetersPerSecond,
-                inputScaling(MathUtil.applyDeadband(
+                    OIConstants.kControllerDeadband)
+                    * DriveConstants.kMaxSpeedMetersPerSecond
+                    * (1 - m_driverController.getLeftTriggerAxis() * OIConstants.kSlowModeScalar),
+                MathUtil.applyDeadband(
                     -m_driverController.getLeftX(),
-                    OIConstants.kControllerDeadband))
-                    * DriveConstants.kMaxSpeedMetersPerSecond,
-                inputScaling(MathUtil.applyDeadband(
+                    OIConstants.kControllerDeadband)
+                    * DriveConstants.kMaxSpeedMetersPerSecond
+                    * (1 - m_driverController.getLeftTriggerAxis() * OIConstants.kSlowModeScalar),
+                MathUtil.applyDeadband(
                     -m_driverController.getRightX(),
-                    OIConstants.kControllerDeadband))
+                    OIConstants.kControllerDeadband)
                     * DriveConstants.kMaxAngularSpeedRadiansPerSecond,
                 !m_driverController.getRightBumper()),
             m_robotDrive));
@@ -114,15 +117,5 @@ public class RobotContainer {
       default:
         return null;
     }
-  }
-
-  /**
-   * Makes lower inputs smaller which allows for finer joystick control.
-   * 
-   * @param input The number to apply input scaling to.
-   * @return The scaled number.
-   */
-  private double inputScaling(double input) {
-    return input * Math.abs(input);
   }
 }
