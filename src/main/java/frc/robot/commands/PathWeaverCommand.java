@@ -54,12 +54,8 @@ public class PathWeaverCommand extends CommandBase {
 		}
 
 		final ProfiledPIDController rotPID = new ProfiledPIDController(
-				DriveConstants.kPRotController,
-				0,
-				DriveConstants.kDRotController,
-				new TrapezoidProfile.Constraints(
-						DriveConstants.kMaxAngularSpeedRadiansPerSecond,
-						DriveConstants.kMaxAngularAccelerationRadiansPerSecondSquared));
+				DriveConstants.kPRotController, 0, 0,
+				new TrapezoidProfile.Constraints(0, 0));
 		rotPID.enableContinuousInput(-Math.PI, Math.PI);
 
 		// This doesn't require the subsystem because PathWeaverCommand requires it.
@@ -67,8 +63,8 @@ public class PathWeaverCommand extends CommandBase {
 				m_trajectory,
 				m_subsystem::getPose,
 				DriveConstants.kDriveKinematics,
-				new PIDController(DriveConstants.kPTranslationController, 0, 0),
-				new PIDController(DriveConstants.kPTranslationController, 0, 0),
+				new PIDController(0, 0, 0),
+				new PIDController(0, 0, 0),
 				rotPID,
 				m_subsystem::setModuleStates);
 	}
