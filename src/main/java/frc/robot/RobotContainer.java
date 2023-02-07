@@ -24,7 +24,7 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final BalanceCommand m_BalanceCommand = new BalanceCommand();
+  private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
 
   /**
@@ -65,7 +65,7 @@ public class RobotContainer {
     new JoystickButton(m_driverController, XboxController.Button.kStart.value)
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
     new JoystickButton(m_driverController, XboxController.Button.kA.value)
-        .onTrue(new InstantCommand(m_BalanceCommand::periodic));
+          .onTrue(m_BalanceCommand);
   }
 
   /**
