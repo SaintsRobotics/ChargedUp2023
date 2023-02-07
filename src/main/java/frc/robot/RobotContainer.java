@@ -59,12 +59,12 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
+    m_chooser.addOption("BlueBottomCharger", "BlueBottomCharger");
     m_chooser.addOption("BlueBottomTwoObject", "BlueBottomTwoObject");
-    m_chooser.addOption("BlueTopTwoObject", "BlueTopTwoObject");
     m_chooser.addOption("BlueMidBackCharger", "BlueMidBackCharger");
     m_chooser.addOption("BlueMidFrontCharger", "BlueMidFrontCharger");
     m_chooser.addOption("BlueTopCharger", "BlueTopCharger");
-    m_chooser.addOption("BlueBottomCharger", "BlueBottomCharger");
+    m_chooser.addOption("BlueTopTwoObject", "BlueTopTwoObject");
     SmartDashboard.putData(m_chooser);
   }
 
@@ -94,26 +94,26 @@ public class RobotContainer {
     }
 
     switch (path) {
+      case ("BlueBottomCharger"):
+        return new SequentialCommandGroup(
+            new PathWeaverCommand(m_robotDrive, path + "1", true));
       case ("BlueBottomTwoObject"):
         return new SequentialCommandGroup(
             new PathWeaverCommand(m_robotDrive, path + "1", true),
             new PathWeaverCommand(m_robotDrive, path + "2", false));
       case ("BlueMidBackCharger"):
         return new PathWeaverCommand(m_robotDrive, path + "1", true);
-      case ("BlueTopTwoObject"):
-        return new SequentialCommandGroup(
-            new PathWeaverCommand(m_robotDrive, path + "1", true),
-            new PathWeaverCommand(m_robotDrive, path + "2", false));
       case ("BlueMidFrontCharger"):
         return new SequentialCommandGroup(
             new PathWeaverCommand(m_robotDrive, path + "1", true),
             new PathWeaverCommand(m_robotDrive, path + "2", false));
       case ("BlueTopCharger"):
         return new SequentialCommandGroup(
-                new PathWeaverCommand(m_robotDrive, path + "1", true));
-      case ("BlueBottomCharger"):
+            new PathWeaverCommand(m_robotDrive, path + "1", true));
+      case ("BlueTopTwoObject"):
         return new SequentialCommandGroup(
-                new PathWeaverCommand(m_robotDrive, path + "1", true));
+            new PathWeaverCommand(m_robotDrive, path + "1", true),
+            new PathWeaverCommand(m_robotDrive, path + "2", false));
       default:
         return null;
     }
