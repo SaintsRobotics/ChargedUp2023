@@ -64,8 +64,8 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new JoystickButton(m_driverController, XboxController.Button.kStart.value)
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
-    new JoystickButton(m_driverController, XboxController.Button.kA.value)
-          .onTrue(m_BalanceCommand);
+    new JoystickButton(m_driverController, XboxController.Button.kY.value)
+          .whileTrue(m_BalanceCommand);
   }
 
   /**
