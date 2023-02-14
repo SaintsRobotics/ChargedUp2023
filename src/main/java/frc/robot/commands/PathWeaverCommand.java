@@ -54,7 +54,7 @@ public class PathWeaverCommand extends CommandBase {
 		}
 
 		final ProfiledPIDController rotPID = new ProfiledPIDController(
-				DriveConstants.kPRotController, 0, 0,
+				DriveConstants.kPRotController, DriveConstants.kIRotController, DriveConstants.kDRotController,
 				new TrapezoidProfile.Constraints(0, 0));
 		rotPID.enableContinuousInput(-Math.PI, Math.PI);
 
