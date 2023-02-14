@@ -61,7 +61,7 @@ public final class Constants {
     public static final double kMaxAngularAccelerationRadiansPerSecondSquared = 7;
 
     public static final double kPRotController = 6;
-    public static final double kIRotController = 0.25;
+    public static final double kIRotController = 0;
     public static final double kDRotController = 0.95;
   }
 
