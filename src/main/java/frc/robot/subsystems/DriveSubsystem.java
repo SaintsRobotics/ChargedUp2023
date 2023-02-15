@@ -95,6 +95,9 @@ public class DriveSubsystem extends SubsystemBase {
     m_field.setRobotPose(m_odometry.getPoseMeters());
 
     SmartDashboard.putNumber("gyro angle", m_gyro.getAngle());
+    SmartDashboard.putNumber("pitch", m_gyro.getPitch());
+    SmartDashboard.putNumber("yaw", m_gyro.getYaw());
+    SmartDashboard.putNumber("roll", m_gyro.getRoll());
   }
 
   /**
@@ -178,5 +181,13 @@ public class DriveSubsystem extends SubsystemBase {
   public void zeroHeading() {
     m_gyro.reset();
     m_gyroAngle = 0;
+  }
+
+  /**
+   * Gets current gyro pitch angle in degrees
+   * @return Current gyro pitch angle
+   */
+  public double getGyroPitch() {
+    return m_gyro.getRoll(); //Gyro is mounted the other way so roll is acutally pitch
   }
 }
