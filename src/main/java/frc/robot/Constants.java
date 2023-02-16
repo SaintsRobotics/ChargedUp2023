@@ -80,4 +80,6 @@ public final class Constants {
     public static final double kControllerDeadband = 0.2;
     public static final double kSlowModeScalar = 0.8;    
   }
+
+  public static final double kTurningStopTime = 0.2; //TODO: tune this
 }
