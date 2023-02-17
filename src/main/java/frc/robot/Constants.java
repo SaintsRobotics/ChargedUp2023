@@ -79,6 +79,11 @@ public final class Constants {
     public static final double kPPivotController = 0.1;
     public static final double kPElevatorController = 0.1;
 
+    public static final double kElevatorRetractedPosition = 0;
+    public static final double kElevatorExtendedPosition = 0.7;
+    public static final double kPivotBackPosition = 0;
+    public static final double kPivotForwardPosition = 0.7;
+
   }
 
   public static final class OIConstants {

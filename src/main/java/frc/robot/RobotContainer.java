@@ -12,8 +12,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.DriveElevatorCommand;
+import frc.robot.commands.PivotArmCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -71,8 +74,17 @@ public class RobotContainer {
     new JoystickButton(m_driverController, XboxController.Button.kStart.value)
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
 
-    new JoystickButton(m_driverController, XboxController.Button.kStart.value)
-        .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
+    new JoystickButton(m_operatorController, XboxController.Button.kA.value)
+        .onTrue(new DriveElevatorCommand(m_armSubsystem, ArmConstants.kElevatorExtendedPosition));
+
+    new JoystickButton(m_operatorController, XboxController.Button.kB.value)
+        .onTrue(new DriveElevatorCommand(m_armSubsystem, ArmConstants.kElevatorExtendedPosition));
+
+    new JoystickButton(m_operatorController, XboxController.Button.kY.value)
+        .onTrue(new PivotArmCommand(m_armSubsystem, ArmConstants.kPivotBackPosition));
+
+    new JoystickButton(m_operatorController, XboxController.Button.kX.value)
+        .onTrue(new PivotArmCommand(m_armSubsystem, ArmConstants.kPivotForwardPosition));
   }
 
   /**
