@@ -25,11 +25,7 @@ public class ArmSubsystem extends SubsystemBase{
   private final CANCoder m_elevatorEncoder = new CANCoder(Constants.ArmConstants.kElevatorEncoderPort);
 
 
-  private final PIDController m_pivotPIDController = new PIDController(
-      ArmConstants.kPPivotController, 0, 0);
-
-  private final PIDController m_elevatorPIDController = new PIDController(
-    ArmConstants.kPElevatorController, 0, 0);
+ 
 
 
   /**
@@ -49,11 +45,20 @@ public class ArmSubsystem extends SubsystemBase{
     
   }
 
-  public void setArmSpeed(double armSpeed) {
-    m_pivotMotor.set(armSpeed);
+  public void setPivotSpeed(double pivotSpeed) {
+    m_pivotMotor.set(pivotSpeed);
   }
 
   public void setElevatorSpeed(double elevatorSpeed) {
     m_elevatorMotor.set(elevatorSpeed);
   }
+
+  public double getPivotPosition () {
+    return m_pivotEncoder.getPosition();
+  }
+
+  public double getElevatorPosition () {
+    return m_elevatorEncoder.getPosition();
+  }
+
 }
