@@ -35,7 +35,8 @@ public class ArmSubsystem extends SubsystemBase{
    */
   
   public void ArmSubsystem() {
-
+    m_pivotSpeed = 0;
+    m_elevatorSpeed = 0;
   }
 
   @Override
@@ -45,18 +46,38 @@ public class ArmSubsystem extends SubsystemBase{
     
   }
 
+  /**
+   * Sets the speed of the arm pivot motor.
+   *
+   * @param pivotSpeed The desired speed of the motor.
+   */
   public void setPivotSpeed(double pivotSpeed) {
-    m_pivotMotor.set(pivotSpeed);
+    m_pivotSpeed = pivotSpeed;
   }
 
+  /**
+   * Sets the speed of the arm elevator motor.
+   *
+   * @param elevatorSpeed The desired speed of the elevator motor.
+   */
   public void setElevatorSpeed(double elevatorSpeed) {
-    m_elevatorMotor.set(elevatorSpeed);
+    m_elevatorSpeed = elevatorSpeed;
   }
 
+  /**
+   * Returns the encoder value of the pivot motor.
+   *
+   * @return The pivot encoder position.
+   */
   public double getPivotPosition () {
     return m_pivotEncoder.getPosition();
   }
 
+  /**
+   * Returns the encoder value of the elevator motor.
+   *
+   * @return The elevator encoder position.
+   */
   public double getElevatorPosition () {
     return m_elevatorEncoder.getPosition();
   }
