@@ -25,15 +25,11 @@ public class ArmSubsystem extends SubsystemBase{
   private final CANCoder m_elevatorEncoder = new CANCoder(Constants.ArmConstants.kElevatorEncoderPort);
 
 
- 
-
-
   /**
    * Constructs a {@link ArmSubsystem}.
    *
    * 
    */
-  
   public void ArmSubsystem() {
     m_pivotSpeed = 0;
     m_elevatorSpeed = 0;
@@ -43,7 +39,6 @@ public class ArmSubsystem extends SubsystemBase{
   public void periodic() {
     m_pivotMotor.set(m_pivotSpeed);
     m_elevatorMotor.set(m_elevatorSpeed);   
-    
   }
 
   /**
