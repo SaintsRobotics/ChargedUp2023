@@ -67,11 +67,21 @@ public final class Constants {
     public static final double kDrivingGearRatio = 8.14;
 
     public static final double kPModuleTurningController = 0.3;
+
+    
+    public static final int kArmMotorPort = 0;
+    
+    public static final int kElevatorMotorPort = 0;
+
+
   }
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
 
     public static final double kControllerDeadband = 0.2;
   }
+
+  
 }
