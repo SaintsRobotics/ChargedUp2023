@@ -5,33 +5,31 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.CANSparkMax;
-import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.kinematics.SwerveModulePosition;
-import edu.wpi.first.math.kinematics.SwerveModuleState;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ModuleConstants;
 import frc.robot.Constants;
-import frc.robot.Robot;
 
 public class ArmSubsystem extends SubsystemBase{
-  private double m_armSpeed;
+  private double m_pivotSpeed;
   private double m_elevatorSpeed;
-  private final CANSparkMax m_armMotor = new CANSparkMax(0, MotorType.kBrushless);
-  private final CANSparkMax m_elevatorMotor = new CANSparkMax(0, MotorType.kBrushless);
 
-  private final CANCoder m_armEncoder = new CANCoder(Constants.ModuleConstants.kArmMotorPort);
-  private final CANCoder m_elevatorEncoder = new CANCoder(Constants.ModuleConstants.kElevatorMotorPort);
+  private final CANSparkMax m_pivotMotor = new CANSparkMax(Constants.ArmConstants.kPivotMotorPort, MotorType.kBrushless);
+  private final CANSparkMax m_elevatorMotor = new CANSparkMax(Constants.ArmConstants.kElevatorMotorPort, MotorType.kBrushless);
+
+  private final CANCoder m_pivotEncoder = new CANCoder(Constants.ArmConstants.kPivotEncoderPort);
+  private final CANCoder m_elevatorEncoder = new CANCoder(Constants.ArmConstants.kElevatorEncoderPort);
 
 
-  private final PIDController m_armPIDController = new PIDController(
-      ModuleConstants.kPModuleTurningController, 0, 0);
+  private final PIDController m_pivotPIDController = new PIDController(
+      ArmConstants.kPPivotController, 0, 0);
+
+  private final PIDController m_elevatorPIDController = new PIDController(
+    ArmConstants.kPElevatorController, 0, 0);
 
 
   /**
@@ -46,16 +44,16 @@ public class ArmSubsystem extends SubsystemBase{
 
   @Override
   public void periodic() {
-    m_armMotor.set(m_armSpeed);
+    m_pivotMotor.set(m_pivotSpeed);
     m_elevatorMotor.set(m_elevatorSpeed);   
     
   }
 
   public void setArmSpeed(double armSpeed) {
-    m_armMotor.set(armSpeed);
+    m_pivotMotor.set(armSpeed);
   }
+
   public void setElevatorSpeed(double elevatorSpeed) {
     m_elevatorMotor.set(elevatorSpeed);
   }
-
 }

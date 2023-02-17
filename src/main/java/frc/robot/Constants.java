@@ -65,14 +65,19 @@ public final class Constants {
 
     /** Gear ratio between the motor and the wheel. */
     public static final double kDrivingGearRatio = 8.14;
-
     public static final double kPModuleTurningController = 0.3;
 
-    
-    public static final int kArmMotorPort = 0;
-    
+  }
+
+  public static final class ArmConstants {
+    public static final int kPivotMotorPort = 0;
     public static final int kElevatorMotorPort = 0;
 
+    public static final int kPivotEncoderPort = 0;
+    public static final int kElevatorEncoderPort = 0;
+
+    public static final double kPPivotController = 0.1;
+    public static final double kPElevatorController = 0.1;
 
   }
 

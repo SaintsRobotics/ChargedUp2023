@@ -35,10 +35,7 @@ public class RobotContainer {
   public RobotContainer() {
     configureButtonBindings();
 
-    m_armSubsystem.setDefaultCommand(
-
-    
-    )
+    // m_armSubsystem.setDefaultCommand();
 
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
