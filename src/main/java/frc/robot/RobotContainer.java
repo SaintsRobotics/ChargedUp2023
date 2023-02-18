@@ -4,6 +4,13 @@
 
 package frc.robot;
 
+import java.util.HashMap;
+
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -11,12 +18,10 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.commands.BalanceCommand;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.PathWeaverCommand;
+import frc.robot.commands.BalanceCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
 /*
@@ -31,6 +36,15 @@ public class RobotContainer {
   private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
+      m_robotDrive::getPose,
+      m_robotDrive::resetOdometry,
+      DriveConstants.kDriveKinematics,
+      new PIDConstants(1, 0, 0),
+      new PIDConstants(1, 0, 0),
+      m_robotDrive::setModuleStates,
+      new HashMap<>(),
+      m_robotDrive);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -81,7 +95,7 @@ public class RobotContainer {
     new JoystickButton(m_driverController, XboxController.Button.kStart.value)
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
     new JoystickButton(m_driverController, XboxController.Button.kY.value)
-          .whileTrue(m_BalanceCommand);
+        .whileTrue(m_BalanceCommand);
   }
 
   /**
@@ -99,25 +113,17 @@ public class RobotContainer {
 
     switch (path) {
       case ("BlueBottomCharger"):
-        return new SequentialCommandGroup(
-            new PathWeaverCommand(m_robotDrive, path + "1", true));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPath(path, new PathConstraints(4, 3)));
       case ("BlueBottomTwoObject"):
-        return new SequentialCommandGroup(
-            new PathWeaverCommand(m_robotDrive, path + "1", true),
-            new PathWeaverCommand(m_robotDrive, path + "2", false));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPath(path, new PathConstraints(4, 3)));
       case ("BlueMidBackCharger"):
-        return new PathWeaverCommand(m_robotDrive, path + "1", true);
+        return m_autoBuilder.fullAuto(PathPlanner.loadPath(path, new PathConstraints(4, 3)));
       case ("BlueMidFrontCharger"):
-        return new SequentialCommandGroup(
-            new PathWeaverCommand(m_robotDrive, path + "1", true),
-            new PathWeaverCommand(m_robotDrive, path + "2", false));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPath(path, new PathConstraints(4, 3)));
       case ("BlueTopCharger"):
-        return new SequentialCommandGroup(
-            new PathWeaverCommand(m_robotDrive, path + "1", true));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPath(path, new PathConstraints(4, 3)));
       case ("BlueTopTwoObject"):
-        return new SequentialCommandGroup(
-            new PathWeaverCommand(m_robotDrive, path + "1", true),
-            new PathWeaverCommand(m_robotDrive, path + "2", false));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPath(path, new PathConstraints(4, 3)));
       default:
         return null;
     }
