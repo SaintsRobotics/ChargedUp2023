@@ -19,20 +19,20 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
  */
 public final class Constants {
   public static final class DriveConstants {
-    public static final int kFrontLeftDriveMotorPort = 9;
-    public static final int kRearLeftDriveMotorPort = 12;
-    public static final int kFrontRightDriveMotorPort = 5;
-    public static final int kRearRightDriveMotorPort = 2;
+    public static final int kFrontLeftDriveMotorPort = 28;
+    public static final int kRearLeftDriveMotorPort = 27;
+    public static final int kFrontRightDriveMotorPort = 30;
+    public static final int kRearRightDriveMotorPort = 33;
 
-    public static final int kFrontLeftTurningMotorPort = 7;
-    public static final int kRearLeftTurningMotorPort = 11;
-    public static final int kFrontRightTurningMotorPort = 4;
-    public static final int kRearRightTurningMotorPort = 16;
+    public static final int kFrontLeftTurningMotorPort = 29;
+    public static final int kRearLeftTurningMotorPort = 26;
+    public static final int kFrontRightTurningMotorPort = 31;
+    public static final int kRearRightTurningMotorPort = 32;
 
-    public static final int kFrontLeftTurningEncoderPort = 19;
-    public static final int kRearLeftTurningEncoderPort = 20;
-    public static final int kFrontRightTurningEncoderPort = 18;
-    public static final int kRearRightTurningEncoderPort = 17;
+    public static final int kFrontLeftTurningEncoderPort = 3;
+    public static final int kRearLeftTurningEncoderPort = 5;
+    public static final int kFrontRightTurningEncoderPort = 4;
+    public static final int kRearRightTurningEncoderPort = 6;
 
     public static final double kFrontLeftTurningEncoderOffset = 356;
     public static final double kRearLeftTurningEncoderOffset = 122;
