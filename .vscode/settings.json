@@ -31,7 +31,9 @@
     "Brushless",
     "Deadband",
     "odometry",
+    "pathplanner",
     "teleop",
+    "wpilib",
     "wpilibj"
   ]
 }

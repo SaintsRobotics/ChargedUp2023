@@ -4,13 +4,21 @@
 
 package frc.robot;
 
-import org.opencv.core.KeyPoint;
+import java.util.HashMap;
+
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
+import com.pathplanner.lib.auto.PIDConstants;
+import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
@@ -18,6 +26,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.DriveElevatorCommand;
 import frc.robot.commands.PivotArmCommand;
 import frc.robot.subsystems.ArmSubsystem;
+import frc.robot.commands.BalanceCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
 /*
@@ -26,6 +35,7 @@ import frc.robot.subsystems.DriveSubsystem;
  * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
  * (including subsystems, commands, and button mappings) should be declared here.
  */
+
 public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
@@ -33,6 +43,20 @@ public class RobotContainer {
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
+  
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final HashMap<String, Command> m_eventMap = new HashMap<>();
+  private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
+      m_robotDrive::getPose,
+      m_robotDrive::resetOdometry,
+      DriveConstants.kDriveKinematics,
+      new PIDConstants(DriveConstants.kPTranslation, 0, 0),
+      new PIDConstants(DriveConstants.kPRotation, 0, 0),
+      m_robotDrive::setModuleStates,
+      m_eventMap,
+      m_robotDrive);
+
+  private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -45,22 +69,37 @@ public class RobotContainer {
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
+        // Holding left trigger engages slow mode
         new RunCommand(
             () -> m_robotDrive.drive(
-                inputScaling(MathUtil.applyDeadband(
+                MathUtil.applyDeadband(
                     -m_driverController.getLeftY(),
-                    OIConstants.kControllerDeadband))
-                    * DriveConstants.kMaxSpeedMetersPerSecond,
-                inputScaling(MathUtil.applyDeadband(
+                    OIConstants.kControllerDeadband)
+                    * DriveConstants.kMaxSpeedMetersPerSecond
+                    * (1 - m_driverController.getLeftTriggerAxis() * OIConstants.kSlowModeScalar),
+                MathUtil.applyDeadband(
                     -m_driverController.getLeftX(),
-                    OIConstants.kControllerDeadband))
-                    * DriveConstants.kMaxSpeedMetersPerSecond,
-                inputScaling(MathUtil.applyDeadband(
+                    OIConstants.kControllerDeadband)
+                    * DriveConstants.kMaxSpeedMetersPerSecond
+                    * (1 - m_driverController.getLeftTriggerAxis() * OIConstants.kSlowModeScalar),
+                MathUtil.applyDeadband(
                     -m_driverController.getRightX(),
-                    OIConstants.kControllerDeadband))
+                    OIConstants.kControllerDeadband)
                     * DriveConstants.kMaxAngularSpeedRadiansPerSecond,
                 !m_driverController.getRightBumper()),
             m_robotDrive));
+
+    m_chooser.addOption("BlueBottomCharger", "BlueBottomCharger");
+    m_chooser.addOption("BlueBottomTwoObject", "BlueBottomTwoObject");
+    m_chooser.addOption("BlueMidBackCharger", "BlueMidBackCharger");
+    m_chooser.addOption("BlueMidFrontCharger", "BlueMidFrontCharger");
+    m_chooser.addOption("BlueTopCharger", "BlueTopCharger");
+    m_chooser.addOption("BlueTopTwoObject", "BlueTopTwoObject");
+
+    // Sample event that triggers when BlueBottomCharger is run
+    m_eventMap.put("event", new WaitCommand(1));
+
+    SmartDashboard.putData(m_chooser);
   }
 
   /**
@@ -71,9 +110,15 @@ public class RobotContainer {
    * {@link JoystickButton}.
    */
   private void configureButtonBindings() {
+
+    // Driver Bindings
     new JoystickButton(m_driverController, XboxController.Button.kStart.value)
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
 
+    new JoystickButton(m_driverController, XboxController.Button.kY.value)
+        .whileTrue(m_BalanceCommand);
+
+    // Operator Bindings
     new JoystickButton(m_operatorController, XboxController.Button.kA.value)
         .onTrue(new DriveElevatorCommand(m_armSubsystem, ArmConstants.kElevatorExtendedPosition));
 
@@ -93,16 +138,28 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    return null;
-  }
+    String path;
+    if (m_chooser.getSelected() != null) {
+      path = m_chooser.getSelected();
+    } else {
+      return null;
+    }
 
-  /**
-   * Makes lower inputs smaller which allows for finer joystick control.
-   * 
-   * @param input The number to apply input scaling to.
-   * @return The scaled number.
-   */
-  private double inputScaling(double input) {
-    return input * Math.abs(input);
+    switch (path) {
+      case ("BlueBottomCharger"):
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(4, 3)));
+      case ("BlueBottomTwoObject"):
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(4, 3)));
+      case ("BlueMidBackCharger"):
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(4, 3)));
+      case ("BlueMidFrontCharger"):
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(4, 3)));
+      case ("BlueTopCharger"):
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(4, 3)));
+      case ("BlueTopTwoObject"):
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(4, 3)));
+      default:
+        return null;
+    }
   }
 }

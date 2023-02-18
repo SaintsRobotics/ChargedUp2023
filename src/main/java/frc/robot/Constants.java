@@ -58,6 +58,9 @@ public final class Constants {
 
     public static final double kMaxSpeedMetersPerSecond = 3.66;
     public static final double kMaxAngularSpeedRadiansPerSecond = 8.76;
+
+    public static final double kPTranslation = 5;
+    public static final double kPRotation = 5;
   }
 
   public static final class ModuleConstants {
@@ -91,7 +94,8 @@ public final class Constants {
     public static final int kOperatorControllerPort = 1;
 
     public static final double kControllerDeadband = 0.2;
+    public static final double kSlowModeScalar = 0.8;    
   }
 
-  
+  public static final double kTurningStopTime = 0.2; //TODO: tune this
 }
