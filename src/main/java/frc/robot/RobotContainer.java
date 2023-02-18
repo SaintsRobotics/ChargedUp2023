@@ -42,8 +42,8 @@ public class RobotContainer {
       m_robotDrive::getPose,
       m_robotDrive::resetOdometry,
       DriveConstants.kDriveKinematics,
-      new PIDConstants(5, 0, 0),
-      new PIDConstants(5, 0, 0),
+      new PIDConstants(DriveConstants.kPTranslation, 0, 0),
+      new PIDConstants(DriveConstants.kPRotation, 0, 0),
       m_robotDrive::setModuleStates,
       m_eventMap,
       m_robotDrive);
