@@ -40,7 +40,6 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   
-
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
   
@@ -58,6 +57,7 @@ public class RobotContainer {
 
   private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
 
+  
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
