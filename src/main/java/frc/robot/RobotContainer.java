@@ -23,10 +23,10 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.DriveElevatorCommand;
 import frc.robot.commands.PivotArmCommand;
 import frc.robot.subsystems.ArmSubsystem;
-import frc.robot.commands.BalanceCommand;
 import frc.robot.subsystems.DriveSubsystem;
 
 /*
