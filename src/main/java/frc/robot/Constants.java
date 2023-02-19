@@ -66,7 +66,7 @@ public final class Constants {
     /** Gear ratio between the motor and the wheel. */
     public static final double kDrivingGearRatio = 8.14;
 
-    public static final double kPModuleTurningController = 0.3;
+    public static final double kPModuleTurningController = -0.3;
   }
 
   public static final class OIConstants {

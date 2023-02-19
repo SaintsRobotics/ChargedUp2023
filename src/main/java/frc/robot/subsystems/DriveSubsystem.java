@@ -98,6 +98,11 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("pitch", m_gyro.getPitch());
     SmartDashboard.putNumber("yaw", m_gyro.getYaw());
     SmartDashboard.putNumber("roll", m_gyro.getRoll());
+
+    SmartDashboard.putNumber("front left encoder", m_frontLeft.getPosition().angle.getDegrees());
+    SmartDashboard.putNumber("front right encoder", m_frontRight.getPosition().angle.getDegrees());
+    SmartDashboard.putNumber("rear left encoder", m_rearLeft.getPosition().angle.getDegrees());
+    SmartDashboard.putNumber("rear right encoder", m_rearRight.getPosition().angle.getDegrees());
   }
 
   /**
