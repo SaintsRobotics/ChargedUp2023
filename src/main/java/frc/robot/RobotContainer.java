@@ -20,12 +20,12 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.BalanceCommand;
-import frc.robot.commands.DriveElevatorCommand;
-import frc.robot.commands.PivotArmCommand;
+import frc.robot.commands.ArmCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -119,17 +119,17 @@ public class RobotContainer {
         .whileTrue(m_BalanceCommand);
 
     // Operator Bindings
-    new JoystickButton(m_operatorController, XboxController.Button.kA.value)
-        .onTrue(new DriveElevatorCommand(m_armSubsystem, ArmConstants.kElevatorExtendedPosition));
+    new POVButton(m_operatorController, 0)
+        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotPickupPosition, ArmConstants.kElevatorPickupPosition)); // Forwards
 
-    new JoystickButton(m_operatorController, XboxController.Button.kB.value)
-        .onTrue(new DriveElevatorCommand(m_armSubsystem, ArmConstants.kElevatorExtendedPosition));
+    new POVButton(m_operatorController, 90)
+        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotScoringPosition, ArmConstants.kElevatorHighScoringPosition)); // Left
 
-    new JoystickButton(m_operatorController, XboxController.Button.kY.value)
-        .onTrue(new PivotArmCommand(m_armSubsystem, ArmConstants.kPivotBackPosition));
+    new POVButton(m_operatorController, 180)
+        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotRestingPosition, ArmConstants.kElevatorRestingPosition)); // Down
 
-    new JoystickButton(m_operatorController, XboxController.Button.kX.value)
-        .onTrue(new PivotArmCommand(m_armSubsystem, ArmConstants.kPivotForwardPosition));
+    new POVButton(m_operatorController, 270)
+        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotScoringPosition, ArmConstants.kElevatorMidScoringPosition)); // Right
   }
 
   /**

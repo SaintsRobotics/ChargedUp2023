@@ -9,20 +9,26 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.ArmSubsystem;
 
-public class PivotArmCommand extends CommandBase {
+public class ArmCommand extends CommandBase {
 
   private final PIDController m_pivotPIDController = new PIDController(
     ArmConstants.kPPivotController, 0, 0);
+private final PIDController m_elevatorPIDController = new PIDController(
+        ArmConstants.kPElevatorController, 0, 0);
 
   private ArmSubsystem m_armSubsystem;
+
   private double m_pivotSetpoint;
+  private double m_elevatorSetpoint;
 
   /** Creates a new DriveElevatorCommand. */
-  public PivotArmCommand(ArmSubsystem armSubsystem, double setpoint) {
+  public ArmCommand(ArmSubsystem armSubsystem, double pivotSetpoint, double elevatorSetpoint) {
     // Use addRequirements() here to declare subsystem dependencies.
     m_armSubsystem = armSubsystem;
     addRequirements(armSubsystem);
-    m_pivotSetpoint = setpoint;
+
+    m_pivotSetpoint = pivotSetpoint;
+    m_elevatorSetpoint = elevatorSetpoint;
   }
 
   // Called when the command is initially scheduled.
@@ -30,6 +36,9 @@ public class PivotArmCommand extends CommandBase {
   public void initialize() {
     m_pivotPIDController.setTolerance(0.1);
     m_pivotPIDController.setSetpoint(m_pivotSetpoint);
+
+    m_elevatorPIDController.setTolerance(0.1);
+    m_elevatorPIDController.setSetpoint(m_elevatorSetpoint);
   }
 
   // Called every time the scheduler runs while the command is scheduled.

@@ -82,10 +82,14 @@ public final class Constants {
     public static final double kPPivotController = 0.1;
     public static final double kPElevatorController = 0.1;
 
-    public static final double kElevatorRetractedPosition = 0;
-    public static final double kElevatorExtendedPosition = 0.7;
-    public static final double kPivotBackPosition = 0;
-    public static final double kPivotForwardPosition = 0.7;
+    // 3 pivot positions, 4 elevator positions // TODO update arm position values
+    public static final double kPivotRestingPosition = 0;
+    public static final double kPivotScoringPosition = 0.75;
+    public static final double kPivotPickupPosition = 0.5;
+    public static final double kElevatorRestingPosition = 0;
+    public static final double kElevatorMidScoringPosition = 0.25;
+    public static final double kElevatorHighScoringPosition = 0.75;
+    public static final double kElevatorPickupPosition = 0.5;
 
   }
 
@@ -97,5 +101,5 @@ public final class Constants {
     public static final double kSlowModeScalar = 0.8;    
   }
 
-  public static final double kTurningStopTime = 0.2; //TODO: tune this
+  public static final double kTurningStopTime = 0.2; //TODO: tune heading correction stop time
 }
