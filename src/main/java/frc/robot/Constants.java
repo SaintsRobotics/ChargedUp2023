@@ -72,8 +72,17 @@ public final class Constants {
     public static final double kPModuleTurningController = 0.3;
   }
 
+  public static final class GrabberConstants {
+    public static final int kIntakeLeftSolenoidPort = 0;
+        public static final int kIntakeRightSolenoidPort = 1;
+        public static final int kPneumaticsHubID = 2; 
+
+        public static final int kCompressorModuleID = 1;
+  }
+
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorcontrollerPort = 1;
 
     public static final double kControllerDeadband = 0.2;
     public static final double kSlowModeScalar = 0.8;    
