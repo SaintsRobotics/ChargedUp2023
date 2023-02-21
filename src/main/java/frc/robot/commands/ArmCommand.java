@@ -12,9 +12,9 @@ import frc.robot.subsystems.ArmSubsystem;
 public class ArmCommand extends CommandBase {
 
   private final PIDController m_pivotPIDController = new PIDController(
-    ArmConstants.kPPivotController, 0, 0);
-private final PIDController m_elevatorPIDController = new PIDController(
-        ArmConstants.kPElevatorController, 0, 0);
+      ArmConstants.kPPivotController, 0, 0);
+  private final PIDController m_elevatorPIDController = new PIDController(
+      ArmConstants.kPElevatorController, 0, 0);
 
   private ArmSubsystem m_armSubsystem;
 
@@ -44,19 +44,20 @@ private final PIDController m_elevatorPIDController = new PIDController(
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    m_armSubsystem.setPivotSpeed(m_pivotPIDController.calculate(m_armSubsystem.getPivotPosition(), m_pivotSetpoint));
+    m_armSubsystem.setArmSpeeds(m_pivotPIDController.calculate(m_armSubsystem.getPivotPosition(), m_pivotSetpoint),
+        m_elevatorPIDController.calculate(m_armSubsystem.getElevatorPosition(), m_elevatorSetpoint));
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_armSubsystem.setPivotSpeed(0);
+    m_armSubsystem.setArmSpeeds(0, 0);
   }
 
   // Returns true when the command should end.
   @Override
   public boolean isFinished() {
-    return m_pivotPIDController.atSetpoint();
+    return (m_pivotPIDController.atSetpoint() && m_elevatorPIDController.atSetpoint());
   }
 }
 
