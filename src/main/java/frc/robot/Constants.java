@@ -4,8 +4,14 @@
 
 package frc.robot;
 
+import java.io.IOException;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -76,8 +82,32 @@ public final class Constants {
     public static final int kDriverControllerPort = 0;
 
     public static final double kControllerDeadband = 0.2;
-    public static final double kSlowModeScalar = 0.8;    
+    public static final double kSlowModeScalar = 0.8;
   }
 
-  public static final double kTurningStopTime = 0.2; //TODO: tune this
+  public static final double kTurningStopTime = 0.2; // TODO: tune this
+
+  public static final class VisionConstants {
+
+    // X and Y are from true center of the robot, Angle is from front of the robot.
+    public static final Translation3d kCameraOffset = new Translation3d(1, 1, 1); // TODO adjust these values
+    public static final double camXOffsetMeters = 0; // TODO: measure this (from true center of robot)
+    public static final double camYOffsetMeters = 0; // TODO: measure this (from true center of robot)
+    public static final double camAngleOffsetRadians = 0; // TODO: measure this (from front of robot, counterclockwise
+                                                          // is positive)
+
+    public static final AprilTagFieldLayout kAprilTagFieldLayout = loadFieldLayout();
+
+    // Need this method to catch error thrown by AprilTagFieldLayout because it
+    // complains about the file path
+    private static AprilTagFieldLayout loadFieldLayout() {
+      try {
+        return AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+      } catch (IOException ioe) {
+        DriverStation.reportError("Failed to load AprilTagFieldLayout, no vision estimation available",
+            ioe.getStackTrace());
+        return null;
+      }
+    }
+  }
 }
