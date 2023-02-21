@@ -77,10 +77,13 @@ public final class Constants {
     public static final int kElevatorMotorPort = 0;
 
     public static final int kPivotEncoderPort = 0;
-    public static final int kElevatorEncoderPort = 0;
+    public static final int kElevatorEncoderPort = 0; // TODO update to 4 limit switches
 
     public static final double kPPivotController = 0.1;
     public static final double kPElevatorController = 0.1;
+
+    public static final double kMaxPivotSpeedMetersPerSecond = 0.25;
+    public static final double kMaxElevatorSpeedMetersPerSecond = 0.25;
 
     // 3 pivot positions, 4 elevator positions // TODO update arm position values
     public static final double kPivotRestingPosition = 0;

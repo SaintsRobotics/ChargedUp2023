@@ -24,8 +24,8 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.ArmCommand;
+import frc.robot.commands.BalanceCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 
@@ -39,10 +39,10 @@ import frc.robot.subsystems.DriveSubsystem;
 public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
-  
+
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
-  
+
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
@@ -57,7 +57,6 @@ public class RobotContainer {
 
   private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
 
-  
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
    */
@@ -88,6 +87,19 @@ public class RobotContainer {
                     * DriveConstants.kMaxAngularSpeedRadiansPerSecond,
                 !m_driverController.getRightBumper()),
             m_robotDrive));
+
+    m_armSubsystem.setDefaultCommand(
+        new RunCommand(
+            () -> m_armSubsystem.setArmSpeeds(
+                MathUtil.applyDeadband(
+                    -m_operatorController.getLeftY(),
+                    OIConstants.kControllerDeadband)
+                    * ArmConstants.kMaxPivotSpeedMetersPerSecond,
+                MathUtil.applyDeadband(
+                    -m_operatorController.getRightY(),
+                    OIConstants.kControllerDeadband)
+                    * ArmConstants.kMaxElevatorSpeedMetersPerSecond),
+            m_armSubsystem));
 
     m_chooser.addOption("BlueBottomCharger", "BlueBottomCharger");
     m_chooser.addOption("BlueBottomTwoObject", "BlueBottomTwoObject");
@@ -120,16 +132,20 @@ public class RobotContainer {
 
     // Operator Bindings
     new POVButton(m_operatorController, 0)
-        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotPickupPosition, ArmConstants.kElevatorPickupPosition)); // Forwards
+        .onTrue(
+            new ArmCommand(m_armSubsystem, ArmConstants.kPivotPickupPosition, ArmConstants.kElevatorPickupPosition)); // Forwards
 
     new POVButton(m_operatorController, 90)
-        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotScoringPosition, ArmConstants.kElevatorHighScoringPosition)); // Left
+        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotScoringPosition,
+            ArmConstants.kElevatorHighScoringPosition)); // Left
 
     new POVButton(m_operatorController, 180)
-        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotRestingPosition, ArmConstants.kElevatorRestingPosition)); // Down
+        .onTrue(
+            new ArmCommand(m_armSubsystem, ArmConstants.kPivotRestingPosition, ArmConstants.kElevatorRestingPosition)); // Down
 
     new POVButton(m_operatorController, 270)
-        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotScoringPosition, ArmConstants.kElevatorMidScoringPosition)); // Right
+        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotScoringPosition,
+            ArmConstants.kElevatorMidScoringPosition)); // Right
   }
 
   /**
