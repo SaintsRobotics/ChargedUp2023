@@ -90,11 +90,10 @@ public final class Constants {
   public static final class VisionConstants {
 
     // X and Y are from true center of the robot, Angle is from front of the robot.
-    public static final Translation3d kCameraOffset = new Translation3d(1, 1, 1); // TODO adjust these values
-    public static final double camXOffsetMeters = 0; // TODO: measure this (from true center of robot)
-    public static final double camYOffsetMeters = 0; // TODO: measure this (from true center of robot)
-    public static final double camAngleOffsetRadians = 0; // TODO: measure this (from front of robot, counterclockwise
-                                                          // is positive)
+    public static final Translation3d kCameraOffset = new Translation3d(1, 1, 1); // TODO adjust vision offset values
+    public static final double camXOffsetMeters = 0; // from true center of robot
+    public static final double camYOffsetMeters = 0; // from true center of robot
+    public static final double camAngleOffsetRadians = 0; // from front of robot, counterclockwise is positive
 
     public static final AprilTagFieldLayout kAprilTagFieldLayout = loadFieldLayout();
 
