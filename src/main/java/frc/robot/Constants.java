@@ -8,6 +8,8 @@ import java.io.IOException;
 
 import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
@@ -89,11 +91,11 @@ public final class Constants {
 
   public static final class VisionConstants {
 
+    public static final String kCameraName = "Microsoft_LifeCam_HD-3000";
+
     // X and Y are from true center of the robot, Angle is from front of the robot.
-    public static final Translation3d kCameraOffset = new Translation3d(1, 1, 1); // TODO adjust vision offset values
-    public static final double camXOffsetMeters = 0; // from true center of robot
-    public static final double camYOffsetMeters = 0; // from true center of robot
-    public static final double camAngleOffsetRadians = 0; // from front of robot, counterclockwise is positive
+    public static final Transform3d kCameraOffset = new Transform3d(new Translation3d(0.5, 0, 0.5), new Rotation3d(0, 0, 0)); 
+    // Currently set as cam mounted facing forward, half a meter forward of center, half a meter up from center. // TODO adjust vision offset values
 
     public static final AprilTagFieldLayout kAprilTagFieldLayout = loadFieldLayout();
 
