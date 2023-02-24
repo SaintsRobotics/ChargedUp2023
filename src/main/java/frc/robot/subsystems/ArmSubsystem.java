@@ -27,9 +27,12 @@ public class ArmSubsystem extends SubsystemBase {
   private final DigitalInput m_midPosLimit = new DigitalInput(ArmConstants.kMidLimitPort);
   private final DigitalInput m_stationPosLimit = new DigitalInput(ArmConstants.kStationLimitPort);
 
-  private Boolean useLimitSwitch = true; //If the operator uses a non zero manual elevator speed then stop the PID
+  private Boolean useLimitSwitch = true; //If the operator uses a non zero manual elevator speed then stop trying to reach targetEH
+  
+  //Desired states for limit switches
   private int targetEH = ArmConstants.kRestingEH;
   
+  //PID for correcting arm angle (both when changing pivot and to counteract gravity)
   private final PIDController m_pivotPID = new PIDController(0, 0, 0); //TODO: tune this
 
   /**
@@ -46,14 +49,15 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+
+    //Correct arm angle
     m_pivotMotor.set(m_pivotPID.calculate(m_pivotEncoder.getAbsolutePosition()) * ArmConstants.kMaxPivotSpeedPercent);
-    
     
     if (useLimitSwitch){
       if (getEH() >= targetEH) //Higher then desired target
         m_elevatorMotor.set(-ArmConstants.kArmDriveSpeedPercent);
 
-      else //Lowe than target
+      else //Lower than target
         m_elevatorMotor.set(ArmConstants.kArmDriveSpeedPercent);
     }
   }
@@ -65,11 +69,11 @@ public class ArmSubsystem extends SubsystemBase {
    * @return The Hash form of the switches' state
    */
   private int getEH(){
-    return 
-      (m_restingPosLimit.get() ? 0b1000 : 0) + 
+    return //NOTE: lower values must correspond to less extended limit switches
+      (m_restingPosLimit.get() ? 0b1000 : 0) +  //Least extended limit switch
       (m_midPosLimit.get() ? 0b0100 : 0) +
       (m_topPosLimit.get() ? 0b0010 : 0) +
-      (m_stationPosLimit.get() ? 0b0001 : 0);
+      (m_stationPosLimit.get() ? 0b0001 : 0); //Most extended limit switch
   }
 
   /**
@@ -123,6 +127,7 @@ public class ArmSubsystem extends SubsystemBase {
     m_pivotMotor.set(pivotSpeed);
     m_elevatorMotor.set(elevatorSpeed);
 
+    //Set new setpoint for arm angle if we are no longer moving the arm pivot
     if (pivotSpeed == 0) m_pivotPID.setSetpoint(m_pivotEncoder.getAbsolutePosition());
   }
 }

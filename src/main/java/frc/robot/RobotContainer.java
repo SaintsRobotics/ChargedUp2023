@@ -62,8 +62,6 @@ public class RobotContainer {
   public RobotContainer() {
     configureButtonBindings();
 
-    // m_armSubsystem.setDefaultCommand();
-
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
@@ -87,6 +85,8 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
+    //Left stick y axis controls pivot
+    //Right stick y axis controls extension
     m_armSubsystem.setDefaultCommand(
         new RunCommand(
             () -> m_armSubsystem.setArmSpeeds(
