@@ -24,7 +24,6 @@ import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.ArmCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -94,11 +93,11 @@ public class RobotContainer {
                 MathUtil.applyDeadband(
                     -m_operatorController.getLeftY(),
                     OIConstants.kControllerDeadband)
-                    * ArmConstants.kMaxPivotSpeedMetersPerSecond,
+                    * ArmConstants.kMaxPivotSpeedPercent,
                 MathUtil.applyDeadband(
                     -m_operatorController.getRightY(),
                     OIConstants.kControllerDeadband)
-                    * ArmConstants.kMaxElevatorSpeedMetersPerSecond),
+                    * ArmConstants.kMaxElevatorSpeedPercent),
             m_armSubsystem));
 
     m_chooser.addOption("BlueBottomCharger", "BlueBottomCharger");
@@ -133,19 +132,19 @@ public class RobotContainer {
     // Operator Bindings
     new POVButton(m_operatorController, 0)
         .onTrue(
-            new ArmCommand(m_armSubsystem, ArmConstants.kPivotPickupPosition, ArmConstants.kElevatorPickupPosition)); // Forwards
+          new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up - Station
 
     new POVButton(m_operatorController, 90)
-        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotScoringPosition,
-            ArmConstants.kElevatorHighScoringPosition)); // Left
+        .onTrue(
+          new InstantCommand(m_armSubsystem::goTop, m_armSubsystem)); // Left - Top
 
     new POVButton(m_operatorController, 180)
         .onTrue(
-            new ArmCommand(m_armSubsystem, ArmConstants.kPivotRestingPosition, ArmConstants.kElevatorRestingPosition)); // Down
+          new InstantCommand(m_armSubsystem::goResting, m_armSubsystem)); // Down - Resting
 
     new POVButton(m_operatorController, 270)
-        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotScoringPosition,
-            ArmConstants.kElevatorMidScoringPosition)); // Right
+        .onTrue(
+          new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
   }
 
   /**

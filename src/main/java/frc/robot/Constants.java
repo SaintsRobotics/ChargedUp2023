@@ -73,27 +73,30 @@ public final class Constants {
   }
 
   public static final class ArmConstants {
-    public static final int kPivotMotorPort = 0;
+    public static final int kPivotMotorPort = 0; //TODO: put correct values
     public static final int kElevatorMotorPort = 0;
+    public static final int kPivotShaftEncoderPort = 0;
+    public static final double kEncoderOffset = 0;
 
-    public static final int kPivotEncoderPort = 0;
-    public static final int kElevatorEncoderPort = 0; // TODO update to 4 limit switches
+    public static final int kRestingLimitPort = 0; //TODO: put correct values
+    public static final int kTopLimitPort = 0;
+    public static final int kMidLimitPort = 0;
+    public static final int kStationLimitPort = 0;
 
-    public static final double kPPivotController = 0.1;
-    public static final double kPElevatorController = 0.1;
+    public static final double kMaxPivotSpeedPercent = 0.25;
+    public static final double kMaxElevatorSpeedPercent = 0.25;
 
-    public static final double kMaxPivotSpeedMetersPerSecond = 0.25;
-    public static final double kMaxElevatorSpeedMetersPerSecond = 0.25;
+    public static final double kArmDriveSpeedPercent = 0.2; //Use a low value so that we don't overshoot TODO: tune this
 
-    // 3 pivot positions, 4 elevator positions // TODO update arm position values
-    public static final double kPivotRestingPosition = 0;
-    public static final double kPivotScoringPosition = 0.75;
-    public static final double kPivotPickupPosition = 0.5;
-    public static final double kElevatorRestingPosition = 0;
-    public static final double kElevatorMidScoringPosition = 0.25;
-    public static final double kElevatorHighScoringPosition = 0.75;
-    public static final double kElevatorPickupPosition = 0.5;
+    public static final double kRestingPivot = 0; //TODO: put correct values;
+    public static final double kMidPivot = 0;
+    public static final double kTopPivot = 0;
+    public static final double kStationPivot = 0;
 
+    public static final int kRestingEH = 0b1000;
+    public static final int kMidEH = 0b1100;
+    public static final int kTopEH = 0b1110;
+    public static final int kStationEH = 0b1111;
   }
 
   public static final class OIConstants {
