@@ -190,4 +190,14 @@ public class DriveSubsystem extends SubsystemBase {
   public double getGyroPitch() {
     return m_gyro.getRoll(); //Gyro is mounted the other way so roll is acutally pitch
   }
+  public void DisableCamera(){ //TODO: 
+    //When auton is running disable this, so that odometry wont be reset during auton when we run red paths 
+
+  }
+
+  public void EnableCamera(){
+    //When auton is ended reenable the camera 
+  }  
+
+
 }

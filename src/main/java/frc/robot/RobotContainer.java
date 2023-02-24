@@ -12,6 +12,9 @@ import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -40,6 +43,8 @@ public class RobotContainer {
   private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final SendableChooser<String> m_colorChooser = new SendableChooser<>();
+
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
       m_robotDrive::getPose,
@@ -80,6 +85,10 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
+
+     m_colorChooser.addOption("BlueBottomTwoObject", "BlueBottomTwoObject"); 
+     m_colorChooser.addOption("RedBottomTwoObject", "RedBottomTwoObject");
+
     m_chooser.addOption("BlueBottomCharger", "BlueBottomCharger");
     m_chooser.addOption("BlueBottomTwoObject", "BlueBottomTwoObject");
     m_chooser.addOption("BlueMidBackCharger", "BlueMidBackCharger");
@@ -116,11 +125,25 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    String color;
+    if (m_colorChooser.getSelected() != null) {
+      color = m_colorChooser.getSelected();
+    } else {
+      return null;
+
     String path;
     if (m_chooser.getSelected() != null) {
       path = m_chooser.getSelected();
     } else {
       return null;
+    }
+
+    switch (color) {
+      case ("BlueBottomTwoObject"):
+        m_robotDrive.resetOdometry(new Pose2d(new Translation2d(2.20, 0.49), new Rotation2d(180)));
+      case ("RedBottomTwoObject"):
+        m_robotDrive.resetOdometry(new Pose2d(new Translation2d(14.34175, 0.49), new Rotation2d(0)));
+
     }
 
     switch (path) {
@@ -153,3 +176,5 @@ public class RobotContainer {
     }
   }
 }
+
+

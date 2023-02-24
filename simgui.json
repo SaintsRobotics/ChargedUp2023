@@ -19,6 +19,9 @@
     }
   },
   "NetworkTables": {
+    "Transitory Values": {
+      "open": false
+    },
     "transitory": {
       "SmartDashboard": {
         "Field": {
