@@ -85,8 +85,8 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
-    //Left stick y axis controls pivot
-    //Right stick y axis controls extension
+    // Left stick y axis controls pivot
+    // Right stick y axis controls extension
     m_armSubsystem.setDefaultCommand(
         new RunCommand(
             () -> m_armSubsystem.setArmSpeeds(
@@ -132,19 +132,19 @@ public class RobotContainer {
     // Operator Bindings
     new POVButton(m_operatorController, 0)
         .onTrue(
-          new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up - Station
+            new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up - Station
 
     new POVButton(m_operatorController, 90)
         .onTrue(
-          new InstantCommand(m_armSubsystem::goTop, m_armSubsystem)); // Left - Top
+            new InstantCommand(m_armSubsystem::goTop, m_armSubsystem)); // Left - Top
 
     new POVButton(m_operatorController, 180)
         .onTrue(
-          new InstantCommand(m_armSubsystem::goResting, m_armSubsystem)); // Down - Resting
+            new InstantCommand(m_armSubsystem::goResting, m_armSubsystem)); // Down - Resting
 
     new POVButton(m_operatorController, 270)
         .onTrue(
-          new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
+            new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
   }
 
   /**

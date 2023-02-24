@@ -5,7 +5,6 @@
 package frc.robot.subsystems;
 
 import com.ctre.phoenix.sensors.CANCoder;
-import com.ctre.phoenix.sensors.SensorTimeBase;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
@@ -20,20 +19,20 @@ public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax m_elevatorMotor = new CANSparkMax(ArmConstants.kElevatorMotorPort,
       MotorType.kBrushless);
 
-  private final CANCoder m_pivotEncoder = new CANCoder(ArmConstants.kPivotShaftEncoderPort);
+  private final CANCoder m_pivotEncoder = new CANCoder(ArmConstants.kPivotEncoderPort);
 
   private final DigitalInput m_restingPosLimit = new DigitalInput(ArmConstants.kRestingLimitPort);
   private final DigitalInput m_topPosLimit = new DigitalInput(ArmConstants.kTopLimitPort);
   private final DigitalInput m_midPosLimit = new DigitalInput(ArmConstants.kMidLimitPort);
   private final DigitalInput m_stationPosLimit = new DigitalInput(ArmConstants.kStationLimitPort);
 
-  private Boolean useLimitSwitch = true; //If the operator uses a non zero manual elevator speed then stop trying to reach targetEH
-  
-  //Desired states for limit switches
+  private Boolean useLimitSwitch = true; // If the operator uses a non zero manual elevator speed then stop trying to reach targetEH
+
+  // Desired states for limit switches
   private int targetEH = ArmConstants.kRestingEH;
-  
-  //PID for correcting arm angle (both when changing pivot and to counteract gravity)
-  private final PIDController m_pivotPID = new PIDController(0, 0, 0); //TODO: tune this
+
+  // PID for correcting arm angle (both when changing pivot and to counteract gravity)
+  private final PIDController m_pivotPID = new PIDController(0, 0, 0); // TODO: tune pivot PID controller
 
   /**
    * Constructs a {@link ArmSubsystem}.
@@ -43,43 +42,47 @@ public class ArmSubsystem extends SubsystemBase {
   public ArmSubsystem() {
     m_pivotPID.enableContinuousInput(-Math.PI, Math.PI);
 
-    m_pivotEncoder.configFeedbackCoefficient(Math.toRadians(0.087890625), "radians", SensorTimeBase.PerSecond);
     m_pivotEncoder.configMagnetOffset(ArmConstants.kEncoderOffset);
   }
 
   @Override
   public void periodic() {
 
-    //Correct arm angle
+    // Correct arm angle
     m_pivotMotor.set(m_pivotPID.calculate(m_pivotEncoder.getAbsolutePosition()) * ArmConstants.kMaxPivotSpeedPercent);
-    
-    if (useLimitSwitch){
-      if (getEH() >= targetEH) //Higher then desired target
-        m_elevatorMotor.set(-ArmConstants.kArmDriveSpeedPercent);
 
-      else //Lower than target
+    if (useLimitSwitch) {
+      if (getEH() >= targetEH) { // Higher than desired target
+        m_elevatorMotor.set(-ArmConstants.kArmDriveSpeedPercent);
+      }
+
+      else { // Lower than target
         m_elevatorMotor.set(ArmConstants.kArmDriveSpeedPercent);
+      }
     }
   }
 
   /**
    * Get the status of all the limit switches in a hash form
-   * The hash form has 1 bit for every limit switch with the first being resting, second being mid, third being top,
-   * fourth being station. The first bit has a place value of 8 and the final has a value of 1
-   * @return The Hash form of the switches' state
+   * The hash form has 1 bit for every limit switch with the first being resting,
+   * second being mid, third being top,
+   * fourth being station. The first bit has a place value of 8 and the final has
+   * a value of 1
+   * 
+   * @return The hash form of the switches' state
    */
-  private int getEH(){
-    return //NOTE: lower values must correspond to less extended limit switches
-      (m_restingPosLimit.get() ? 0b1000 : 0) +  //Least extended limit switch
-      (m_midPosLimit.get() ? 0b0100 : 0) +
-      (m_topPosLimit.get() ? 0b0010 : 0) +
-      (m_stationPosLimit.get() ? 0b0001 : 0); //Most extended limit switch
+  private int getEH() {
+    return // NOTE: lower values must correspond to less extended limit switches
+    (m_restingPosLimit.get() ? 0b1000 : 0) + // Least extended limit switch
+        (m_midPosLimit.get() ? 0b0100 : 0) +
+        (m_topPosLimit.get() ? 0b0010 : 0) +
+        (m_stationPosLimit.get() ? 0b0001 : 0); // Most extended limit switch
   }
 
   /**
    * Makes the arm go into resting position
    */
-  public void goResting(){
+  public void goResting() {
     useLimitSwitch = true;
     m_pivotPID.setSetpoint(ArmConstants.kRestingPivot);
     targetEH = ArmConstants.kRestingEH;
@@ -88,7 +91,7 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * Makes the arm go into top position
    */
-  public void goTop(){
+  public void goTop() {
     useLimitSwitch = true;
     m_pivotPID.setSetpoint(ArmConstants.kTopPivot);
     targetEH = ArmConstants.kTopEH;
@@ -97,7 +100,7 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * Makes the arm go into mid position
    */
-  public void goMid(){
+  public void goMid() {
     useLimitSwitch = true;
     m_pivotPID.setSetpoint(ArmConstants.kMidPivot);
     targetEH = ArmConstants.kMidEH;
@@ -106,7 +109,7 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * Makes the arm go into station position
    */
-  public void goStation(){
+  public void goStation() {
     useLimitSwitch = true;
     m_pivotPID.setSetpoint(ArmConstants.kStationPivot);
     targetEH = ArmConstants.kStationEH;
@@ -115,19 +118,23 @@ public class ArmSubsystem extends SubsystemBase {
   /**
    * Sets the speeds of the arm elevator and pivot motors.
    *
-   * @param pivotSpeed The desired speed (in percent) of the pivot motor.
+   * @param pivotSpeed    The desired speed (in percent) of the pivot motor.
    * @param elevatorSpeed The desired speed (in percent) of the elevator motor.
    */
   public void setArmSpeeds(double pivotSpeed, double elevatorSpeed) {
 
-    //Don't adjust arm if no input (use limit switch instead)
-    if (pivotSpeed == 0 && elevatorSpeed == 0) return;
+    // Don't adjust arm if no input (use limit switch instead)
+    if (pivotSpeed == 0 && elevatorSpeed == 0) {
+      return;
+    }
 
     useLimitSwitch = false;
     m_pivotMotor.set(pivotSpeed);
     m_elevatorMotor.set(elevatorSpeed);
 
-    //Set new setpoint for arm angle if we are no longer moving the arm pivot
-    if (pivotSpeed == 0) m_pivotPID.setSetpoint(m_pivotEncoder.getAbsolutePosition());
+    // Set new setpoint for arm angle if we are no longer moving the arm pivot
+    if (pivotSpeed == 0) {
+      m_pivotPID.setSetpoint(Math.toRadians(m_pivotEncoder.getAbsolutePosition()));
+    }
   }
 }

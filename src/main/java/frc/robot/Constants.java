@@ -73,12 +73,12 @@ public final class Constants {
   }
 
   public static final class ArmConstants {
-    public static final int kPivotMotorPort = 0; //TODO: put correct values
+    public static final int kPivotMotorPort = 0; // TODO: fix arm ports
     public static final int kElevatorMotorPort = 0;
-    public static final int kPivotShaftEncoderPort = 0;
+    public static final int kPivotEncoderPort = 0;
     public static final double kEncoderOffset = 0;
 
-    public static final int kRestingLimitPort = 0; //TODO: put correct values
+    public static final int kRestingLimitPort = 0;
     public static final int kTopLimitPort = 0;
     public static final int kMidLimitPort = 0;
     public static final int kStationLimitPort = 0;
@@ -86,9 +86,9 @@ public final class Constants {
     public static final double kMaxPivotSpeedPercent = 0.25;
     public static final double kMaxElevatorSpeedPercent = 0.25;
 
-    public static final double kArmDriveSpeedPercent = 0.2; //Use a low value so that we don't overshoot TODO: tune this
+    public static final double kArmDriveSpeedPercent = 0.2; // Use a low value so that we don't overshoot
 
-    public static final double kRestingPivot = 0; //TODO: put correct values;
+    public static final double kRestingPivot = 0; // TODO: find correct angle values for pivot
     public static final double kMidPivot = 0;
     public static final double kTopPivot = 0;
     public static final double kStationPivot = 0;
@@ -104,8 +104,8 @@ public final class Constants {
     public static final int kOperatorControllerPort = 1;
 
     public static final double kControllerDeadband = 0.2;
-    public static final double kSlowModeScalar = 0.8;    
+    public static final double kSlowModeScalar = 0.8;
   }
 
-  public static final double kTurningStopTime = 0.2; //TODO: tune heading correction stop time
+  public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
 }
