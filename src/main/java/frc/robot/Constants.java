@@ -80,4 +80,12 @@ public final class Constants {
   }
 
   public static final double kTurningStopTime = 0.2; //TODO: tune this
+
+  public static final class AutonConstants { //TODO: tune these
+    public static final int maxVelocity = 4;
+    public static final int maxAcceleration = 3; 
+
+
+  } 
+
 }

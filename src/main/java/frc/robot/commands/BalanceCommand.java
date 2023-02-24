@@ -7,7 +7,7 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 public class BalanceCommand extends CommandBase {
 
     private double m_tolerance = 3.5; // degrees
-    private final PIDController m_balancePID = new PIDController(-0.025, 0, 0);
+    private final PIDController m_balancePID = new PIDController(-0.025, 0, 0); //Previous -0.025
 
     private DriveSubsystem m_driveSubsystem;
 
