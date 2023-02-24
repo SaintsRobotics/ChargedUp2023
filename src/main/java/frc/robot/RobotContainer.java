@@ -102,6 +102,8 @@ public class RobotContainer {
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
     new JoystickButton(m_driverController, XboxController.Button.kY.value)
         .whileTrue(m_BalanceCommand);
+    new JoystickButton(m_driverController, XboxController.Button.kLeftBumper.value)
+      .onTrue(new InstantCommand(m_robotDrive::snapTo90, m_robotDrive));
   }
 
   /**
