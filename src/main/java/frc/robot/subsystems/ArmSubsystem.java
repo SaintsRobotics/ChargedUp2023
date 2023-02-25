@@ -17,7 +17,7 @@ import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax m_pivotMotor = new CANSparkMax(ArmConstants.kPivotMotorPort,
-      MotorType.kBrushless);
+      MotorType.kBrushless); // TODO TEST IF ELEVATOR AND PIVOT MOTORS NEED TO BE INVERTED
   private final CANSparkMax m_elevatorMotor = new CANSparkMax(ArmConstants.kElevatorMotorPort,
       MotorType.kBrushless);
 
@@ -26,59 +26,44 @@ public class ArmSubsystem extends SubsystemBase {
   private final DigitalInput m_minLimit = new DigitalInput(ArmConstants.kMinLimitPort);
   private final DigitalInput m_maxLimit = new DigitalInput(ArmConstants.kMaxLimitPort);
 
-  // PID for correcting arm angle (both when changing pivot and to counteract gravity)
+  // PID for correcting arm angle (both when changing pivot and to counteract
+  // gravity)
   private final PIDController m_pivotPID = new PIDController(0, 0, 0); // TODO: tune arm PID controllers
   private final PIDController m_elevatorPID = new PIDController(0, 0, 0);
 
-  private boolean seenSwitch = false; //Elevator won't move down until we see the switch
-  private final boolean m_initArmPos; //Whether or not to move arm above limit switch on initilization
+  private boolean seenSwitch = false; // Elevator won't move down until we see the switch
+  private double m_encoderOffset = 0; // Encoder offset, updtated whenever a limit switch goes HIGH, in meters
+  private double m_elevatorSpeed = 0;
 
-  private double eco = 0; //Encoder Correction Offset, updtated whenever a limit switch goes HIGH
-  
   /**
    * Constructs a {@link ArmSubsystem}.
-   *  Does not move arm above limit switch automatically and always moves arm to resting position
+   * Does not move arm above limit switch automatically and always moves arm to
+   * resting position
    * 
    */
   public ArmSubsystem() {
     m_pivotPID.enableContinuousInput(-Math.PI, Math.PI);
     m_pivotEncoder.configMagnetOffset(-ArmConstants.kPEncoderOffset);
-    
+
     m_elevatorPID.setSetpoint(ArmConstants.kRestingPos);
     m_pivotPID.setSetpoint(ArmConstants.kRestingPivot);
-
-    m_initArmPos = false;
   }
 
   /**
-   * Subsystem constructer but with more options
-   * @param initArmPos Whether or not to move arm above limit switch on init
-   * @param armPos Starting arm pos, a negative value will use the default (resting position)
-   * @param pivot Starting pivot, a negative value will use the default (resting position)
-   */
-  public ArmSubsystem(boolean initArmPos, double armPos, double pivot){
-    m_pivotPID.enableContinuousInput(-Math.PI, Math.PI);
-    m_pivotEncoder.configMagnetOffset(-ArmConstants.kPEncoderOffset);
-    
-    m_elevatorPID.setSetpoint(armPos < 0 ? ArmConstants.kRestingPos : armPos);
-    m_pivotPID.setSetpoint(pivot < 0 ? ArmConstants.kRestingPivot : pivot);
-
-    m_initArmPos = initArmPos;
-  }
-
-  /**
-   * Converts elevator encoder value to meters
-   * @param in Number of rotations motor has made
+   * Converts elevator spark max encoder value to meters
+   * 
+   * @param encoderValue Number of rotations motor has made
    * @return Current elevator position in meters
    */
-  private double encoder2meters(double in){
-    //4:1 gear ratio
-    //22 tooth sproket
-    //1/4 inch chain
-    //39.37 inches in a meter
-    //rotation * 4 = 22 teeth * 1/4 inch = 5.5 inches per 4 rotations = 1.375 inches per rotation
-    //meters = rotation * 1.375 / 39.37
-    return (in * (ArmConstants.sproketTeeth * ArmConstants.inchPerTeeth / ArmConstants.gearRatio) / 39.37 + eco);
+  private double encoderToMeters(double encoderValue) {
+    // 4:1 gear ratio
+    // 22 tooth sproket
+    // 1/4 inch chain
+    // 39.37 inches in a meter
+    // rotation * 4 = 22 teeth * 1/4 inch = 5.5 inches per 4 rotations = 1.375
+    // inches per rotation
+    // meters = rotation * 1.375 / 39.37
+    return (encoderValue * (ArmConstants.sproketTeeth * ArmConstants.inchPerTeeth / ArmConstants.gearRatio) / 39.37);
   }
 
   @Override
@@ -88,30 +73,30 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getAbsolutePosition());
     SmartDashboard.putNumber("Elevator Encoder", m_elevatorMotor.getEncoder().getPosition());
 
-    //Check if we want to move arm above limit switch
-    if (m_initArmPos && !seenSwitch) m_elevatorMotor.set(ArmConstants.kMaxElevatorSpeedPercent);
-
-    // Correct arm angle
-    if (m_minLimit.get() || m_maxLimit.get()) seenSwitch = true;
-    
-    //Correct encoder using eoc
-    if (m_minLimit.get()){
-      eco = 0;
-      eco = ArmConstants.kMinSwitchPos - encoder2meters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
-    }
-    else if (m_maxLimit.get()){
-      eco = 0;
-      eco = ArmConstants.kMaxSwitchPos + encoder2meters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
+    if (m_minLimit.get() || m_maxLimit.get()) {
+      seenSwitch = true;
     }
 
-    double elevatorSpeed = m_elevatorPID.calculate(encoder2meters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()));
+    // Correct encoder using m_encoderOffset //TODO test m_encoderOffset (clockwise positive movement?)
+    if (m_minLimit.get()) {
+      m_encoderOffset = ArmConstants.kMinSwitchPos + encoderToMeters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
+    } else if (m_maxLimit.get()) {
+      m_encoderOffset = ArmConstants.kMaxSwitchPos - encoderToMeters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
+    }
 
-    if (m_minLimit.get()) m_elevatorMotor.set(ArmConstants.kMaxElevatorSpeedPercent);
-    else if (m_maxLimit.get()) m_elevatorMotor.set(-ArmConstants.kMaxElevatorSpeedPercent);
-    else if (seenSwitch || elevatorSpeed > 0)
-      m_elevatorMotor.set(elevatorSpeed);
+    m_elevatorSpeed = m_elevatorPID.calculate(encoderToMeters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()));
 
-    if (seenSwitch) m_pivotMotor.set(m_pivotPID.calculate(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) * ArmConstants.kMaxPivotSpeedPercent);
+    if (m_minLimit.get() && m_elevatorSpeed < 0) { // Move so that the elevator never goes below the min limit switch
+      m_elevatorMotor.set(ArmConstants.kMaxElevatorSpeedPercent); // FIXME work on elevator speed... and pivot limits
+    } else if (m_maxLimit.get() && m_elevatorSpeed > 0) { // Move so that the elevator never goes above the max limit switch
+      m_elevatorMotor.set(-ArmConstants.kMaxElevatorSpeedPercent);
+    } else if (seenSwitch || m_elevatorSpeed > 0) {
+      m_elevatorMotor.set(m_elevatorSpeed);
+    }
+
+    if (seenSwitch) {
+      m_pivotMotor.set(m_pivotPID.calculate(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) * ArmConstants.kMaxPivotSpeedPercent);
+    }
   }
 
   /**
@@ -159,15 +144,23 @@ public class ArmSubsystem extends SubsystemBase {
       return;
     }
 
-    //Ensure elevator is above limit switch
-    if (!seenSwitch && elevatorSpeed < 0) return;
+    // Ensure elevator is above limit switch
+    if (!seenSwitch && elevatorSpeed < 0) {
+      return;
+    }
 
-    if (seenSwitch) m_pivotMotor.set(pivotSpeed);
+    if (seenSwitch) {
+      m_pivotMotor.set(pivotSpeed);
+    }
 
-    //Check limit switches
-    if (m_minLimit.get()) m_elevatorMotor.set(ArmConstants.kMaxElevatorSpeedPercent);
-    else if (m_maxLimit.get()) m_elevatorMotor.set(-ArmConstants.kMaxElevatorSpeedPercent);
-    else m_elevatorMotor.set(elevatorSpeed);
+    // Check limit switches
+    if (m_minLimit.get()) {
+      m_elevatorMotor.set(ArmConstants.kMaxElevatorSpeedPercent);
+    } else if (m_maxLimit.get()) {
+      m_elevatorMotor.set(-ArmConstants.kMaxElevatorSpeedPercent);
+    } else {
+      m_elevatorMotor.set(elevatorSpeed);
+    }
 
     // Set new setpoint for arm angle if we are no longer moving the arm pivot
     if (pivotSpeed == 0) {
@@ -175,16 +168,16 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     if (elevatorSpeed == 0)
-      m_elevatorPID.setSetpoint(encoder2meters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()));
+      m_elevatorPID.setSetpoint(encoderToMeters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()));
   }
 
-  //Because we can't stop both the arm and the pivot at the same time when using setArmSpeeds (see comment in setArmSpeeds) we need a sperate function
-  public void stopElevator(){
+  // Because we can't stop both the arm and the pivot at the same time when using
+  // setArmSpeeds (see comment in setArmSpeeds) we need a sperate function
+  public void stopElevator() {
     m_elevatorMotor.set(0);
   }
 
-
-  public void stopPivot(){
+  public void stopPivot() {
     m_pivotMotor.set(0);
   }
 }
