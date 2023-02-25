@@ -101,35 +101,6 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Snaps the robot to the nearest 90 degree angle
-   */
-  public void snapTo90(){
-    //Get gyro angle in degrees [0, 360]
-    double snapAngle = Robot.isReal() ? m_gyro.getAngle() : Math.toDegrees(m_gyroAngle);
-    snapAngle = MathUtil.inputModulus(snapAngle, 0, 360);
-
-    //Snap angle
-    if (snapAngle >= 315 && snapAngle < 45) snapAngle = 0;
-    else if (snapAngle >= 45 && snapAngle < 135) snapAngle = 90;
-    else if (snapAngle >= 135 && snapAngle < 225) snapAngle = 180;
-    else snapAngle = 270;
-    
-    //Convert to radians [-pi, pi]
-    snapAngle = MathUtil.angleModulus(Math.toRadians(snapAngle));
-
-    //Use heading correction to snap to angle
-    m_headingCorrectionPID.setSetpoint(snapAngle);
-    
-    //Drive
-    var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-        new ChassisSpeeds(0, 0, 
-          m_headingCorrectionPID.calculate(
-            MathUtil.angleModulus(m_gyro.getRotation2d().getRadians())
-          )));
-    setModuleStates(swerveModuleStates);
-  }
-
-  /**
    * Returns the currently-estimated pose of the robot.
    *
    * @return The pose.
