@@ -7,9 +7,11 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 
@@ -21,19 +23,13 @@ public class ArmSubsystem extends SubsystemBase {
 
   private final CANCoder m_pivotEncoder = new CANCoder(ArmConstants.kPivotEncoderPort);
 
-  private final DigitalInput m_restingPosLimit = new DigitalInput(ArmConstants.kRestingLimitPort);
-  private final DigitalInput m_topPosLimit = new DigitalInput(ArmConstants.kTopLimitPort);
-  private final DigitalInput m_midPosLimit = new DigitalInput(ArmConstants.kMidLimitPort);
-  private final DigitalInput m_stationPosLimit = new DigitalInput(ArmConstants.kStationLimitPort);
-
-  private Boolean useLimitSwitch = true; // If the operator uses a non zero manual elevator speed then stop trying to reach targetEH
-
-  // Desired states for limit switches
-  private int targetEH = ArmConstants.kRestingEH;
+  private final DigitalInput m_minLimit = new DigitalInput(ArmConstants.kMinLimitPort);
+  private final DigitalInput m_maxLimit = new DigitalInput(ArmConstants.kMaxLimitPort);
 
   // PID for correcting arm angle (both when changing pivot and to counteract gravity)
-  private final PIDController m_pivotPID = new PIDController(0, 0, 0); // TODO: tune pivot PID controller
-
+  private final PIDController m_pivotPID = new PIDController(0, 0, 0); // TODO: tune arm PID controllers
+  private final PIDController m_elevatorPID = new PIDController(0, 0, 0);
+  
   /**
    * Constructs a {@link ArmSubsystem}.
    *
@@ -41,78 +37,57 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public ArmSubsystem() {
     m_pivotPID.enableContinuousInput(-Math.PI, Math.PI);
+    m_pivotEncoder.configMagnetOffset(-ArmConstants.kPEncoderOffset);
+    
+    m_elevatorPID.setSetpoint(ArmConstants.kRestingPos);
+    m_pivotPID.setSetpoint(ArmConstants.kRestingPivot);
 
-    m_pivotEncoder.configMagnetOffset(ArmConstants.kEncoderOffset);
-  }
+    }
 
   @Override
   public void periodic() {
+    SmartDashboard.putNumber("Elevator Output Current (Amps)", m_elevatorMotor.getOutputCurrent());
+    SmartDashboard.putNumber("Pivot Output Current (Amps)", m_pivotMotor.getOutputCurrent());
+    SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getAbsolutePosition());
 
     // Correct arm angle
-    m_pivotMotor.set(m_pivotPID.calculate(m_pivotEncoder.getAbsolutePosition()) * ArmConstants.kMaxPivotSpeedPercent);
+    m_pivotMotor.set(m_pivotPID.calculate(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) * ArmConstants.kMaxPivotSpeedPercent);
 
-    if (useLimitSwitch) {
-      if (getEH() >= targetEH) { // Higher than desired target
-        m_elevatorMotor.set(-ArmConstants.kArmDriveSpeedPercent);
-      }
-
-      else { // Lower than target
-        m_elevatorMotor.set(ArmConstants.kArmDriveSpeedPercent);
-      }
-    }
-  }
-
-  /**
-   * Get the status of all the limit switches in a hash form
-   * The hash form has 1 bit for every limit switch with the first being resting,
-   * second being mid, third being top,
-   * fourth being station. The first bit has a place value of 8 and the final has
-   * a value of 1
-   * 
-   * @return The hash form of the switches' state
-   */
-  private int getEH() {
-    return // NOTE: lower values must correspond to less extended limit switches
-    (m_restingPosLimit.get() ? 0b1000 : 0) + // Least extended limit switch
-        (m_midPosLimit.get() ? 0b0100 : 0) +
-        (m_topPosLimit.get() ? 0b0010 : 0) +
-        (m_stationPosLimit.get() ? 0b0001 : 0); // Most extended limit switch
+    if (m_minLimit.get()) m_elevatorMotor.set(ArmConstants.kMaxElevatorSpeedPercent);
+    else if (m_maxLimit.get()) m_elevatorMotor.set(-ArmConstants.kMaxElevatorSpeedPercent);
+    else m_elevatorMotor.set(m_elevatorPID.calculate((m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition() * 4 / 5.5) / 39.37));
   }
 
   /**
    * Makes the arm go into resting position
    */
   public void goResting() {
-    useLimitSwitch = true;
     m_pivotPID.setSetpoint(ArmConstants.kRestingPivot);
-    targetEH = ArmConstants.kRestingEH;
+    m_elevatorPID.setSetpoint(ArmConstants.kRestingPos);
   }
 
   /**
    * Makes the arm go into top position
    */
   public void goTop() {
-    useLimitSwitch = true;
     m_pivotPID.setSetpoint(ArmConstants.kTopPivot);
-    targetEH = ArmConstants.kTopEH;
+    m_elevatorPID.setSetpoint(ArmConstants.kTopPos);
   }
 
   /**
    * Makes the arm go into mid position
    */
   public void goMid() {
-    useLimitSwitch = true;
     m_pivotPID.setSetpoint(ArmConstants.kMidPivot);
-    targetEH = ArmConstants.kMidEH;
+    m_elevatorPID.setSetpoint(ArmConstants.kMidPos);
   }
 
   /**
    * Makes the arm go into station position
    */
   public void goStation() {
-    useLimitSwitch = true;
     m_pivotPID.setSetpoint(ArmConstants.kStationPivot);
-    targetEH = ArmConstants.kStationEH;
+    m_elevatorPID.setSetpoint(ArmConstants.kStationPos);
   }
 
   /**
@@ -123,12 +98,11 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public void setArmSpeeds(double pivotSpeed, double elevatorSpeed) {
 
-    // Don't adjust arm if no input (use limit switch instead)
+    // Don't adjust arm if no input
     if (pivotSpeed == 0 && elevatorSpeed == 0) {
       return;
     }
 
-    useLimitSwitch = false;
     m_pivotMotor.set(pivotSpeed);
     m_elevatorMotor.set(elevatorSpeed);
 
@@ -136,5 +110,8 @@ public class ArmSubsystem extends SubsystemBase {
     if (pivotSpeed == 0) {
       m_pivotPID.setSetpoint(Math.toRadians(m_pivotEncoder.getAbsolutePosition()));
     }
+
+    if (elevatorSpeed == 0)
+      m_elevatorPID.setSetpoint((m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition() * 4 / 5.5) / 39.37);
   }
 }
