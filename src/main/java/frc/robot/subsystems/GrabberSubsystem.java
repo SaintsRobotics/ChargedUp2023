@@ -16,7 +16,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GrabberConstants;
 
 public class GrabberSubsystem extends SubsystemBase {
-    /** Creates a new ExampleSubsystem. */
+    
     private PneumaticHub pHub;
     private DoubleSolenoid solenoid0;
     public boolean enableCompressor = true;
@@ -34,27 +34,42 @@ public class GrabberSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        // This method will be called once per scheduler run
         SmartDashboard.putNumber("Pressure", pHub.getPressure(0));
         SmartDashboard.putBoolean("Compressor Enabled", pHub.getCompressor());
     }
 
+    /**
+     * Turns off the solonoid
+     */
     public void off() {
         solenoid0.set(kOff);
     }
 
+    /**
+     * Puts the solonoid of forwards
+     */
     public void forward() {
         solenoid0.set(kForward);
     }
 
+    /**
+     * Puts the solonoid in reverse
+     */
     public void reverse() {
         solenoid0.set(kReverse);
     }
 
+
+    /**
+     * Toggles the solonoid's state (which in turn toggles the grabber)
+     */
     public void toggle() {
         solenoid0.toggle();
     }
 
+    /**
+     * Toggles whether or not the compressor is enables
+     */
     public void toggleCompressor() {
         enableCompressor = !enableCompressor;
     }
