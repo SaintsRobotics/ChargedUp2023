@@ -86,8 +86,7 @@ public class RobotContainer {
             m_robotDrive));
 
 
-     m_colorChooser.addOption("BlueBottomTwoObject", "BlueBottomTwoObject"); 
-     m_colorChooser.addOption("RedBottomTwoObject", "RedBottomTwoObject");
+
 
     m_chooser.addOption("BlueBottomCharger", "BlueBottomCharger");
     m_chooser.addOption("BlueBottomTwoObject", "BlueBottomTwoObject");
@@ -99,10 +98,23 @@ public class RobotContainer {
     m_chooser.addOption("BlueTopTwoObjectCharger", "BlueTopTwoObjectCharger");
     m_chooser.addOption("BlueTopThreeObject", "BlueTopThreeObject");
     m_chooser.addOption("BlueBottomThreeObject", "BlueBottomThreeObject");
+    m_chooser.addOption("RedMidBackCharger", "RedMidBackCharger");
+    m_chooser.addOption("RedBottomCharger", "RedBottomCharger");
+    m_chooser.addOption("RedBottomTwoObject", "RedBottomTwoObject");
+    m_chooser.addOption("RedMidFrontCharger", "RedMidFrontCharger");
+    m_chooser.addOption("RedTopCharger", "RedTopCharger");
+    m_chooser.addOption("RedTopTwoObject", "RedTopTwoObject");
+    m_chooser.addOption("RedTopTwoObjectCharger", "RedTopTwoObjectCharger");
+    m_chooser.addOption("RedBottomTwoObjectCharger", "RedBottomTwoObjectCharger");
+
+
+
+
     // Sample event that triggers when BlueBottomCharger is run
     m_eventMap.put("event", new WaitCommand(1));
 
     SmartDashboard.putData(m_chooser);
+    
   }
 
   /**
@@ -125,12 +137,7 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    String color;
-    if (m_colorChooser.getSelected() != null) {
-      color = m_colorChooser.getSelected();
-    } else {
-      return null;
-
+    
     String path;
     if (m_chooser.getSelected() != null) {
       path = m_chooser.getSelected();
@@ -138,13 +145,7 @@ public class RobotContainer {
       return null;
     }
 
-    switch (color) {
-      case ("BlueBottomTwoObject"):
-        m_robotDrive.resetOdometry(new Pose2d(new Translation2d(2.20, 0.49), new Rotation2d(180)));
-      case ("RedBottomTwoObject"):
-        m_robotDrive.resetOdometry(new Pose2d(new Translation2d(14.34175, 0.49), new Rotation2d(0)));
-
-    }
+    
 
     switch (path) {
       case ("BlueBottomCharger"):
@@ -170,11 +171,37 @@ public class RobotContainer {
       case ("BlueTopThreeObject"):
         return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("BlueBottomThreeObject"):
-      return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+      case ("RedMidBackCharger"):
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+      case ("RedBottomCharger"):
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+      case ("RedBottomTwoObject"):
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+      case ("RedMidFrontCharger"):
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+      case ("RedTopCharger"):
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+      case ("RedTopTwoObjects"):
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+      case ("RedBottomTwoObjectCharger"):
+        return new SequentialCommandGroup(
+          m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("RedBottomTwoObject", new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))),
+          m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("RedBottomCharger", new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))));
+      case ("RedTopTwoObjectCharger"):
+        return new SequentialCommandGroup(
+          m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("RedTopTwoObject", new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))),
+          m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("RedTopCharger", new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))));
+
+
+
       default:
         return null;
     }
   }
 }
+
+
+
 
 
