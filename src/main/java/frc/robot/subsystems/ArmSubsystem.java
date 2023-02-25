@@ -49,6 +49,7 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Output Current (Amps)", m_elevatorMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Output Current (Amps)", m_pivotMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getAbsolutePosition());
+    SmartDashboard.putNumber("Elevator Encoder", m_elevatorMotor.getEncoder().getPosition());
 
     // Correct arm angle
     m_pivotMotor.set(m_pivotPID.calculate(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) * ArmConstants.kMaxPivotSpeedPercent);
