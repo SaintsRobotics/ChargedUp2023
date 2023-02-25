@@ -44,11 +44,11 @@ public final class Constants {
     public static final boolean kFrontRightDriveMotorReversed = true;
     public static final boolean kRearRightDriveMotorReversed = true;
 
-    /** Distance between centers of right and left wheels on robot. */
-    public static final double kTrackWidth = 0.57;
+    /** Distance between centers of right and left wheels on robot (in meters). */
+    public static final double kTrackWidth = 0.48;
 
-    /** Distance between front and back wheels on robot. */
-    public static final double kWheelBase = 0.6;
+    /** Distance between front and back wheels on robot (in meters). */
+    public static final double kWheelBase = 0.63;
 
     public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
         new Translation2d(kWheelBase / 2, kTrackWidth / 2),
@@ -56,25 +56,26 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
-    public static final double kMaxSpeedMetersPerSecond = 3.66;
-    public static final double kMaxAngularSpeedRadiansPerSecond = 8.76;
+    public static final double kMaxSpeedMetersPerSecond = 3.6576;
+    public static final double kMaxAngularSpeedRadiansPerSecond = 15.24;
   }
 
   public static final class ModuleConstants {
     public static final double kWheelDiameterMeters = 0.1;
 
     /** Gear ratio between the motor and the wheel. */
-    public static final double kDrivingGearRatio = 8.14;
+    public static final double kDrivingGearRatio = 8.14; // SDS MK4i's in L1 configuration
 
     public static final double kPModuleTurningController = -0.3;
   }
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
+    public static final int kOperatorControllerPort = 1;
 
     public static final double kControllerDeadband = 0.2;
     public static final double kSlowModeScalar = 0.8;    
   }
 
-  public static final double kTurningStopTime = 0.2; //TODO: tune this
+  public static final double kTurningStopTime = 0.2; //TODO: tune heading correction
 }
