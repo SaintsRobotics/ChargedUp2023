@@ -92,10 +92,18 @@ public final class Constants {
     public static final double kTopPivot = 0;
     public static final double kStationPivot = 0;
 
-    public static final int kRestingPos = 0; //TODO: measure correct positions
-    public static final int kMidPos = 0;
-    public static final int kTopPos = 0;
-    public static final int kStationPos = 0;
+    public static final double kRestingPos = 0; //TODO: measure correct positions
+    public static final double kMidPos = 0;
+    public static final double kTopPos = 0;
+    public static final double kStationPos = 0;
+
+    public static final int sproketTeeth = 22;
+    public static final double inchPerTeeth = 0.25;
+    public static final double gearRatio = 4/1;
+
+    public static final double kMinSwitchPos = 0; //TODO: measure these, meters
+    public static final double kMaxSwitchPos = 0;
+
   }
 
   public static final class GrabberConstants{

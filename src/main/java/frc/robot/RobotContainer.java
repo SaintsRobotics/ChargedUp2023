@@ -145,6 +145,14 @@ public class RobotContainer {
     new POVButton(m_operatorController, 270)
         .onTrue(
             new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
+
+    new JoystickButton(m_operatorController, XboxController.Button.kLeftStick.value)
+        .whileTrue(
+            new InstantCommand(m_armSubsystem::stopPivot, m_armSubsystem));
+
+    new JoystickButton(m_operatorController, XboxController.Button.kRightStick.value)
+        .whileTrue(
+            new InstantCommand(m_armSubsystem::stopElevator, m_armSubsystem));
   }
 
   /**
