@@ -28,7 +28,7 @@ public class GrabberSubsystem extends SubsystemBase {
         pHub.disableCompressor();
         
         if (enableCompressor) {
-            pHub.enableCompressorAnalog(60, 90);
+            pHub.enableCompressorAnalog(GrabberConstants.kCompressorMinimumPressure, GrabberConstants.kCompressorMaximumPressure);
         }
     }
 
