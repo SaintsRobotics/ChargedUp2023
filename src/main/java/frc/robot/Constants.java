@@ -59,8 +59,8 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 3.6576;
     public static final double kMaxAngularSpeedRadiansPerSecond = 15.24;
     
-    public static final double kPTranslation = 5;
-    public static final double kPRotation = 5;
+    public static final double kPTranslation = 0.5;
+    public static final double kPRotation = 0.5;
   }
 
   public static final class ModuleConstants {
@@ -70,6 +70,17 @@ public final class Constants {
     public static final double kDrivingGearRatio = 8.14; // SDS MK4i's in L1 configuration
 
     public static final double kPModuleTurningController = -0.3;
+  }
+
+  public static final class GrabberConstants {
+    public static final int kIntakeLeftSolenoidPort = 0;
+        public static final int kIntakeRightSolenoidPort = 1;
+        public static final int kPneumaticsHubID = 2; 
+
+        public static final int kCompressorModuleID = 1;
+
+        public static final int kCompressorMinimumPressure = 70; 
+        public static final int kCompressorMaximumPressure = 110; 
   }
 
   public static final class OIConstants {
