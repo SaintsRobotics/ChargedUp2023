@@ -4,14 +4,15 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.DriveSubsystem;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.DriveConstants;
+import frc.robot.subsystems.DriveSubsystem;
 
 /** Uses a PID and the gyroscope to balance the robot on the charger. */
 public class BalanceCommand extends CommandBase {
   private final DriveSubsystem m_subsystem;
-  private final PIDController m_PID = new PIDController(-0.025, 0, 0);
+  private final PIDController m_PID = new PIDController(DriveConstants.kPBalance, 0, 0);
 
   /**
    * Creates a new {@link BalanceCommand}.
@@ -23,7 +24,7 @@ public class BalanceCommand extends CommandBase {
     addRequirements(m_subsystem);
 
     m_PID.enableContinuousInput(-180, 180);
-    m_PID.setTolerance(3.5);
+    m_PID.setTolerance(DriveConstants.kToleranceBalance);
   }
 
   @Override
