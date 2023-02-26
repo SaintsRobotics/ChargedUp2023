@@ -26,10 +26,7 @@ public class GrabberSubsystem extends SubsystemBase {
         solenoid0 = new DoubleSolenoid(GrabberConstants.kPneumaticsHubID, PneumaticsModuleType.REVPH,
                 GrabberConstants.kIntakeLeftSolenoidPort, GrabberConstants.kIntakeRightSolenoidPort);
         pHub.disableCompressor();
-        
-        if (enableCompressor) {
-            pHub.enableCompressorAnalog(GrabberConstants.kCompressorMinimumPressure, GrabberConstants.kCompressorMaximumPressure);
-        }
+        pHub.enableCompressorAnalog(GrabberConstants.kCompressorMinimumPressure, GrabberConstants.kCompressorMaximumPressure);
 
         reverse();
     }
@@ -38,6 +35,7 @@ public class GrabberSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putNumber("Pressure", pHub.getPressure(0));
         SmartDashboard.putBoolean("Compressor Enabled", pHub.getCompressor());
+        SmartDashboard.putBoolean("Startup Compressor", enableCompressor);
     }
 
     /**
@@ -74,5 +72,10 @@ public class GrabberSubsystem extends SubsystemBase {
      */
     public void toggleCompressor() {
         enableCompressor = !enableCompressor;
+        if (enableCompressor) {
+            pHub.enableCompressorAnalog(GrabberConstants.kCompressorMinimumPressure, GrabberConstants.kCompressorMaximumPressure);
+        } else {
+            pHub.disableCompressor();
+        }
     }
 }
