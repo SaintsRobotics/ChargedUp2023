@@ -17,7 +17,7 @@ import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax m_pivotMotor = new CANSparkMax(ArmConstants.kPivotMotorPort,
-      MotorType.kBrushless); //TODO: TEST IF ELEVATOR AND PIVOT MOTORS NEED TO BE INVERTED
+      MotorType.kBrushless); // TODO: TEST IF ELEVATOR AND PIVOT MOTORS NEED TO BE INVERTED
   private final CANSparkMax m_elevatorMotor = new CANSparkMax(ArmConstants.kElevatorMotorPort,
       MotorType.kBrushless);
 
@@ -47,8 +47,7 @@ public class ArmSubsystem extends SubsystemBase {
     m_pivotPID.enableContinuousInput(-Math.PI, Math.PI);
     m_pivotEncoder.configMagnetOffset(-ArmConstants.kPEncoderOffset);
 
-    m_elevatorPID.setSetpoint(ArmConstants.kRestingPos);
-    m_pivotPID.setSetpoint(ArmConstants.kRestingPivot);
+    m_elevatorMotor.setInverted(true);
   }
 
   /**
@@ -65,7 +64,8 @@ public class ArmSubsystem extends SubsystemBase {
     // rotation * 4 = 22 teeth * 1/4 inch = 5.5 inches per 4 rotations = 1.375
     // inches per rotation
     // meters = rotation * 1.375 / 39.37
-    return m_encoderOffset + (encoderValue * (ArmConstants.sproketTeeth * ArmConstants.inchPerTeeth / ArmConstants.gearRatio) / 39.37);
+    return m_encoderOffset
+        + (encoderValue * (ArmConstants.sproketTeeth * ArmConstants.inchPerTeeth / ArmConstants.gearRatio) / 39.37);
   }
 
   @Override
@@ -73,42 +73,51 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Output Current (Amps)", m_elevatorMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Output Current (Amps)", m_pivotMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getAbsolutePosition());
-    SmartDashboard.putNumber("Elevator Encoder", m_elevatorMotor.getEncoder().getPosition());
+    SmartDashboard.putNumber("Elevator Encoder", m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
+    SmartDashboard.putBoolean("Min Limit Switch", !m_minLimit.get());
+    SmartDashboard.putBoolean("Max Limit Switch", !m_maxLimit.get());
+    SmartDashboard.putBoolean("Seen Switch", seenSwitch);
+    SmartDashboard.putNumber("elevator speed", m_elevatorMotor.get());
+    //TODO: use limit switches to limit elevator motion (too high or too low)
 
-    if (m_minLimit.get() || m_maxLimit.get()) {
+    if (!m_minLimit.get() || !m_maxLimit.get()) {
       seenSwitch = true;
     }
-    
-    if (m_minLimit.get()){
+
+    if (!m_minLimit.get()) {
       m_encoderOffset = 0;
-      m_encoderOffset = ArmConstants.kMinSwitchPos - encoderToMeters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
+      m_encoderOffset = ArmConstants.kMinSwitchPos
+          - encoderToMeters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
     }
 
-    if (m_maxLimit.get()){
-      m_encoderOffset = 0;
-      m_encoderOffset = ArmConstants.kMaxSwitchPos - encoderToMeters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
+    if (!m_maxLimit.get()) {
+      m_encoderOffset = 0; // TODO the direction of the motor
+      m_encoderOffset = ArmConstants.kMaxSwitchPos
+          - encoderToMeters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition());
     }
 
-    if (m_elevatorSpeed != 0 || m_pivotSpeed != 0){
-      if (seenSwitch){
+    if (m_elevatorSpeed != null && (m_elevatorSpeed != 0 || m_pivotSpeed != 0)) { // manual input
+      if (seenSwitch || !m_minLimit.get()) {
+        if (m_maxLimit.get() || m_elevatorSpeed < 0) m_elevatorMotor.set(m_elevatorSpeed);
+        //m_pivotMotor.set(m_pivotSpeed);
+      } else if (m_elevatorSpeed > 0)
         m_elevatorMotor.set(m_elevatorSpeed);
-        m_pivotMotor.set(m_pivotSpeed);
-      }
-      else if (m_elevatorSpeed > 0) m_elevatorMotor.set(m_elevatorSpeed);
     }
 
-    else if (m_elevatorSpeed != null && m_elevatorSpeed == 0 && m_pivotSpeed == 0) {
+    else if (m_elevatorSpeed != null && m_elevatorSpeed == 0 && m_pivotSpeed == 0) { // no manual input
       m_pivotPID.setSetpoint(Math.toRadians(m_pivotEncoder.getAbsolutePosition()));
       m_elevatorPID.setSetpoint(encoderToMeters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()));
+      m_elevatorMotor.set(0.03);
+      //m_elevatorSpeed = null;
     }
 
-    else{
+    else { // POV or no manual input
       double elevatorSpeed = m_elevatorPID.calculate(encoderToMeters(m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()));
-      if (seenSwitch){
+      if (seenSwitch || !m_minLimit.get()) {
+        if (m_maxLimit.get() || m_elevatorSpeed < 0) m_elevatorMotor.set(elevatorSpeed);
+        //m_pivotMotor.set(Math.toRadians(m_pivotEncoder.getAbsolutePosition()));
+      } else if (elevatorSpeed > 0)
         m_elevatorMotor.set(elevatorSpeed);
-        m_pivotMotor.set(Math.toRadians(m_pivotEncoder.getAbsolutePosition()));
-      }
-      else if (elevatorSpeed > 0) m_elevatorMotor.set(elevatorSpeed);
     }
   }
 
@@ -155,7 +164,8 @@ public class ArmSubsystem extends SubsystemBase {
    * @param elevatorSpeed The desired speed (in percent) of the elevator motor.
    */
   public void setArmSpeeds(double pivotSpeed, double elevatorSpeed) {
-    if (m_elevatorSpeed == null && elevatorSpeed == 0 && pivotSpeed == 0) return;
+    if (m_elevatorSpeed == null && elevatorSpeed == 0 && pivotSpeed == 0)
+      return;
     m_pivotSpeed = pivotSpeed;
     m_elevatorSpeed = elevatorSpeed;
   }

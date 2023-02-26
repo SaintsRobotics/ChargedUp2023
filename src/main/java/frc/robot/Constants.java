@@ -77,15 +77,12 @@ public final class Constants {
     public static final int kElevatorMotorPort = 34;
     public static final int kPivotEncoderPort = 7;
     public static final double kPEncoderOffset = 0;
-    public static final double kEEncoderOffset = 0;
 
-    public static final double kMaxPivotSpeedPercent = 0.5;
-    public static final double kMaxElevatorSpeedPercent = 0.5;
+    public static final double kMaxPivotSpeedPercent = 0.2;
+    public static final double kMaxElevatorSpeedPercent = 0.2;
 
     public static final int kMinLimitPort = 9; 
     public static final int kMaxLimitPort = 8;
-
-    public static final double kArmDriveSpeedPercent = 0.2; // Use a low value so that we don't overshoot
 
     public static final double kRestingPivot = 0; // TODO: find correct angle values for pivot, radians
     public static final double kMidPivot = 0;
@@ -102,7 +99,7 @@ public final class Constants {
     public static final double gearRatio = 4/1;
 
     public static final double kMinSwitchPos = 0; //TODO: measure these, meters
-    public static final double kMaxSwitchPos = 0;
+    public static final double kMaxSwitchPos = 0.61595;
 
   }
 
