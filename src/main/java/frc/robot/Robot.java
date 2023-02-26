@@ -4,7 +4,9 @@
 
 package frc.robot;
 
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 
@@ -20,9 +22,12 @@ public class Robot extends TimedRobot {
 
   private RobotContainer m_robotContainer;
 
+  private Timer m_buttonTimer = new Timer();
+
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
+    m_buttonTimer.start();
   }
 
   @Override
@@ -36,6 +41,11 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
+    // If User button on the RoboRIO is pressed while robot is disabled, then do not start the compressor
+    if (RobotController.getUserButton() && m_buttonTimer.get() > 1) {
+      m_robotContainer.grabberSubsystem.toggleCompressor();
+      m_buttonTimer.reset();
+    }
   }
 
   @Override

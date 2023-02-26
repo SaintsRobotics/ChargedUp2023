@@ -29,6 +29,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.GrabberSubsystem;
 
 
 /*
@@ -40,8 +41,10 @@ import frc.robot.subsystems.DriveSubsystem;
 
 public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
   private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private final SendableChooser<String> m_colorChooser = new SendableChooser<>();
 
@@ -85,9 +88,6 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
-
-
-
     m_chooser.addOption("BlueBottomCharger", "BlueBottomCharger");
     m_chooser.addOption("BlueBottomTwoObject", "BlueBottomTwoObject");
     m_chooser.addOption("BlueMidBackCharger", "BlueMidBackCharger");
@@ -114,7 +114,6 @@ public class RobotContainer {
     m_eventMap.put("event", new WaitCommand(1));
 
     SmartDashboard.putData(m_chooser);
-    
   }
 
   /**
@@ -127,8 +126,11 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new JoystickButton(m_driverController, XboxController.Button.kStart.value)
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
+        
     new JoystickButton(m_driverController, XboxController.Button.kY.value)
         .whileTrue(m_BalanceCommand);
+
+    new JoystickButton(m_operatorController, XboxController.Button.kA.value).onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
   }
 
   /**
@@ -137,15 +139,12 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    
     String path;
     if (m_chooser.getSelected() != null) {
       path = m_chooser.getSelected();
     } else {
       return null;
     }
-
-    
 
     switch (path) {
       case ("BlueBottomCharger"):
