@@ -38,7 +38,7 @@ public class RobotContainer {
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
   private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-  private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorcontrollerPort);
+  private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
