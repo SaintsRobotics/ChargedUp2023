@@ -79,8 +79,8 @@ public final class Constants {
 
         public static final int kCompressorModuleID = 1;
 
-        public static final int kCompressorMinimumPressure = 60; 
-        public static final int kCompressorMaximumPressure = 90; 
+        public static final int kCompressorMinimumPressure = 70; 
+        public static final int kCompressorMaximumPressure = 110; 
   }
 
   public static final class OIConstants {
