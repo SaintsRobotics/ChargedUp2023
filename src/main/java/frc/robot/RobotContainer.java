@@ -27,6 +27,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.GrabberSubsystem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -38,6 +39,8 @@ import frc.robot.subsystems.DriveSubsystem;
 public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+  public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
+  private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
@@ -53,8 +56,6 @@ public class RobotContainer {
       m_robotDrive::setModuleStates,
       m_eventMap,
       m_robotDrive);
-
-  private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
 
   /**
    * The container for the robot. Contains subsystems, OI devices, and commands.
@@ -130,6 +131,8 @@ public class RobotContainer {
         .whileTrue(m_BalanceCommand);
 
     // Operator Bindings
+    new JoystickButton(m_operatorController, XboxController.Button.kA.value).onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
+
     new POVButton(m_operatorController, 0)
         .onTrue(
             new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up - Station
@@ -145,6 +148,8 @@ public class RobotContainer {
     new POVButton(m_operatorController, 270)
         .onTrue(
             new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
+        
+
   }
 
   /**
