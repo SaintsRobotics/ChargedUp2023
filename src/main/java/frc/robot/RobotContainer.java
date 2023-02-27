@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
@@ -38,7 +37,7 @@ import frc.robot.subsystems.GrabberSubsystem;
 
 public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
+  public final ArmSubsystem armSubsystem = new ArmSubsystem();
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
   private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
 
@@ -88,9 +87,9 @@ public class RobotContainer {
 
     // Left stick y axis controls pivot
     // Right stick y axis controls extension
-    m_armSubsystem.setDefaultCommand(
+    armSubsystem.setDefaultCommand(
         new RunCommand(
-            () -> m_armSubsystem.setArmSpeeds(
+            () -> armSubsystem.setArmSpeeds(
                 MathUtil.applyDeadband(
                     -m_operatorController.getLeftY(),
                     OIConstants.kControllerDeadband)
@@ -99,7 +98,7 @@ public class RobotContainer {
                     -m_operatorController.getRightY(),
                     OIConstants.kControllerDeadband)
                     * ArmConstants.kMaxElevatorSpeedPercent),
-            m_armSubsystem));
+            armSubsystem));
 
     m_chooser.addOption("BlueBottomCharger", "BlueBottomCharger");
     m_chooser.addOption("BlueBottomTwoObject", "BlueBottomTwoObject");
@@ -133,6 +132,7 @@ public class RobotContainer {
     // Operator Bindings
     new JoystickButton(m_operatorController, XboxController.Button.kA.value).onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
 
+    /* DO NOT USE: ROBOT WILL BREAK
     new POVButton(m_operatorController, 0)
         .onTrue(
             new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up - Station
@@ -149,7 +149,7 @@ public class RobotContainer {
         .onTrue(
             new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
         
-
+*/
   }
 
   /**

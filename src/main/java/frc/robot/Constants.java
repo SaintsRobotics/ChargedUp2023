@@ -100,7 +100,7 @@ public final class Constants {
     public static final double gearRatio = 4/1;
 
     public static final double kMinSwitchPos = 0; //TODO: measure these, meters
-    public static final double kMaxSwitchPos = 0.61595;
+    public static final double kMaxSwitchPos = 0.61595 - 0.05;
   }
 
   public static final class GrabberConstants {

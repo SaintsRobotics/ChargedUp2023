@@ -9,11 +9,13 @@ import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import com.revrobotics.SparkMaxAbsoluteEncoder.Type;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Robot;
 
 public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax m_pivotMotor = new CANSparkMax(ArmConstants.kPivotMotorPort,
@@ -32,10 +34,11 @@ public class ArmSubsystem extends SubsystemBase {
   // gravity)
   private final PIDController m_pivotPID = new PIDController(0, 0, 0); // TODO: tune arm PID controllers
   /** setpoint is in meters */
-  private final PIDController m_elevatorPID = new PIDController(0, 0, 0);
+  public final PIDController m_elevatorPID = new PIDController(1.5, 0, 0);
 
-  private boolean seenSwitch = false; // Elevator won't move down until we see the switch
-  private double m_encoderOffset = 0; // Encoder offset, updtated whenever a limit switch goes LOW, in meters
+
+  public boolean seenSwitch = false; // Elevator won't move down until we see the switch
+  private double m_encoderOffset = -0.16; // Encoder offset, updtated whenever a limit switch goes LOW, in meters
 
   /**
    * Constructs a {@link ArmSubsystem}.
@@ -69,35 +72,41 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    double es = m_elevatorPID.calculate(m_encoderOffset + encoderToMeters(m_elevatorMotor.getEncoder().getPosition()));
+
     SmartDashboard.putNumber("Elevator Output Current (Amps)", m_elevatorMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Output Current (Amps)", m_pivotMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getPosition());
     SmartDashboard.putNumber("Elevator Absolute Encoder", m_elevatorMotor.getAbsoluteEncoder(Type.kDutyCycle).getPosition()); // TODO test if relative and absolute sparkmax encoders are the same
-    SmartDashboard.putNumber("Elevator Relative Encoder", m_elevatorMotor.getEncoder().getPosition()); // this encoder has a conversion factor method. We want non absolute encoder because values can go past 360 and we need to know that
+    SmartDashboard.putNumber("Elevator Relative Encoder m", m_encoderOffset + encoderToMeters(m_elevatorMotor.getEncoder().getPosition())); // this encoder has a conversion factor method. We want non absolute encoder because values can go past 360 and we need to know that
     SmartDashboard.putBoolean("Min Limit Switch", !m_minLimit.get());
     SmartDashboard.putBoolean("Max Limit Switch", !m_maxLimit.get());
     SmartDashboard.putBoolean("Seen Switch", seenSwitch);
     SmartDashboard.putNumber("elevator speed", m_elevatorMotor.get());
+    SmartDashboard.putNumber("Elevator PID out", es);
+    SmartDashboard.putNumber("Elevator PID error", m_elevatorPID.getPositionError());
+    SmartDashboard.putNumber("Elevator PID setpoint", m_elevatorPID.getSetpoint());
 
     if (!m_minLimit.get() || !m_maxLimit.get()) {
       seenSwitch = true;
     }
-
+    
     if (!m_minLimit.get()) {
       m_encoderOffset = ArmConstants.kMinSwitchPos - encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
-      if (m_elevatorPID.getSetpoint() < 0) {
-        m_elevatorPID.setSetpoint(0);
-      }
     }
     if (!m_maxLimit.get()) {
       m_encoderOffset = ArmConstants.kMaxSwitchPos - encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
-      if (m_elevatorPID.getSetpoint() > 0) {
-        m_elevatorPID.setSetpoint(0);
-      }
     }
 
-    m_pivotMotor.set(m_pivotPID.calculate(m_pivotEncoder.getPosition()));
-    m_elevatorMotor.set(m_elevatorPID.calculate(m_encoderOffset + encoderToMeters(m_elevatorMotor.getEncoder().getPosition())));
+    if (m_elevatorPID.getSetpoint() < ArmConstants.kMinSwitchPos && seenSwitch) {
+      m_elevatorPID.setSetpoint(ArmConstants.kMinSwitchPos);
+    }
+    if (m_elevatorPID.getSetpoint() > ArmConstants.kMaxSwitchPos) {
+      m_elevatorPID.setSetpoint(ArmConstants.kMaxSwitchPos);
+    }
+    
+    // m_pivotMotor.set(m_pivotPID.calculate(m_pivotEncoder.getPosition()));
+    m_elevatorMotor.set(MathUtil.clamp(es, -0.25, 0.25) + 0.03); //TODO: take angle into account
   }
 
   /**
@@ -124,6 +133,11 @@ public class ArmSubsystem extends SubsystemBase {
     m_elevatorPID.setSetpoint(ArmConstants.kMidPos);
   }
 
+  public void teleopInit(){
+    m_elevatorPID.setSetpoint(m_encoderOffset + encoderToMeters(m_elevatorMotor.getEncoder().getPosition()));
+    seenSwitch = false;
+  }
+
   /**
    * Makes the arm go into station position
    */
@@ -143,7 +157,10 @@ public class ArmSubsystem extends SubsystemBase {
       return;
     }
 
-    m_pivotPID.setSetpoint(m_pivotEncoder.getPosition() + (pivotSpeed * 0.5)); // TODO: tune manual arm control to PID setpoint multiplier
-    m_elevatorPID.setSetpoint(m_elevatorMotor.getEncoder().getPosition() + (elevatorSpeed * 0.5));
+    if (elevatorSpeed == 0) m_elevatorPID.setSetpoint(m_encoderOffset + m_elevatorMotor.getEncoder().getPosition());
+    if (pivotSpeed == 0) m_pivotPID.setSetpoint(m_pivotEncoder.getPosition());
+
+    // m_pivotPID.setSetpoint(m_pivotEncoder.getPosition() + (pivotSpeed * Robot.kDefaultPeriod)); // TODO: tune manual arm control to PID setpoint multiplier
+    m_elevatorPID.setSetpoint(m_elevatorPID.getSetpoint() + (elevatorSpeed * Robot.kDefaultPeriod));
   }
 }
