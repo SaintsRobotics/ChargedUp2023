@@ -52,7 +52,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
-    m_robotContainer.armSubsystem.m_elevatorPID.reset();
+    m_robotContainer.armSubsystem.enable();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -66,8 +66,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-    m_robotContainer.armSubsystem.m_elevatorPID.reset();
-    m_robotContainer.armSubsystem.teleopInit();
+    m_robotContainer.armSubsystem.enable();
     
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
