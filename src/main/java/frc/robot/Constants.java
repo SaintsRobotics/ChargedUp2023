@@ -62,7 +62,6 @@ public final class Constants {
     public static final double kPTranslation = 0.5;
     public static final double kPRotation = 0.5;
 
-    public static final double kPBalance = -0.025;
     public static final double kToleranceBalance = 3.5;
   }
 
