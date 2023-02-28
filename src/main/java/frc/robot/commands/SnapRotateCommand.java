@@ -20,22 +20,12 @@ public class SnapRotateCommand extends CommandBase {
         addRequirements(m_subsystem);
 
         m_PID.setTolerance(DriveConstants.kToleranceSnapRotate);
-        m_PID.enableContinuousInput(-180, 180);
+        m_PID.enableContinuousInput(-Math.PI, Math.PI);
     }
 
     @Override
     public void initialize() {
-        final double angle = m_subsystem.getPose().getRotation().getDegrees();
-
-        if (angle >= 135 || angle < -135) {
-            m_PID.setSetpoint(-180);
-        } else if (angle < -45) {
-            m_PID.setSetpoint(-90);
-        } else if (angle < 45) {
-            m_PID.setSetpoint(0);
-        } else {
-            m_PID.setSetpoint(90);
-        }
+        m_PID.setSetpoint(Math.round(m_subsystem.getPose().getRotation().getRadians() / (Math.PI / 2)) * (Math.PI / 2));
     }
 
     @Override
@@ -43,7 +33,7 @@ public class SnapRotateCommand extends CommandBase {
         m_subsystem.drive(
                 0,
                 0,
-                m_PID.calculate(m_subsystem.getPose().getRotation().getDegrees()),
+                m_PID.calculate(m_subsystem.getPose().getRotation().getRadians()),
                 false);
     }
 
