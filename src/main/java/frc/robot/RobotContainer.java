@@ -57,7 +57,6 @@ public class RobotContainer {
   public RobotContainer() {
     configureButtonBindings();
 
-    
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.
         // Turning is controlled by the X axis of the right stick.
@@ -104,11 +103,12 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new JoystickButton(m_driverController, XboxController.Button.kStart.value)
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
-        
+
     new JoystickButton(m_driverController, XboxController.Button.kY.value)
         .whileTrue(m_BalanceCommand);
 
-    new JoystickButton(m_operatorController, XboxController.Button.kA.value).onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
+    new JoystickButton(m_operatorController, XboxController.Button.kA.value)
+        .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
   }
 
   /**

@@ -58,7 +58,7 @@ public final class Constants {
 
     public static final double kMaxSpeedMetersPerSecond = 3.6576;
     public static final double kMaxAngularSpeedRadiansPerSecond = 15.24;
-    
+
     public static final double kPTranslation = 0.5;
     public static final double kPRotation = 0.5;
   }
@@ -74,13 +74,13 @@ public final class Constants {
 
   public static final class GrabberConstants {
     public static final int kIntakeLeftSolenoidPort = 0;
-        public static final int kIntakeRightSolenoidPort = 1;
-        public static final int kPneumaticsHubID = 2; 
+    public static final int kIntakeRightSolenoidPort = 1;
+    public static final int kPneumaticsHubID = 2;
 
-        public static final int kCompressorModuleID = 1;
+    public static final int kCompressorModuleID = 1;
 
-        public static final int kCompressorMinimumPressure = 70; 
-        public static final int kCompressorMaximumPressure = 110; 
+    public static final int kCompressorMinimumPressure = 70;
+    public static final int kCompressorMaximumPressure = 110;
   }
 
   public static final class OIConstants {
@@ -88,8 +88,8 @@ public final class Constants {
     public static final int kOperatorControllerPort = 1;
 
     public static final double kControllerDeadband = 0.2;
-    public static final double kSlowModeScalar = 0.8;    
+    public static final double kSlowModeScalar = 0.8;
   }
 
-  public static final double kTurningStopTime = 0.2; //TODO: tune heading correction
+  public static final double kTurningStopTime = 0.2; // TODO: tune heading correction
 }
