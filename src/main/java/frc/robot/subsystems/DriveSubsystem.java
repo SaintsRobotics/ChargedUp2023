@@ -20,7 +20,6 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
-import frc.robot.Constants;
 import frc.robot.Robot;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -143,7 +142,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     double currentAngle = MathUtil.angleModulus(m_gyro.getRotation2d().getRadians());
 
-    if ((xSpeed == 0 && ySpeed == 0) || m_headingCorrectionTimer.get() < Constants.kTurningStopTime) {
+    if ((xSpeed == 0 && ySpeed == 0) || m_headingCorrectionTimer.get() < DriveConstants.kTurningStopTime) {
       m_headingCorrectionPID.setSetpoint(currentAngle);
     } else {
       rotation = m_headingCorrectionPID.calculate(currentAngle);
