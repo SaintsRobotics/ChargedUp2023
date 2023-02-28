@@ -2,12 +2,15 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.DriveSubsystem;
 
 public class Snap90Command extends CommandBase {
     private DriveSubsystem m_subsystem;
-    private PIDController snapPID = new PIDController(0, 0, 0); //TODO: tune this
+    private PIDController snapPID = new PIDController(7.5, 0, 0); //TODO: tune this
+    double snapAngle;
+    double currAngle;
 
     public Snap90Command(DriveSubsystem subsystem){
         m_subsystem = subsystem;
@@ -15,20 +18,24 @@ public class Snap90Command extends CommandBase {
     }
 
     @Override
-    public void execute() {
-        double snapAngle = m_subsystem.getPose().getRotation().getDegrees();
-        snapAngle = MathUtil.inputModulus(snapAngle, 0, 360);
+    public void initialize() {
+        currAngle = m_subsystem.getPose().getRotation().getDegrees();
+        currAngle = MathUtil.inputModulus(currAngle, 0, 360);
 
         //Snap angle
-        if (snapAngle >= 315 && snapAngle < 45) snapAngle = 0;
-        else if (snapAngle >= 45 && snapAngle < 135) snapAngle = 90;
-        else if (snapAngle >= 135 && snapAngle < 225) snapAngle = 180;
-        else snapAngle = 270;
+        if (currAngle >= 315 || currAngle < 45) snapAngle = 0;
+        else if (currAngle >= 45 && currAngle < 135) snapAngle = Math.PI/2;
+        else if (currAngle >= 135 && currAngle < 225) snapAngle = Math.PI;
+        else snapAngle = -Math.PI/2;
+
+    }
+
+    @Override
+    public void execute() {
     
-        //Convert to radians [-pi, pi]
-        snapAngle = MathUtil.angleModulus(Math.toRadians(snapAngle));
+        SmartDashboard.putNumber("snap angle", snapAngle);
 
         //Use heading correction to snap to angle
-        m_subsystem.drive(0, 0, snapPID.calculate(m_subsystem.getPose().getRotation().getDegrees(), snapAngle), false);
+        m_subsystem.drive(0, 0, snapPID.calculate(m_subsystem.getPose().getRotation().getRadians(), snapAngle), false);
     }
 }
