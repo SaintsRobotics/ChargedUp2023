@@ -55,8 +55,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final AHRS m_gyro = new AHRS();
   private double m_gyroAngle;
 
-  private final PIDController m_headingCorrectionPID = new PIDController(5, 0, 0); //TODO: tune heading correction PID
-	private final Timer m_headingCorrectionTimer;
+  private final PIDController m_headingCorrectionPID = new PIDController(5, 0, 0); // TODO: tune heading correction PID
+  private final Timer m_headingCorrectionTimer;
 
   private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
       DriveConstants.kDriveKinematics,
@@ -75,10 +75,9 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putData("Field", m_field);
 
     m_headingCorrectionPID.enableContinuousInput(-Math.PI, Math.PI);
-		m_headingCorrectionPID.setSetpoint(MathUtil.angleModulus(m_gyro.getRotation2d().getRadians()));
-		m_headingCorrectionTimer = new Timer();
-		m_headingCorrectionTimer.start();
-
+    m_headingCorrectionPID.setSetpoint(MathUtil.angleModulus(m_gyro.getRotation2d().getRadians()));
+    m_headingCorrectionTimer = new Timer();
+    m_headingCorrectionTimer.start();
   }
 
   @Override
@@ -137,18 +136,18 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
     if (rot != 0) {
-			m_headingCorrectionTimer.reset();
-		}
+      m_headingCorrectionTimer.reset();
+    }
 
     double rotation = rot;
 
     double currentAngle = MathUtil.angleModulus(m_gyro.getRotation2d().getRadians());
-    
+
     if ((xSpeed == 0 && ySpeed == 0) || m_headingCorrectionTimer.get() < Constants.kTurningStopTime) {
-			m_headingCorrectionPID.setSetpoint(currentAngle);
-		} else {
-			rotation = m_headingCorrectionPID.calculate(currentAngle);
-		}
+      m_headingCorrectionPID.setSetpoint(currentAngle);
+    } else {
+      rotation = m_headingCorrectionPID.calculate(currentAngle);
+    }
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
@@ -185,9 +184,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   /**
    * Gets current gyro pitch angle in degrees
+   * 
    * @return Current gyro pitch angle
    */
   public double getGyroPitch() {
-    return m_gyro.getRoll(); //Gyro is mounted the other way so roll is acutally pitch
+    // TODO check if we need pitch, yaw or roll on the new bot.
+    return m_gyro.getRoll(); // Gyro is mounted the other way so roll is acutally pitch
   }
 }
