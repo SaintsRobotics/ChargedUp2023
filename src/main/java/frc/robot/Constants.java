@@ -59,6 +59,8 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 3.6576;
     public static final double kMaxAngularSpeedRadiansPerSecond = 15.24;
 
+    public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
+
     public static final double kPTranslation = 0.5;
     public static final double kPRotation = 0.5;
     public static final double kPSnapRotate = 0.2;
@@ -130,5 +132,8 @@ public final class Constants {
     public static final double kSlowModeScalar = 0.8;
   }
 
-  public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
+  public static final class AutonConstants {
+    public static final int maxVelocity = 4;
+    public static final int maxAcceleration = 3;
+  }
 }

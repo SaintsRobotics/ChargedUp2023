@@ -3,10 +3,18 @@
     "types": {
       "/FMSInfo": "FMSInfo",
       "/SmartDashboard/Field": "Field2d",
-      "/SmartDashboard/SendableChooser[0]": "String Chooser"
+      "/SmartDashboard/SendableChooser[0]": "String Chooser",
+      "/SmartDashboard/SendableChooser[1]": "String Chooser"
     },
     "windows": {
       "/SmartDashboard/Field": {
+        "bottom": 544,
+        "height": 8.013679504394531,
+        "image": "C:\\Users\\Public\\Documents\\vscode-workspace\\ChargedUp2023\\.pathplanner\\2023-field.png",
+        "left": 46,
+        "right": 1088,
+        "top": 36,
+        "width": 16.541748046875,
         "window": {
           "visible": true
         }
@@ -19,8 +27,17 @@
     }
   },
   "NetworkTables": {
+    "Persistent Values": {
+      "open": false
+    },
+    "Retained Values": {
+      "open": false
+    },
     "transitory": {
       "LiveWindow": {
+        ".status": {
+          "open": true
+        },
         "open": true
       },
       "Shuffleboard": {
@@ -33,5 +50,8 @@
         "open": true
       }
     }
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }
