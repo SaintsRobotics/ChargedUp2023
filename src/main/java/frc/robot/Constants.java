@@ -63,8 +63,10 @@ public final class Constants {
 
     public static final double kPTranslation = 0.5;
     public static final double kPRotation = 0.5;
+    public static final double kPSnapRotate = 6;
 
     public static final double kToleranceBalance = 3.5;
+    public static final double kToleranceSnapRotate = 0.02;
   }
 
   public static final class ModuleConstants {
