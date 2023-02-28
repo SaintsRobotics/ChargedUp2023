@@ -90,8 +90,6 @@ public class RobotContainer {
     m_chooser.addOption("TopCharger", "TopCharger");
     m_chooser.addOption("TopThreeObject", "TopThreeObject");
     m_chooser.addOption("TopTwoObject", "TopTwoObject");
-    m_chooser.addOption("BottomTwoObjectCharger", "BottomTwoObjectCharger");
-    m_chooser.addOption("TopTwoObjectCharger", "TopTwoObjectCharger");
 
     // Sample event that triggers when BottomCharger is run
     m_eventMap.put("event", new WaitCommand(1));
