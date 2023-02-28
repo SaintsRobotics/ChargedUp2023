@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutonConstants;
@@ -34,7 +33,6 @@ import frc.robot.subsystems.GrabberSubsystem;
  * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
  * (including subsystems, commands, and button mappings) should be declared here.
  */
-
 public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
@@ -132,45 +130,11 @@ public class RobotContainer {
       return null;
     }
 
-    switch (path) {
-      case ("BottomCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
-            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
-      case ("BottomThreeObject"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
-            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
-      case ("BottomTwoObject"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
-            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
-      case ("MidBackCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
-            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
-      case ("MidFrontCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
-            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
-      case ("TopCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
-            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
-      case ("TopThreeObject"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
-            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
-      case ("TopTwoObject"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
-            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
-      case ("BottomTwoObjectCharger"):
-        return new SequentialCommandGroup(
-            m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("BottomTwoObject",
-                new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))),
-            m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("BottomCharger",
-                new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))));
-      case ("TopTwoObjectCharger"):
-        return new SequentialCommandGroup(
-            m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("TopTwoObject",
-                new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))),
-            m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("TopCharger",
-                new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))));
-      default:
-        return null;
-    }
+    return m_autoBuilder.fullAuto(
+        PathPlanner.loadPathGroup(
+            path,
+            new PathConstraints(
+                AutonConstants.maxVelocity,
+                AutonConstants.maxAcceleration)));
   }
 }
