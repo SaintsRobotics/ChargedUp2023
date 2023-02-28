@@ -27,10 +27,22 @@
     }
   },
   "NetworkTables": {
-    "Transitory Values": {
+    "Persistent Values": {
+      "open": false
+    },
+    "Retained Values": {
       "open": false
     },
     "transitory": {
+      "LiveWindow": {
+        ".status": {
+          "open": true
+        },
+        "open": true
+      },
+      "Shuffleboard": {
+        "open": true
+      },
       "SmartDashboard": {
         "Field": {
           "open": true
@@ -38,5 +50,8 @@
         "open": true
       }
     }
+  },
+  "NetworkTables View": {
+    "visible": false
   }
 }

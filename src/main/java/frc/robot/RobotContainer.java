@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DriveConstants;
@@ -90,11 +89,9 @@ public class RobotContainer {
     m_chooser.addOption("TopCharger", "TopCharger");
     m_chooser.addOption("TopThreeObject", "TopThreeObject");
     m_chooser.addOption("TopTwoObject", "TopTwoObject");
-
-    // Sample event that triggers when BottomCharger is run
-    m_eventMap.put("event", new WaitCommand(1));
-
     SmartDashboard.putData(m_chooser);
+
+    m_eventMap.put("BalanceCommand", new BalanceCommand(m_robotDrive));
   }
 
   /**

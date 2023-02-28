@@ -90,7 +90,9 @@
       "isLocked": true,
       "isStopPoint": false,
       "stopEvent": {
-        "names": [],
+        "names": [
+          "BalanceCommand"
+        ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",
         "waitTime": 1.0
