@@ -69,7 +69,7 @@ public final class Constants {
     public static final double kWheelDiameterMeters = 0.1;
 
     /** Gear ratio between the motor and the wheel. */
-    public static final double kDrivingGearRatio = 8.14;
+    public static final double kDrivingGearRatio = 8.14; // SDS MK4i's in L1 configuration
 
     public static final double kPModuleTurningController = -0.3;
   }
@@ -87,11 +87,11 @@ public final class Constants {
 
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
-    public static final int kOperatorcontrollerPort = 1;
+    public static final int kOperatorControllerPort = 1;
 
     public static final double kControllerDeadband = 0.2;
     public static final double kSlowModeScalar = 0.8;
   }
 
-  public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
+  public static final double kTurningStopTime = 0.2; // TODO: tune heading correction
 }
