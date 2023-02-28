@@ -28,6 +28,7 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_robotContainer = new RobotContainer();
     m_buttonTimer.start();
+    m_robotContainer.armSubsystem.seenSwitch = false;
   }
 
   @Override
@@ -37,6 +38,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    m_robotContainer.armSubsystem.seenSwitch = false;
   }
 
   @Override
@@ -50,6 +52,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void autonomousInit() {
+    m_robotContainer.armSubsystem.enable();
     m_autonomousCommand = m_robotContainer.getAutonomousCommand();
 
     if (m_autonomousCommand != null) {
@@ -63,6 +66,8 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
+    m_robotContainer.armSubsystem.enable();
+    
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
     }

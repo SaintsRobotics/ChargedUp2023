@@ -69,9 +69,44 @@ public final class Constants {
     public static final double kWheelDiameterMeters = 0.1;
 
     /** Gear ratio between the motor and the wheel. */
+
     public static final double kDrivingGearRatio = 8.14; // SDS MK4i's in L1 configuration
 
     public static final double kPModuleTurningController = -0.3;
+
+  }
+
+  public static final class ArmConstants {
+    public static final int kPivotMotorPort = 36;
+    public static final int kElevatorMotorPort = 34;
+    public static final int kPivotEncoderPort = 7;
+    public static final double kPivotEncoderOffset = -191;
+
+    public static final double kMaxPivotSpeedPercent = 0.2;
+    public static final double kMaxElevatorSpeedPercent = 0.2;
+
+    public static final int kMinLimitPort = 9; 
+    public static final int kMaxLimitPort = 8;
+
+    public static final double kRestingPivot = 0; // TODO: find correct angle values for pivot, radians
+    public static final double kMidPivot = 0;
+    public static final double kTopPivot = 0;
+    public static final double kStationPivot = 0;
+
+    public static final double kRestingPos = 0; //TODO: measure correct positions, meters
+    public static final double kMidPos = 0;
+    public static final double kTopPos = 0;
+    public static final double kStationPos = 0;
+
+    public static final int sproketTeeth = 22;
+    public static final double inchPerTeeth = 0.25;
+    public static final double gearRatio = 4/1;
+
+    public static final double kMinSwitchPos = 0;
+    public static final double kMaxSwitchPos = 0.61595 - 0.05;
+
+    public static final double kMinPivotPos = 0; // TODO find accurate min and max for pivot
+    public static final double kMaxPivotPos = 90; // 0 is straight up
   }
 
   public static final class GrabberConstants {
@@ -93,5 +128,5 @@ public final class Constants {
     public static final double kSlowModeScalar = 0.8;
   }
 
-  public static final double kTurningStopTime = 0.2; // TODO: tune heading correction
+  public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
 }
