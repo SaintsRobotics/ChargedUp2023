@@ -12,9 +12,6 @@ import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -31,7 +28,6 @@ import frc.robot.commands.BalanceCommand;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
 
-
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
  * "declarative" paradigm, very little robot logic should actually be handled in the {@link Robot}
@@ -46,7 +42,6 @@ public class RobotContainer {
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  private final SendableChooser<String> m_colorChooser = new SendableChooser<>();
 
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
@@ -57,6 +52,7 @@ public class RobotContainer {
       new PIDConstants(DriveConstants.kPRotation, 0, 0),
       m_robotDrive::setModuleStates,
       m_eventMap,
+      true,
       m_robotDrive);
 
   /**
@@ -107,9 +103,6 @@ public class RobotContainer {
     m_chooser.addOption("RedTopTwoObjectCharger", "RedTopTwoObjectCharger");
     m_chooser.addOption("RedBottomTwoObjectCharger", "RedBottomTwoObjectCharger");
 
-
-
-
     // Sample event that triggers when BlueBottomCharger is run
     m_eventMap.put("event", new WaitCommand(1));
 
@@ -126,11 +119,12 @@ public class RobotContainer {
   private void configureButtonBindings() {
     new JoystickButton(m_driverController, XboxController.Button.kStart.value)
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
-        
+
     new JoystickButton(m_driverController, XboxController.Button.kY.value)
         .whileTrue(m_BalanceCommand);
 
-    new JoystickButton(m_operatorController, XboxController.Button.kA.value).onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
+    new JoystickButton(m_operatorController, XboxController.Button.kA.value)
+        .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
   }
 
   /**
@@ -148,59 +142,74 @@ public class RobotContainer {
 
     switch (path) {
       case ("BlueBottomCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("BlueBottomTwoObject"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("BlueMidBackCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("BlueMidFrontCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("BlueTopCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("BlueTopTwoObject"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("BlueBottomTwoObjectCharger"):
         return new SequentialCommandGroup(
-          m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("BlueBottomTwoObject", new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))),
-          m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("BlueBottomCharger", new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))));
+            m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("BlueBottomTwoObject",
+                new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))),
+            m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("BlueBottomCharger",
+                new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))));
       case ("BlueTopTwoObjectCharger"):
         return new SequentialCommandGroup(
-          m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("BlueTopTwoObject", new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))),
-          m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("BlueTopCharger", new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))));
+            m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("BlueTopTwoObject",
+                new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))),
+            m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("BlueTopCharger",
+                new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))));
       case ("BlueTopThreeObject"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("BlueBottomThreeObject"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("RedMidBackCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("RedBottomCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("RedBottomTwoObject"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("RedMidFrontCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("RedTopCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("RedTopTwoObjects"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
+        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path,
+            new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration)));
       case ("RedBottomTwoObjectCharger"):
         return new SequentialCommandGroup(
-          m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("RedBottomTwoObject", new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))),
-          m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("RedBottomCharger", new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))));
+            m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("RedBottomTwoObject",
+                new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))),
+            m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("RedBottomCharger",
+                new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))));
       case ("RedTopTwoObjectCharger"):
         return new SequentialCommandGroup(
-          m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("RedTopTwoObject", new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))),
-          m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("RedTopCharger", new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))));
-
-
+            m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("RedTopTwoObject",
+                new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))),
+            m_autoBuilder.fullAuto(PathPlanner.loadPathGroup("RedTopCharger",
+                new PathConstraints(AutonConstants.maxVelocity, AutonConstants.maxAcceleration))));
 
       default:
         return null;
     }
   }
 }
-
-
-
-
-
