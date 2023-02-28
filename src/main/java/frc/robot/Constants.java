@@ -18,69 +18,73 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
  * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
-    public static final class DriveConstants {
-      public static final int kFrontLeftDriveMotorPort = 28;
-      public static final int kRearLeftDriveMotorPort = 27;
-      public static final int kFrontRightDriveMotorPort = 30;
-      public static final int kRearRightDriveMotorPort = 33;
-  
-      public static final int kFrontLeftTurningMotorPort = 29;
-      public static final int kRearLeftTurningMotorPort = 26;
-      public static final int kFrontRightTurningMotorPort = 31;
-      public static final int kRearRightTurningMotorPort = 32;
-  
-      public static final int kFrontLeftTurningEncoderPort = 3;
-      public static final int kRearLeftTurningEncoderPort = 5;
-      public static final int kFrontRightTurningEncoderPort = 4;
-      public static final int kRearRightTurningEncoderPort = 6;
-  
-      public static final double kFrontLeftTurningEncoderOffset = 237;
-      public static final double kRearLeftTurningEncoderOffset = 86.8;
-      public static final double kFrontRightTurningEncoderOffset = 297.5;
-      public static final double kRearRightTurningEncoderOffset = 225.3;
-  
-      public static final boolean kFrontLeftDriveMotorReversed = false;
-      public static final boolean kRearLeftDriveMotorReversed = false;
-      public static final boolean kFrontRightDriveMotorReversed = true;
-      public static final boolean kRearRightDriveMotorReversed = true;
-  
-      /** Distance between centers of right and left wheels on robot (in meters). */
-      public static final double kTrackWidth = 0.48;
-  
-      /** Distance between front and back wheels on robot (in meters). */
-      public static final double kWheelBase = 0.63;
-  
-      public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
-          new Translation2d(kWheelBase / 2, kTrackWidth / 2),
-          new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
-          new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
-          new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
-  
-      public static final double kMaxSpeedMetersPerSecond = 3.6576;
-      public static final double kMaxAngularSpeedRadiansPerSecond = 15.24;
+  public static final class DriveConstants {
+    public static final int kFrontLeftDriveMotorPort = 28;
+    public static final int kRearLeftDriveMotorPort = 27;
+    public static final int kFrontRightDriveMotorPort = 30;
+    public static final int kRearRightDriveMotorPort = 33;
 
-      public static final double kPTranslation = 0.5;
-      public static final double kPRotation = 0.5;
-    }
+    public static final int kFrontLeftTurningMotorPort = 29;
+    public static final int kRearLeftTurningMotorPort = 26;
+    public static final int kFrontRightTurningMotorPort = 31;
+    public static final int kRearRightTurningMotorPort = 32;
 
-    public static final class ModuleConstants {
+    public static final int kFrontLeftTurningEncoderPort = 3;
+    public static final int kRearLeftTurningEncoderPort = 5;
+    public static final int kFrontRightTurningEncoderPort = 4;
+    public static final int kRearRightTurningEncoderPort = 6;
+
+    public static final double kFrontLeftTurningEncoderOffset = 237;
+    public static final double kRearLeftTurningEncoderOffset = 86.8;
+    public static final double kFrontRightTurningEncoderOffset = 297.5;
+    public static final double kRearRightTurningEncoderOffset = 225.3;
+
+    public static final boolean kFrontLeftDriveMotorReversed = false;
+    public static final boolean kRearLeftDriveMotorReversed = false;
+    public static final boolean kFrontRightDriveMotorReversed = true;
+    public static final boolean kRearRightDriveMotorReversed = true;
+
+    /** Distance between centers of right and left wheels on robot (in meters). */
+    public static final double kTrackWidth = 0.48;
+
+    /** Distance between front and back wheels on robot (in meters). */
+    public static final double kWheelBase = 0.63;
+
+    public static final SwerveDriveKinematics kDriveKinematics = new SwerveDriveKinematics(
+        new Translation2d(kWheelBase / 2, kTrackWidth / 2),
+        new Translation2d(kWheelBase / 2, -kTrackWidth / 2),
+        new Translation2d(-kWheelBase / 2, kTrackWidth / 2),
+        new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
+
+    public static final double kMaxSpeedMetersPerSecond = 3.6576;
+    public static final double kMaxAngularSpeedRadiansPerSecond = 15.24;
+
+    public static final double kTurningStopTime = 0.2; // TODO: tune this
+
+    public static final double kPTranslation = 0.5;
+    public static final double kPRotation = 0.5;
+
+    public static final double kToleranceBalance = 3.5;
+  }
+
+  public static final class ModuleConstants {
     public static final double kWheelDiameterMeters = 0.1;
 
     /** Gear ratio between the motor and the wheel. */
-    public static final double kDrivingGearRatio = 8.14;
+    public static final double kDrivingGearRatio = 8.14; // SDS MK4i's in L1 configuration
 
     public static final double kPModuleTurningController = -0.3;
   }
 
   public static final class GrabberConstants {
     public static final int kIntakeLeftSolenoidPort = 0;
-        public static final int kIntakeRightSolenoidPort = 1;
-        public static final int kPneumaticsHubID = 2; 
+    public static final int kIntakeRightSolenoidPort = 1;
+    public static final int kPneumaticsHubID = 2;
 
-        public static final int kCompressorModuleID = 1;
+    public static final int kCompressorModuleID = 1;
 
-        public static final int kCompressorMinimumPressure = 70; 
-        public static final int kCompressorMaximumPressure = 110; 
+    public static final int kCompressorMinimumPressure = 70;
+    public static final int kCompressorMaximumPressure = 110;
   }
 
   public static final class OIConstants {
@@ -88,16 +92,11 @@ public final class Constants {
     public static final int kOperatorControllerPort = 1;
 
     public static final double kControllerDeadband = 0.2;
-    public static final double kSlowModeScalar = 0.8;    
+    public static final double kSlowModeScalar = 0.8;
   }
 
-  public static final double kTurningStopTime = 0.2; //TODO: tune this
-
-  public static final class AutonConstants { //TODO: tune these
+  public static final class AutonConstants {
     public static final int maxVelocity = 4;
-    public static final int maxAcceleration = 3; 
-
-
-  } 
-
+    public static final int maxAcceleration = 3;
+  }
 }
