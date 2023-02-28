@@ -18,9 +18,9 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.button.JoystickButton;<<<<<<<HEAD
-import frc.robot.Constants.AutonConstants;=======
-import frc.robot.Constants.ArmConstants;>>>>>>>origin/main
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.BalanceCommand;
@@ -37,8 +37,7 @@ import frc.robot.subsystems.GrabberSubsystem;
 public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final ArmSubsystem armSubsystem = new ArmSubsystem();
-  public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();<<<<<<<HEAD=======
-  private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);>>>>>>>origin/main
+  public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
