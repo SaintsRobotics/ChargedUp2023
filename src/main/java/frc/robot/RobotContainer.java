@@ -13,6 +13,7 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,9 +25,8 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.BalanceCommand;
-import frc.robot.commands.Snap90Command;
+import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
-
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
 
@@ -42,7 +42,6 @@ public class RobotContainer {
   public final ArmSubsystem armSubsystem = new ArmSubsystem();
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
   private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
-  private final Snap90Command m_snapCommand = new Snap90Command(m_robotDrive);
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
@@ -126,35 +125,39 @@ public class RobotContainer {
   private void configureButtonBindings() {
 
     // Driver Bindings
-    new JoystickButton(m_driverController, XboxController.Button.kStart.value)
+    new JoystickButton(m_driverController, Button.kStart.value)
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
 
-    new JoystickButton(m_driverController, XboxController.Button.kY.value)
+    new JoystickButton(m_driverController, Button.kY.value)
         .whileTrue(m_BalanceCommand);
-    new JoystickButton(m_driverController, XboxController.Button.kA.value)
-      .whileTrue(m_snapCommand);
+    new JoystickButton(m_driverController, Button.kA.value)
+        .onTrue(new SnapRotateCommand(m_robotDrive));
 
     // Operator Bindings
-    new JoystickButton(m_operatorController, XboxController.Button.kA.value).onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
+    new JoystickButton(m_operatorController, Button.kA.value)
+        .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
 
-    /* DO NOT USE: ROBOT WILL BREAK
-    new POVButton(m_operatorController, 0)
-        .onTrue(
-            new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up - Station
-
-    new POVButton(m_operatorController, 90)
-        .onTrue(
-            new InstantCommand(m_armSubsystem::goTop, m_armSubsystem)); // Left - Top
-
-    new POVButton(m_operatorController, 180)
-        .onTrue(
-            new InstantCommand(m_armSubsystem::goResting, m_armSubsystem)); // Down - Resting
-
-    new POVButton(m_operatorController, 270)
-        .onTrue(
-            new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
-        
-*/
+    /*
+     * DO NOT USE: ROBOT WILL BREAK
+     * new POVButton(m_operatorController, 0)
+     * .onTrue(
+     * new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up -
+     * Station
+     * 
+     * new POVButton(m_operatorController, 90)
+     * .onTrue(
+     * new InstantCommand(m_armSubsystem::goTop, m_armSubsystem)); // Left - Top
+     * 
+     * new POVButton(m_operatorController, 180)
+     * .onTrue(
+     * new InstantCommand(m_armSubsystem::goResting, m_armSubsystem)); // Down -
+     * Resting
+     * 
+     * new POVButton(m_operatorController, 270)
+     * .onTrue(
+     * new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
+     * 
+     */
   }
 
   /**

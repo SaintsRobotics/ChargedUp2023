@@ -20,6 +20,12 @@
   },
   "NetworkTables": {
     "transitory": {
+      "LiveWindow": {
+        "open": true
+      },
+      "Shuffleboard": {
+        "open": true
+      },
       "SmartDashboard": {
         "Field": {
           "open": true
