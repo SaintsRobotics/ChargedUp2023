@@ -82,13 +82,13 @@ public final class Constants {
     public static final int kPivotEncoderPort = 7;
     public static final double kPivotEncoderOffset = -191;
 
-    public static final double kMaxPivotSpeedPercent = 0.2;
+    public static final double kMaxPivotSpeedPercent = 0.3;
     public static final double kMaxElevatorSpeedPercent = 0.2;
 
     public static final int kMinLimitPort = 9; 
     public static final int kMaxLimitPort = 8;
 
-    public static final double kRestingPivot = 0; // TODO: find correct angle values for pivot, radians
+    public static final double kRestingPivot = 0; // TODO: find correct angle values for pivot, degrees
     public static final double kMidPivot = 0;
     public static final double kTopPivot = 0;
     public static final double kStationPivot = 0;

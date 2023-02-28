@@ -4,6 +4,7 @@
 
 package frc.robot.subsystems;
 
+import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
@@ -31,7 +32,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   // PID for correcting arm angle (both when changing pivot and to counteract
   // gravity)
-  private final PIDController m_pivotPID = new PIDController(0, 0, 0); // TODO: tune pivot PID controller
+  private final PIDController m_pivotPID = new PIDController(-0.05, 0, 0); // TODO: tune pivot PID controller
   /** setpoint is in meters */
   public final PIDController m_elevatorPID = new PIDController(1.5, 0, 0);
 
@@ -46,16 +47,17 @@ public class ArmSubsystem extends SubsystemBase {
    * 
    */
   public ArmSubsystem() {
-    m_pivotPID.enableContinuousInput(-Math.PI, Math.PI);
+    m_pivotPID.enableContinuousInput(-180, 180);
     m_pivotEncoder.configMagnetOffset(ArmConstants.kPivotEncoderOffset);
+    m_pivotEncoder.configAbsoluteSensorRange(AbsoluteSensorRange.Signed_PlusMinus180);
 
     m_elevatorMotor.setInverted(true);
   }
 
   /** Runs on robot enable and resets PID controller and sets seenSwitch to false */
   public void enable(){
-    // m_pivotPID.reset();
-    // m_pivotPID.setSetpoint(m_pivotEncoder.getPosition());
+    m_pivotPID.reset();
+    m_pivotPID.setSetpoint(m_pivotEncoder.getPosition());
 
     m_elevatorPID.reset();
     m_elevatorPID.setSetpoint(getElevatorEncoder());
@@ -65,6 +67,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    double ps = m_pivotPID.calculate(m_pivotEncoder.getPosition());
     SmartDashboard.putNumber("Elevator Output Current (Amps)", m_elevatorMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Output Current (Amps)", m_pivotMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getAbsolutePosition());
@@ -75,6 +78,8 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("elevator speed", m_elevatorMotor.get());
     SmartDashboard.putNumber("Elevator PID error", m_elevatorPID.getPositionError());
     SmartDashboard.putNumber("Elevator PID setpoint", m_elevatorPID.getSetpoint());
+    SmartDashboard.putNumber("Pivot Amps", m_pivotMotor.getOutputCurrent());
+    SmartDashboard.putNumber("Pivot PID out", m_encoderOffset);
 
     if (!m_minLimit.get() || !m_maxLimit.get()) {
       seenSwitch = true;
@@ -82,6 +87,7 @@ public class ArmSubsystem extends SubsystemBase {
     
     if (!m_minLimit.get()) {
       m_encoderOffset = ArmConstants.kMinSwitchPos - encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
+      m_pivotPID.setSetpoint(30);
     }
     if (!m_maxLimit.get()) {
       m_encoderOffset = ArmConstants.kMaxSwitchPos - encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
@@ -98,15 +104,18 @@ public class ArmSubsystem extends SubsystemBase {
       m_elevatorPID.setSetpoint(getElevatorEncoder());
     }
 
-    // if (m_pivotPID.getSetpoint() < ArmConstants.kMinPivotPos) {
-    //   m_pivotPID.setSetpoint(ArmConstants.kMinPivotPos);
-    // }
-    // if (m_elevatorPID.getSetpoint() > ArmConstants.kMaxPivotPos) {
-    //   m_pivotPID.setSetpoint(ArmConstants.kMaxPivotPos);
-    // }
+    if (m_pivotPID.getSetpoint() < ArmConstants.kMinPivotPos) {
+      m_pivotPID.setSetpoint(ArmConstants.kMinPivotPos);
+    }
+    if (m_elevatorPID.getSetpoint() > ArmConstants.kMaxPivotPos) {
+      m_pivotPID.setSetpoint(ArmConstants.kMaxPivotPos);
+    }
+
+    if (seenSwitch) {
+      m_pivotMotor.set(MathUtil.clamp(ps, -0.05, 0.05)); //TODO: adjust clamp value
+    }
     
-    // m_pivotMotor.set(m_pivotPID.calculate(MathUtil.clamp(m_pivotEncoder.getPosition(), -0.25, 0.25)));
-    m_elevatorMotor.set(MathUtil.clamp(m_elevatorPID.calculate(getElevatorEncoder()), -0.25, 0.25) + (0.03 * Math.cos(m_pivotEncoder.getPosition()))); //TODO: take angle into account
+   m_elevatorMotor.set(MathUtil.clamp(m_elevatorPID.calculate(getElevatorEncoder()), -0.25, 0.25) + (0.03 * Math.cos(m_pivotEncoder.getPosition()))); //TODO: take angle into account
 
   }
 
@@ -153,10 +162,7 @@ public class ArmSubsystem extends SubsystemBase {
       return;
     }
 
-    // if (pivotSpeed == 0) m_pivotPID.setSetpoint(m_pivotEncoder.getPosition());
-    if (elevatorSpeed == 0) m_elevatorPID.setSetpoint(getElevatorEncoder());
-
-    // m_pivotPID.setSetpoint(m_pivotEncoder.getPosition() + (pivotSpeed * Robot.kDefaultPeriod)); // TODO: tune manual arm control to PID setpoint multiplier
+    m_pivotPID.setSetpoint(m_pivotEncoder.getPosition() + (pivotSpeed * Robot.kDefaultPeriod));
     m_elevatorPID.setSetpoint(m_elevatorPID.getSetpoint() + (elevatorSpeed * Robot.kDefaultPeriod));
   }
 
