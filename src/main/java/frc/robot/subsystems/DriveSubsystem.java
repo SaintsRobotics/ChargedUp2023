@@ -55,7 +55,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final AHRS m_gyro = new AHRS();
   private double m_gyroAngle;
 
-  private final PIDController m_headingCorrectionPID = new PIDController(5, 0, 0); //TODO: tune this
+  private final PIDController m_headingCorrectionPID = new PIDController(5, 0, 0); //TODO: tune heading correction PID
 	private final Timer m_headingCorrectionTimer;
 
   private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
