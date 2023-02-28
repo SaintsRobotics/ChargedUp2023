@@ -77,7 +77,7 @@ public final class Constants {
     public static final int kPivotMotorPort = 36;
     public static final int kElevatorMotorPort = 34;
     public static final int kPivotEncoderPort = 7;
-    public static final double kPivotEncoderOffset = 0;
+    public static final double kPivotEncoderOffset = -191;
 
     public static final double kMaxPivotSpeedPercent = 0.2;
     public static final double kMaxElevatorSpeedPercent = 0.2;
@@ -102,8 +102,8 @@ public final class Constants {
     public static final double kMinSwitchPos = 0;
     public static final double kMaxSwitchPos = 0.61595 - 0.05;
 
-    public static final double kMinPivotPos = 90; // TODO find accurate min and max for pivot
-    public static final double kMaxPivotPos = 0; // 0 is straight up
+    public static final double kMinPivotPos = 0; // TODO find accurate min and max for pivot
+    public static final double kMaxPivotPos = 90; // 0 is straight up
   }
 
   public static final class GrabberConstants {
