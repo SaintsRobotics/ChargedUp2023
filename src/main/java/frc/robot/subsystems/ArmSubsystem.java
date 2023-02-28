@@ -52,7 +52,7 @@ public class ArmSubsystem extends SubsystemBase {
     m_elevatorMotor.setInverted(true);
   }
 
-  /** Runs on robot enable and resets PID controller */
+  /** Runs on robot enable and resets PID controller and sets seenSwitch to false */
   public void enable(){
     // m_pivotPID.reset();
     // m_pivotPID.setSetpoint(m_pivotEncoder.getPosition());
@@ -95,6 +95,10 @@ public class ArmSubsystem extends SubsystemBase {
     }
     if (m_elevatorPID.getSetpoint() > ArmConstants.kMaxSwitchPos) {
       m_elevatorPID.setSetpoint(ArmConstants.kMaxSwitchPos);
+    }
+
+    if (m_elevatorPID.getSetpoint() < getElevatorEncoder() && !seenSwitch) {
+      m_elevatorPID.setSetpoint(getElevatorEncoder());
     }
 
     // if (m_pivotPID.getSetpoint() < ArmConstants.kMinPivotPos) {
