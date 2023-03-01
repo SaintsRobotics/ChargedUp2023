@@ -41,13 +41,13 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final ArmSubsystem armSubsystem = new ArmSubsystem();
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
+  private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
 
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
-  private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
       m_robotDrive::getPose,
       m_robotDrive::resetOdometry,
