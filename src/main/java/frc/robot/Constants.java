@@ -59,10 +59,14 @@ public final class Constants {
     public static final double kMaxSpeedMetersPerSecond = 3.6576;
     public static final double kMaxAngularSpeedRadiansPerSecond = 15.24;
 
+    public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
+
     public static final double kPTranslation = 0.5;
     public static final double kPRotation = 0.5;
+    public static final double kPSnapRotate = 6;
 
     public static final double kToleranceBalance = 3.5;
+    public static final double kToleranceSnapRotate = 0.02;
   }
 
   public static final class ModuleConstants {
@@ -85,7 +89,7 @@ public final class Constants {
     public static final double kMaxPivotSpeedPercent = 20;
     public static final double kMaxElevatorSpeedPercent = 0.2;
 
-    public static final int kMinLimitPort = 9; 
+    public static final int kMinLimitPort = 9;
     public static final int kMaxLimitPort = 8;
 
     public static final double kRestingPivot = 0; // TODO: find correct angle values for pivot, degrees
@@ -93,14 +97,14 @@ public final class Constants {
     public static final double kTopPivot = 0;
     public static final double kStationPivot = 0;
 
-    public static final double kRestingPos = 0; //TODO: measure correct positions, meters
+    public static final double kRestingPos = 0; // TODO: measure correct positions, meters
     public static final double kMidPos = 0;
     public static final double kTopPos = 0;
     public static final double kStationPos = 0;
 
     public static final int sproketTeeth = 22;
     public static final double inchPerTeeth = 0.25;
-    public static final double gearRatio = 4/1;
+    public static final double gearRatio = 4 / 1;
 
     public static final double kMinSwitchPos = 0;
     public static final double kMaxSwitchPos = 0.61595 - 0.05;
@@ -128,5 +132,8 @@ public final class Constants {
     public static final double kSlowModeScalar = 0.8;
   }
 
-  public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
+  public static final class AutonConstants {
+    public static final int maxVelocity = 4;
+    public static final int maxAcceleration = 3;
+  }
 }
