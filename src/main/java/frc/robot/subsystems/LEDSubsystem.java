@@ -19,6 +19,9 @@ public class LEDSubsystem extends SubsystemBase {
 
     m_LED.setData(m_LEDBuffer);
     m_LED.start();
+
+    // Blue when bot turns on.
+    setLED(0, 0, 255);
   }
 
   /**

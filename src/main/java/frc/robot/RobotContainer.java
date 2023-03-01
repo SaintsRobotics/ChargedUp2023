@@ -41,7 +41,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final ArmSubsystem armSubsystem = new ArmSubsystem();
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
-  private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
+  private final LEDSubsystem m_LEDSubsystem = new LEDSubsystem();
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
@@ -133,14 +133,17 @@ public class RobotContainer {
         .whileTrue(new BalanceCommand(m_robotDrive));
     new JoystickButton(m_driverController, Button.kA.value)
         .onTrue(new SnapRotateCommand(m_robotDrive));
-    new JoystickButton(m_driverController, Button.kB.value)
-        .onTrue(new InstantCommand(() -> m_ledSubsystem.setLED(255, 255, 0)));
-    new JoystickButton(m_driverController, Button.kX.value)
-        .onTrue(new InstantCommand(() -> m_ledSubsystem.setLED(138, 43, 226)));
 
     // Operator Bindings
     new JoystickButton(m_operatorController, Button.kA.value)
         .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
+
+    new JoystickButton(m_operatorController, Button.kB.value)
+        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(255, 255, 0))) // Yellow
+        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 255))); // Blue
+    new JoystickButton(m_operatorController, Button.kX.value)
+        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(138, 43, 226))) // Purple
+        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 255))); // Blue
 
     /*
      * DO NOT USE: ROBOT WILL BREAK
