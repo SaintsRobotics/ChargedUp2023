@@ -36,7 +36,6 @@ public class ArmSubsystem extends SubsystemBase {
   /** setpoint is in meters */
   public final PIDController m_elevatorPID = new PIDController(1.5, 0, 0);
 
-
   public boolean seenSwitch = false; // Elevator won't move down until we see the switch
   private double m_encoderOffset = -0.16; // Encoder offset, updtated whenever a limit switch goes LOW, in meters
   private boolean plock = false;
@@ -56,8 +55,10 @@ public class ArmSubsystem extends SubsystemBase {
     m_elevatorMotor.setInverted(true);
   }
 
-  /** Runs on robot enable and resets PID controller and sets seenSwitch to false */
-  public void enable(){
+  /**
+   * Runs on robot enable and resets PID controller and sets seenSwitch to false
+   */
+  public void enable() {
     m_pivotPID.reset();
     m_pivotPID.setSetpoint(m_pivotEncoder.getAbsolutePosition());
 
@@ -76,7 +77,11 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Elevator Output Current (Amps)", m_elevatorMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Output Current (Amps)", m_pivotMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getAbsolutePosition());
-    SmartDashboard.putNumber("Elevator Relative Encoder m", getElevatorEncoder()); // this encoder has a conversion factor method. We want non absolute encoder because values can go past 360 and we need to know that
+    SmartDashboard.putNumber("Elevator Relative Encoder m", getElevatorEncoder()); // this encoder has a conversion
+                                                                                   // factor method. We want non
+                                                                                   // absolute encoder because values
+                                                                                   // can go past 360 and we need to
+                                                                                   // know that
     SmartDashboard.putBoolean("Min Limit Switch", !m_minLimit.get());
     SmartDashboard.putBoolean("Max Limit Switch", !m_maxLimit.get());
     SmartDashboard.putBoolean("Seen Switch", seenSwitch);
@@ -91,44 +96,52 @@ public class ArmSubsystem extends SubsystemBase {
     if (!m_minLimit.get() || !m_maxLimit.get()) {
       seenSwitch = true;
     }
-    
+
     if (!m_minLimit.get()) {
       m_encoderOffset = ArmConstants.kMinSwitchPos - encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
       m_pivotPID.setSetpoint(m_pivotEncoder.getAbsolutePosition());
+      return;
     }
 
     if (!m_maxLimit.get()) {
       m_encoderOffset = ArmConstants.kMaxSwitchPos - encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
+      return;
     }
 
     if (m_elevatorPID.getSetpoint() < (ArmConstants.kMinSwitchPos + 0.075) && seenSwitch) {
       m_elevatorPID.setSetpoint(ArmConstants.kMinSwitchPos + 0.075);
+      return;
     }
     if (m_elevatorPID.getSetpoint() > ArmConstants.kMaxSwitchPos) {
       m_elevatorPID.setSetpoint(ArmConstants.kMaxSwitchPos);
+      return;
     }
 
     if (m_elevatorPID.getSetpoint() < getElevatorEncoder() && !seenSwitch) {
       m_elevatorPID.setSetpoint(getElevatorEncoder());
+      return;
     }
 
-    if (m_pivotPID.getSetpoint() < ArmConstants.kMinPivotPos+3) {
-      //m_pivotPID.setSetpoint(ArmConstants.kMinPivotPos+3);
+    if (m_pivotPID.getSetpoint() < ArmConstants.kMinPivotPos + 3) {
+      // m_pivotPID.setSetpoint(ArmConstants.kMinPivotPos+3);
       m_pivotMotor.set(0);
       plock = true;
       return;
     }
     plock = false;
-    
-    if (m_pivotPID.getSetpoint() > ArmConstants.kMaxPivotPos-3) {
-      m_pivotPID.setSetpoint(ArmConstants.kMaxPivotPos-3);
+
+    if (m_pivotPID.getSetpoint() > ArmConstants.kMaxPivotPos - 3) {
+      m_pivotPID.setSetpoint(ArmConstants.kMaxPivotPos - 3);
+      return;
     }
 
-    if (seenSwitch || ps < 0) {
-      m_pivotMotor.set(MathUtil.clamp(ps, -0.3, 0.3)); //TODO: adjust clamp value
+
+    if (seenSwitch || ps < 0 || m_pivotPID.getSetpoint() <= 20) {
+      m_pivotMotor.set(MathUtil.clamp(ps, -0.3, 0.3)); // TODO: adjust clamp value
     }
-    
-   m_elevatorMotor.set(MathUtil.clamp(m_elevatorPID.calculate(getElevatorEncoder()), -0.25, 0.25) + (0.03 * Math.cos(m_pivotEncoder.getPosition()))); //TODO: take angle into account
+
+    m_elevatorMotor.set(MathUtil.clamp(m_elevatorPID.calculate(getElevatorEncoder()), -0.25, 0.25)
+        + (0.03 * Math.cos(m_pivotEncoder.getPosition()))); // TODO: take angle into account
 
   }
 
@@ -175,8 +188,9 @@ public class ArmSubsystem extends SubsystemBase {
       return;
     }
 
-    if (!plock || pivotSpeed > 0)
-    m_pivotPID.setSetpoint(m_pivotPID.getSetpoint() + (pivotSpeed * Robot.kDefaultPeriod));
+    if (!plock || pivotSpeed > 0) {
+      m_pivotPID.setSetpoint(m_pivotPID.getSetpoint() + (pivotSpeed * Robot.kDefaultPeriod));
+    }
     m_elevatorPID.setSetpoint(m_elevatorPID.getSetpoint() + (elevatorSpeed * Robot.kDefaultPeriod));
   }
 
@@ -196,15 +210,15 @@ public class ArmSubsystem extends SubsystemBase {
     // meters = rotation * 1.375 / 39.37
     return encoderValue * (ArmConstants.sproketTeeth * ArmConstants.inchPerTeeth / ArmConstants.gearRatio) / 39.37;
   }
-  
-  /** 
+
+  /**
    * Gets the elevator encoder value in meters with the offset.
    * 
    * @return The elevator encoder value.
    */
   private double getElevatorEncoder() {
     return m_encoderOffset + encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
-    // should setPositionConversionFactor on the motor rather than using encoderToMeters
+    // should setPositionConversionFactor on the motor rather than using
+    // encoderToMeters
   }
 }
-
