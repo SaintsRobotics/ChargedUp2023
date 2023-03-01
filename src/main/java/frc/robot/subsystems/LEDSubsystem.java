@@ -16,8 +16,6 @@ public class LEDSubsystem extends SubsystemBase {
   /** Creates a new {@link LEDSubsystem}. */
   public LEDSubsystem() {
     m_LED.setLength(m_LEDBuffer.getLength());
-
-    m_LED.setData(m_LEDBuffer);
     m_LED.start();
 
     // Blue when bot turns on.
@@ -35,5 +33,6 @@ public class LEDSubsystem extends SubsystemBase {
     for (var i = 0; i < m_LEDBuffer.getLength(); i++) {
       m_LEDBuffer.setRGB(i, r, g, b);
     }
+    m_LED.setData(m_LEDBuffer);
   }
 }
