@@ -13,6 +13,7 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -24,6 +25,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -38,6 +40,7 @@ public class RobotContainer {
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
+  private final LEDSubsystem m_ledSubsystem = new LEDSubsystem();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
       m_robotDrive::getPose,
       m_robotDrive::resetOdometry,
@@ -102,6 +105,10 @@ public class RobotContainer {
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
     new JoystickButton(m_driverController, XboxController.Button.kY.value)
         .whileTrue(m_BalanceCommand);
+    new JoystickButton(m_driverController, Button.kB.value)
+        .onTrue(new InstantCommand(() -> m_ledSubsystem.setLED(255, 255, 0)));
+    new JoystickButton(m_driverController, Button.kX.value)
+        .onTrue(new InstantCommand(() -> m_ledSubsystem.setLED(138, 43, 226)));
   }
 
   /**

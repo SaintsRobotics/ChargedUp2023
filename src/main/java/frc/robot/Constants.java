@@ -72,6 +72,11 @@ public final class Constants {
     public static final double kPModuleTurningController = 0.3;
   }
 
+  public static final class LEDConstants {
+    public static final int kLEDPort = 0;
+    public static final int kLEDLength = 60;
+  }
+
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
 
