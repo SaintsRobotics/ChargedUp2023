@@ -139,6 +139,10 @@ public class RobotContainer {
     new JoystickButton(m_operatorController, Button.kA.value)
         .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
 
+    new JoystickButton(m_operatorController, Button.kB.value)
+        .toggleOnTrue(new InstantCommand(armSubsystem::togglePID, armSubsystem))
+        .toggleOnFalse(new InstantCommand(armSubsystem::togglePID, armSubsystem));
+
     /*
      * DO NOT USE: ROBOT WILL BREAK
      * new POVButton(m_operatorController, 0)

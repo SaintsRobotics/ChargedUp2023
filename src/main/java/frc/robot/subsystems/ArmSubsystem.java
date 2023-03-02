@@ -37,10 +37,15 @@ public class ArmSubsystem extends SubsystemBase {
   public final PIDController m_elevatorPID = new PIDController(1.5, 0, 0);
 
   public boolean seenSwitch = false; // Elevator won't move down until we see the switch
-  private double m_encoderOffset = -0.16; // Encoder offset, updtated whenever a limit switch goes LOW, in meters
+
+  //TODO: measure this later
+  private double m_encoderElevatorOffset = -0.149678698451591; // Encoder offset, updtated whenever a limit switch goes LOW, in meters
   
   // Keeps track of whether we want to allow pivot to raise. This is used to stop the terrible oscilation when the pivot fully retracts (because the spring keeps pushing the arm away from the setpoint
   private boolean plock = false;
+
+  //Keeps track if we want to stop PIDs
+  private boolean stopPID = false;
 
   /**
    * Constructs a {@link ArmSubsystem}.
@@ -72,6 +77,7 @@ public class ArmSubsystem extends SubsystemBase {
     m_pivotMotor.set(0);
 
     seenSwitch = false;
+    stopPID = false;
   }
 
   @Override
@@ -98,7 +104,9 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Pivot PID in |", m_pivotPID.getSetpoint());
     SmartDashboard.putNumber("Pivot Error", m_pivotPID.getPositionError());
     SmartDashboard.putNumber("Elevator Out", es);
+    SmartDashboard.putBoolean("Sp", stopPID);
 
+    //TODO: drop current limit to 25Amps
     //Set seenSwitch to true if we see a switch
     if (!m_minLimit.get() || !m_maxLimit.get()) {
       seenSwitch = true;
@@ -106,33 +114,38 @@ public class ArmSubsystem extends SubsystemBase {
 
     //Correct encoder and setpoint when we hit bottom limit
     if (!m_minLimit.get()) {
-      m_encoderOffset = ArmConstants.kMinSwitchPos - encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
+      m_encoderElevatorOffset = ArmConstants.kMinSwitchPos - encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
       m_pivotPID.setSetpoint(m_pivotEncoder.getAbsolutePosition());
+      SmartDashboard.putString("return", "minlimit");
       return;
     }
 
     //Correct encoder when we hit top limit
     if (!m_maxLimit.get()) {
-      m_encoderOffset = ArmConstants.kMaxSwitchPos - encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
+      m_encoderElevatorOffset = ArmConstants.kMaxSwitchPos - encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
+      SmartDashboard.putString("return", "maxlimit");
       return;
     }
 
     //Check for underextension (physical), if so increase the setpoint
     if (m_elevatorPID.getSetpoint() < (ArmConstants.kMinSwitchPos + 0.075) && seenSwitch) {
       m_elevatorPID.setSetpoint(ArmConstants.kMinSwitchPos + 0.075);
+      SmartDashboard.putString("return", "under");
       return;
     }
     
     
     //Check for overextentsion, of so decrease the setpoint
-    if (m_elevatorPID.getSetpoint() > ArmConstants.kMaxSwitchPos) {
-      m_elevatorPID.setSetpoint(ArmConstants.kMaxSwitchPos);
+    if (m_elevatorPID.getSetpoint() > ArmConstants.kMaxSwitchPos - 0.01) {
+      m_elevatorPID.setSetpoint(ArmConstants.kMaxSwitchPos - 0.01);
+      SmartDashboard.putString("return", "overext");
       return;
     }
 
     //Don't allow retraction before seeing limit switch
     if (m_elevatorPID.getSetpoint() < getElevatorEncoder() && !seenSwitch) {
       m_elevatorPID.setSetpoint(getElevatorEncoder());
+      SmartDashboard.putString("return", "limitR");
       return;
     }
 
@@ -142,6 +155,7 @@ public class ArmSubsystem extends SubsystemBase {
       
       //Stops oscilation (due to spring and low gravitational influence on torque)
       plock = true;
+      SmartDashboard.putString("return", "bkl");
       return;
     }
     
@@ -151,18 +165,44 @@ public class ArmSubsystem extends SubsystemBase {
     //Stop pivoting too low
     if (m_pivotPID.getSetpoint() > ArmConstants.kMaxPivotPos - 3) {
       m_pivotPID.setSetpoint(ArmConstants.kMaxPivotPos - 3);
+      SmartDashboard.putString("return", "tooLo");
       return;
     }
+
+    SmartDashboard.putString("return", "none");
 
     //Only pivot if we won't hit the pivot motor mounting area
     //TODO: add anti oscilation with POV setpoints (if any setpoint may cause oscilation, current anti-oscilation code via plock only works with manual control)
     if (seenSwitch || ps < 0 || m_pivotPID.getSetpoint() <= 20) {
-      m_pivotMotor.set(MathUtil.clamp(ps, -0.3, 0.3)); // TODO: adjust clamp value
+      if (!stopPID)
+        m_pivotMotor.set(MathUtil.clamp(ps, -0.3, 0.3)); // TODO: adjust clamp value
     }
   
-    m_elevatorMotor.set(MathUtil.clamp(es, -0.25, 0.25)
-        + (0.03 * Math.cos(m_pivotEncoder.getPosition()))); // TODO: take angle into account
+    if (!stopPID) {
+      double motorSpeed = MathUtil.clamp(es, -0.25, 0.25)
+      + (0.015 * Math.cos(m_pivotEncoder.getPosition()));
+      m_elevatorMotor.set(motorSpeed); // TODO: take angle into account
+      SmartDashboard.putNumber("motorSpeed", motorSpeed);
+    } else {
+      SmartDashboard.putNumber("motorSpeed", 999);
+    }
 
+  }
+
+  /**
+   * Toggles whether or not we use PIDs and resets PIDs ands setpoints and stops motor
+   */
+  public void togglePID(){
+    m_elevatorMotor.set(0);
+    m_pivotMotor.set(0);
+
+    m_pivotPID.reset();
+    m_pivotPID.setSetpoint(m_pivotEncoder.getAbsolutePosition());
+
+    m_elevatorPID.reset();
+    m_elevatorPID.setSetpoint(getElevatorEncoder());
+
+    stopPID = !stopPID;
   }
 
   /**
@@ -204,7 +244,6 @@ public class ArmSubsystem extends SubsystemBase {
    * @param elevatorSpeed The desired speed of the elevator motor.
    */
   public void setArmSpeeds(double pivotSpeed, double elevatorSpeed) {
-    
     //Don't adjust arm speed if no input, technically uneeded in this implementation but leave it just to be safe
     if (pivotSpeed == 0 && elevatorSpeed == 0) {
       return;
@@ -241,7 +280,7 @@ public class ArmSubsystem extends SubsystemBase {
    * @return The elevator encoder value.
    */
   private double getElevatorEncoder() {
-    return m_encoderOffset + encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
+    return m_encoderElevatorOffset + encoderToMeters(m_elevatorMotor.getEncoder().getPosition());
     // should setPositionConversionFactor on the motor rather than using
     // encoderToMeters
   }
