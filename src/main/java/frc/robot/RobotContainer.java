@@ -13,17 +13,19 @@ import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
+import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.BalanceCommand;
+import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
@@ -34,12 +36,10 @@ import frc.robot.subsystems.GrabberSubsystem;
  * periodic methods (other than the scheduler calls).  Instead, the structure of the robot
  * (including subsystems, commands, and button mappings) should be declared here.
  */
-
 public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final ArmSubsystem armSubsystem = new ArmSubsystem();
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
-  private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
@@ -54,6 +54,7 @@ public class RobotContainer {
       new PIDConstants(DriveConstants.kPRotation, 0, 0),
       m_robotDrive::setModuleStates,
       m_eventMap,
+      true,
       m_robotDrive);
 
   /**
@@ -103,17 +104,17 @@ public class RobotContainer {
                     * ArmConstants.kMaxElevatorSpeedPercent),
             armSubsystem));
 
-    m_chooser.addOption("BlueBottomCharger", "BlueBottomCharger");
-    m_chooser.addOption("BlueBottomTwoObject", "BlueBottomTwoObject");
-    m_chooser.addOption("BlueMidBackCharger", "BlueMidBackCharger");
-    m_chooser.addOption("BlueMidFrontCharger", "BlueMidFrontCharger");
-    m_chooser.addOption("BlueTopCharger", "BlueTopCharger");
-    m_chooser.addOption("BlueTopTwoObject", "BlueTopTwoObject");
-
-    // Sample event that triggers when BlueBottomCharger is run
-    m_eventMap.put("event", new WaitCommand(1));
-
+    m_chooser.addOption("BottomCharger", "BottomCharger");
+    m_chooser.addOption("BottomThreeObject", "BottomThreeObject");
+    m_chooser.addOption("BottomTwoObject", "BottomTwoObject");
+    m_chooser.addOption("MidBackCharger", "MidBackCharger");
+    m_chooser.addOption("MidFrontCharger", "MidFrontCharger");
+    m_chooser.addOption("TopCharger", "TopCharger");
+    m_chooser.addOption("TopThreeObject", "TopThreeObject");
+    m_chooser.addOption("TopTwoObject", "TopTwoObject");
     SmartDashboard.putData(m_chooser);
+
+    m_eventMap.put("BalanceCommand", new BalanceCommand(m_robotDrive));
   }
 
   /**
@@ -126,33 +127,39 @@ public class RobotContainer {
   private void configureButtonBindings() {
 
     // Driver Bindings
-    new JoystickButton(m_driverController, XboxController.Button.kStart.value)
+    new JoystickButton(m_driverController, Button.kStart.value)
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
 
-    new JoystickButton(m_driverController, XboxController.Button.kY.value)
-        .whileTrue(m_BalanceCommand);
+    new JoystickButton(m_driverController, Button.kY.value)
+        .whileTrue(new BalanceCommand(m_robotDrive));
+    new JoystickButton(m_driverController, Button.kA.value)
+        .onTrue(new SnapRotateCommand(m_robotDrive));
 
     // Operator Bindings
-    new JoystickButton(m_operatorController, XboxController.Button.kA.value).onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
+    new JoystickButton(m_operatorController, Button.kA.value)
+        .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
 
-    /* DO NOT USE: ROBOT WILL BREAK
-    new POVButton(m_operatorController, 0)
-        .onTrue(
-            new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up - Station
-
-    new POVButton(m_operatorController, 90)
-        .onTrue(
-            new InstantCommand(m_armSubsystem::goTop, m_armSubsystem)); // Left - Top
-
-    new POVButton(m_operatorController, 180)
-        .onTrue(
-            new InstantCommand(m_armSubsystem::goResting, m_armSubsystem)); // Down - Resting
-
-    new POVButton(m_operatorController, 270)
-        .onTrue(
-            new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
-        
-*/
+    /*
+     * DO NOT USE: ROBOT WILL BREAK
+     * new POVButton(m_operatorController, 0)
+     * .onTrue(
+     * new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up -
+     * Station
+     * 
+     * new POVButton(m_operatorController, 90)
+     * .onTrue(
+     * new InstantCommand(m_armSubsystem::goTop, m_armSubsystem)); // Left - Top
+     * 
+     * new POVButton(m_operatorController, 180)
+     * .onTrue(
+     * new InstantCommand(m_armSubsystem::goResting, m_armSubsystem)); // Down -
+     * Resting
+     * 
+     * new POVButton(m_operatorController, 270)
+     * .onTrue(
+     * new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
+     * 
+     */
   }
 
   /**
@@ -168,21 +175,11 @@ public class RobotContainer {
       return null;
     }
 
-    switch (path) {
-      case ("BlueBottomCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(4, 3)));
-      case ("BlueBottomTwoObject"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(4, 3)));
-      case ("BlueMidBackCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(4, 3)));
-      case ("BlueMidFrontCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(4, 3)));
-      case ("BlueTopCharger"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(4, 3)));
-      case ("BlueTopTwoObject"):
-        return m_autoBuilder.fullAuto(PathPlanner.loadPathGroup(path, new PathConstraints(4, 3)));
-      default:
-        return null;
-    }
+    return m_autoBuilder.fullAuto(
+        PathPlanner.loadPathGroup(
+            path,
+            new PathConstraints(
+                AutonConstants.maxVelocity,
+                AutonConstants.maxAcceleration)));
   }
 }
