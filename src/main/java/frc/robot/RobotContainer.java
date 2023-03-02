@@ -73,16 +73,19 @@ public class RobotContainer {
                     -m_driverController.getLeftY(),
                     OIConstants.kControllerDeadband)
                     * DriveConstants.kMaxSpeedMetersPerSecond
-                    * (1 - m_driverController.getLeftTriggerAxis() * OIConstants.kSlowModeScalar),
+                    * (1 - m_driverController.getLeftTriggerAxis() * OIConstants.kSlowModeScalar)
+                    / 3,
                 MathUtil.applyDeadband(
                     -m_driverController.getLeftX(),
                     OIConstants.kControllerDeadband)
                     * DriveConstants.kMaxSpeedMetersPerSecond
-                    * (1 - m_driverController.getLeftTriggerAxis() * OIConstants.kSlowModeScalar),
+                    * (1 - m_driverController.getLeftTriggerAxis() * OIConstants.kSlowModeScalar)
+                    / 3,
                 MathUtil.applyDeadband(
                     -m_driverController.getRightX(),
                     OIConstants.kControllerDeadband)
-                    * DriveConstants.kMaxAngularSpeedRadiansPerSecond,
+                    * DriveConstants.kMaxAngularSpeedRadiansPerSecond
+                    / 3,
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
@@ -135,6 +138,10 @@ public class RobotContainer {
     // Operator Bindings
     new JoystickButton(m_operatorController, Button.kA.value)
         .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
+
+    new JoystickButton(m_operatorController, Button.kB.value)
+        .toggleOnTrue(new InstantCommand(armSubsystem::togglePID, armSubsystem))
+        .toggleOnFalse(new InstantCommand(armSubsystem::togglePID, armSubsystem));
 
     /*
      * DO NOT USE: ROBOT WILL BREAK
