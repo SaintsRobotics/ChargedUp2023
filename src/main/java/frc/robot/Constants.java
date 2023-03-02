@@ -106,7 +106,7 @@ public final class Constants {
     public static final double kMaxSwitchPos = 0.61595 - 0.05;
 
     public static final double kMinPivotPos = 0; // TODO find accurate min and max for pivot
-    public static final double kMaxPivotPos = 92; // 0 is straight up
+    public static final double kMaxPivotPos = 87; // 0 is straight up
   }
 
   public static final class GrabberConstants {
