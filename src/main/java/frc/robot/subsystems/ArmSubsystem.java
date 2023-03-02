@@ -82,9 +82,11 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
-    //TODO: remove local variable and some smart dashboard outputs
     double ps = m_pivotPID.calculate(m_pivotEncoder.getAbsolutePosition());
     double es = m_elevatorPID.calculate(getElevatorEncoder());
+    /*
+    //TODO: remove local variable and some smart dashboard outputs
+    
     SmartDashboard.putNumber("Elevator Output Current (Amps)", m_elevatorMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Output Current (Amps)", m_pivotMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getAbsolutePosition());
@@ -104,7 +106,8 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Pivot PID in |", m_pivotPID.getSetpoint());
     SmartDashboard.putNumber("Pivot Error", m_pivotPID.getPositionError());
     SmartDashboard.putNumber("Elevator Out", es);
-    SmartDashboard.putBoolean("Sp", stopPID);
+    SmartDashboard.putBoolean("Sp", stopPID); 
+    */
 
     //TODO: drop current limit to 25Amps
     //Set seenSwitch to true if we see a switch
