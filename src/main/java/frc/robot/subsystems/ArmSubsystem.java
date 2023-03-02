@@ -78,6 +78,7 @@ public class ArmSubsystem extends SubsystemBase {
   public void periodic() {
     //TODO: remove local variable and some smart dashboard outputs
     double ps = m_pivotPID.calculate(m_pivotEncoder.getAbsolutePosition());
+    double es = m_elevatorPID.calculate(getElevatorEncoder());
     SmartDashboard.putNumber("Elevator Output Current (Amps)", m_elevatorMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Output Current (Amps)", m_pivotMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getAbsolutePosition());
@@ -95,7 +96,8 @@ public class ArmSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("Pivot Amps", m_pivotMotor.getOutputCurrent());
     SmartDashboard.putNumber("Pivot PID out |", ps);
     SmartDashboard.putNumber("Pivot PID in |", m_pivotPID.getSetpoint());
-    SmartDashboard.putNumber("Error", m_pivotPID.getPositionError());
+    SmartDashboard.putNumber("Pivot Error", m_pivotPID.getPositionError());
+    SmartDashboard.putNumber("Elevator Out", es);
 
     //Set seenSwitch to true if we see a switch
     if (!m_minLimit.get() || !m_maxLimit.get()) {
@@ -158,7 +160,7 @@ public class ArmSubsystem extends SubsystemBase {
       m_pivotMotor.set(MathUtil.clamp(ps, -0.3, 0.3)); // TODO: adjust clamp value
     }
   
-    m_elevatorMotor.set(MathUtil.clamp(m_elevatorPID.calculate(getElevatorEncoder()), -0.25, 0.25)
+    m_elevatorMotor.set(MathUtil.clamp(es, -0.25, 0.25)
         + (0.03 * Math.cos(m_pivotEncoder.getPosition()))); // TODO: take angle into account
 
   }

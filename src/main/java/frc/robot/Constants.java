@@ -86,7 +86,7 @@ public final class Constants {
     public static final int kPivotEncoderPort = 7;
     public static final double kPivotEncoderOffset = -191;
 
-    public static final double kMaxPivotSpeedPercent = 20;
+    public static final double kMaxPivotSpeedPercent = 10;
     public static final double kMaxElevatorSpeedPercent = 0.2;
 
     public static final int kMinLimitPort = 9;
