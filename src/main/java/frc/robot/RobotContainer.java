@@ -132,28 +132,6 @@ public class RobotContainer {
     // Operator Bindings
     new JoystickButton(m_operatorController, Button.kA.value)
         .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
-
-    /*
-     * DO NOT USE: ROBOT WILL BREAK
-     * new POVButton(m_operatorController, 0)
-     * .onTrue(
-     * new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up -
-     * Station
-     * 
-     * new POVButton(m_operatorController, 90)
-     * .onTrue(
-     * new InstantCommand(m_armSubsystem::goTop, m_armSubsystem)); // Left - Top
-     * 
-     * new POVButton(m_operatorController, 180)
-     * .onTrue(
-     * new InstantCommand(m_armSubsystem::goResting, m_armSubsystem)); // Down -
-     * Resting
-     * 
-     * new POVButton(m_operatorController, 270)
-     * .onTrue(
-     * new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
-     * 
-     */
   }
 
   /**
