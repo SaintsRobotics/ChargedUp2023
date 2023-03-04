@@ -307,7 +307,7 @@ public class ArmSubsystem extends SubsystemBase {
   //     return 0;
   //   }
   //   if (pivotEncoderVal <= ArmConstants.kMidPivot)
-  }
+  // }
   // private double getElevatorMaxCheckpoints () {
   //   double pivotEncoderVal = MathUtil.clamp(m_pivotEncoder.getAbsolutePosition(), 0, 90);
   //   double maxHeight = 999;
