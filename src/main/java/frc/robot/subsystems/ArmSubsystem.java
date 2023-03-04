@@ -43,6 +43,7 @@ public class ArmSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // Sets the position of the elevator encoder when it sees a limit switch
     if (!m_minLimit.get()) {
       m_elevatorMotor.getEncoder().setPosition(0);
     }
