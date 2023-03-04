@@ -85,9 +85,9 @@ public class ArmSubsystem extends SubsystemBase {
     double es = m_elevatorPID.calculate(getElevatorEncoder());
 
     SmartDashboard.putNumber("Elevator Encoder", getElevatorEncoder() * 39.3); // inches
-    SmartDashboard.putNumber("elevator distance difference (length until max)", getElevatorMax() - getElevatorEncoder() * 39.3);
+    // SmartDashboard.putNumber("elevator distance difference (length until max)", getElevatorMax() - getElevatorEncoder() * 39.3);
     SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getAbsolutePosition());
-    SmartDashboard.putNumber("elevator max extension", getElevatorMax() * 39.3);
+    SmartDashboard.putNumber("elevator max extension", getElevatorMaxCheckpoints() * 39.3);
     SmartDashboard.putNumber("theoretical distance past frame", 39.3 * (getElevatorEncoder() * Math.sin(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) - ArmConstants.kAxleToFrontPerimeter));
     SmartDashboard.putNumber("theoretical height", 39.3 * (getElevatorEncoder() * Math.cos(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) + ArmConstants.kPivotAxleHeight));
 
@@ -163,7 +163,17 @@ public class ArmSubsystem extends SubsystemBase {
       return;
     }
 
-    MathUtil.clamp(m_elevatorPID.getSetpoint(), m_elevatorPID.getSetpoint(), getElevatorMax());
+    // SmartDashboard.putNumber("elevator distance difference (length until max)", (getElevatorMaxCheckpoints() - getElevatorEncoder()) * 39.3);
+    // SmartDashboard.putNumber("elevator", getElevatorEncoder());
+    // SmartDashboard.putNumber("max ext", getElevatorMaxCheckpoints());
+    // SmartDashboard.putBoolean("elevatorMaxCheck", m_elevatorPID.getSetpoint() > getElevatorMaxCheckpoints());
+    // if (m_elevatorPID.getSetpoint() > getElevatorMaxCheckpoints()) {
+    //   m_elevatorMotor.set(0);
+    //   m_elevatorPID.setSetpoint(getElevatorEncoder());
+    //   SmartDashboard.putNumber("elevatorMaxSetpoint", m_elevatorPID.getSetpoint());
+
+    //   return;
+    // }
 
     //Stop pivoting backwards
     if (m_pivotPID.getSetpoint() < ArmConstants.kMinPivotPos + 3) {
@@ -308,17 +318,19 @@ public class ArmSubsystem extends SubsystemBase {
   //   }
   //   if (pivotEncoderVal <= ArmConstants.kMidPivot)
   // }
-  // private double getElevatorMaxCheckpoints () {
-  //   double pivotEncoderVal = MathUtil.clamp(m_pivotEncoder.getAbsolutePosition(), 0, 90);
-  //   double maxHeight = 999;
-  //   double maxExtension = 999;
-  
-  // double extensionLimit = ArmConstants.kAxleToFrontPerimeter - ArmConstants.kMinSwitchPos*Math.cos(pivotEncoderValue);
-  // maxExtension = ArmConstants.kMaxFrameExtensionLimit + extensionLimit - ArmConstants.kGrabberToDetector;
-  // double heightLimit = ArmConstants.floor2ArmBase + ArmConstants.kMinPivotPos * Math.sin(pivotEncoderValue);
 
+  private double getElevatorMaxCheckpoints () {
+    double pivotEncoderVal = Math.toRadians(MathUtil.clamp(m_pivotEncoder.getAbsolutePosition(), 0, 90));
     
-  // }
+    double max_extension = (ArmConstants.kMaxFrameExtensionLimit + ArmConstants.kAxleToFrontPerimeter) / (pivotEncoderVal == 0 ? 1.0e-10 : Math.sin(pivotEncoderVal));
+    max_extension -= ArmConstants.detector2tip + ArmConstants.kLimitToAxle;
+
+    double max_height = (ArmConstants.kMaxExtensionHeight) / (pivotEncoderVal == Math.PI/2 ? 1.0e-10 : Math.cos(pivotEncoderVal));
+    max_height -= ArmConstants.floor2ArmBase + ArmConstants.detector2tip;
+
+    return Math.min(max_height, max_extension);
+  }
+
   private double getElevatorMax() {
     double maxHeight = 999;
     double maxExtension = 999;

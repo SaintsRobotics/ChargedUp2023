@@ -110,9 +110,9 @@ public final class Constants {
     public static final double gearRatio = 4 / 1;
 
     public static final double kMinSwitchPos = 0;
-    public static final double kMaxSwitchPos = 0.61595;
+    public static final double kMaxSwitchPos = 0.42; //0.61595;
 
-    public static final double kMinPivotPos = 0; // TODO find accurate min and max for pivot
+    public static final double kMinPivotPos = 0; 
     public static final double kMaxPivotPos = 90; // 0 is straight up
 
     public static final double kPivotAxleHeight = 0.2286; // All values in meters
@@ -120,7 +120,8 @@ public final class Constants {
     public static final double kMaxExtensionHeight = 1.9812 - 0.05; // minus 5 centimeters of leeway
     public static final double kMaxFrameExtensionLimit = 1.2192 - 0.02; // minus 2 centimeters of leeway
     public static final double kElevatorMaxExtensionOffset = 0.3683; // L offset
-    public static final double kGrabberToDetector = 0;
+    public static final double kGrabberToDetector = 40.5/39.3;
+    public static final double kLimitToAxle = 0.149678698451591;
   }
 
   public static final class GrabberConstants {
