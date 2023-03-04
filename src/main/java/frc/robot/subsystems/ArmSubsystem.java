@@ -78,6 +78,8 @@ public class ArmSubsystem extends SubsystemBase {
 
     seenSwitch = false;
     stopPID = false;
+
+    if (getElevatorEncoder() > -0.1) seenSwitch = true;
   }
 
   @Override
