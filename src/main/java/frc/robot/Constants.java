@@ -133,7 +133,7 @@ public final class Constants {
   }
 
   public static final class AutonConstants {
-    public static final int maxVelocity = 4;
-    public static final int maxAcceleration = 3;
+    public static final double kMaxVelocity = 1;
+    public static final double kMaxAcceleration = 0.5;
   }
 }

@@ -183,7 +183,7 @@ public class RobotContainer {
         PathPlanner.loadPathGroup(
             path,
             new PathConstraints(
-                AutonConstants.maxVelocity,
-                AutonConstants.maxAcceleration)));
+                AutonConstants.kMaxVelocity,
+                AutonConstants.kMaxAcceleration)));
   }
 }
