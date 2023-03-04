@@ -83,6 +83,14 @@ public class ArmSubsystem extends SubsystemBase {
   public void periodic() {
     double ps = m_pivotPID.calculate(m_pivotEncoder.getAbsolutePosition());
     double es = m_elevatorPID.calculate(getElevatorEncoder());
+
+    SmartDashboard.putNumber("Elevator Encoder", getElevatorEncoder() * 39.3); // inches
+    SmartDashboard.putNumber("elevator distance difference (length until max)", getElevatorMax() - getElevatorEncoder() * 39.3);
+    SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getAbsolutePosition());
+    SmartDashboard.putNumber("elevator max extension", getElevatorMax() * 39.3);
+    SmartDashboard.putNumber("theoretical distance past frame", 39.3 * (getElevatorEncoder() * Math.sin(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) - ArmConstants.kAxleToFrontPerimeter));
+    SmartDashboard.putNumber("theoretical height", 39.3 * (getElevatorEncoder() * Math.cos(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) + ArmConstants.kPivotAxleHeight));
+
     /*
     //TODO: remove local variable and some smart dashboard outputs
     
@@ -293,18 +301,45 @@ public class ArmSubsystem extends SubsystemBase {
     // encoderToMeters
   }
 
-  private double getElevatorMax() {
-    double maxHeight = ArmConstants.kMaxExtensionHeight;
-    double maxExtension = 999;
-    double pivotEncoderValue = m_pivotEncoder.getAbsolutePosition(); // Ensures that the pivot encoder does not update between calls
+  // private double getElevatorMaxCheckpoints () {
+  //   double pivotEncoderVal = MathUtil.clamp(m_pivotEncoder.getAbsolutePosition(), 0, 90);
+  //   if (pivotEncoderVal >= 0 && pivotEncoderVal <= ArmConstants.kTopPivot) {
+  //     return 0;
+  //   }
+  //   if (pivotEncoderVal <= ArmConstants.kMidPivot)
+  }
+  // private double getElevatorMaxCheckpoints () {
+  //   double pivotEncoderVal = MathUtil.clamp(m_pivotEncoder.getAbsolutePosition(), 0, 90);
+  //   double maxHeight = 999;
+  //   double maxExtension = 999;
+  
+  // double extensionLimit = ArmConstants.kAxleToFrontPerimeter - ArmConstants.kMinSwitchPos*Math.cos(pivotEncoderValue);
+  // maxExtension = ArmConstants.kMaxFrameExtensionLimit + extensionLimit - ArmConstants.kGrabberToDetector;
+  // double heightLimit = ArmConstants.floor2ArmBase + ArmConstants.kMinPivotPos * Math.sin(pivotEncoderValue);
 
+    
+  // }
+  private double getElevatorMax() {
+    double maxHeight = 999;
+    double maxExtension = 999;
+    double pivotEncoderValue = MathUtil.clamp(m_pivotEncoder.getAbsolutePosition(), 0, 90); // Ensures that the pivot encoder does not update between calls
+
+    // grabberToDetector = value between the limit switch detector and the tip of the grabber
+    // extensionLimit = horizontal distance between limit switch and the front of frame
+
+    
+    
     if (pivotEncoderValue != 0) {
-      maxExtension = (ArmConstants.kMaxFrameExtensionLimit + ArmConstants.kAxleToFrontPerimeter)/Math.sin(pivotEncoderValue);
+      maxExtension = (ArmConstants.kMaxFrameExtensionLimit + ArmConstants.kAxleToFrontPerimeter)/Math.sin(Math.toRadians(pivotEncoderValue));
     }
     if (pivotEncoderValue != 90) {
-      maxHeight = (ArmConstants.kMaxExtensionHeight - ArmConstants.kPivotAxleHeight)/Math.cos(pivotEncoderValue);
+      maxHeight = (ArmConstants.kMaxExtensionHeight - ArmConstants.kPivotAxleHeight)/Math.cos(Math.toRadians(pivotEncoderValue));
     }
 
+    SmartDashboard.putNumber("maxHeight", maxHeight * 39.3);
+    SmartDashboard.putNumber("maxExtension", maxExtension * 39.3);
+  
     return Math.min(maxHeight, maxExtension) - ArmConstants.kElevatorMaxExtensionOffset; // TODO: Check math with Greg
   }
 }
+

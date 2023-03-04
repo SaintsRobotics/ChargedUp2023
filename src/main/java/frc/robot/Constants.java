@@ -81,6 +81,9 @@ public final class Constants {
   }
 
   public static final class ArmConstants {
+    public static final double floor2ArmBase = 10f / 39.37;
+    public static final double detector2tip = 42f / 39.37;
+
     public static final int kPivotMotorPort = 36;
     public static final int kElevatorMotorPort = 34;
     public static final int kPivotEncoderPort = 7;
@@ -112,11 +115,12 @@ public final class Constants {
     public static final double kMinPivotPos = 0; // TODO find accurate min and max for pivot
     public static final double kMaxPivotPos = 90; // 0 is straight up
 
-    public static final double kPivotAxleHeight = 0; // All values in meters
-    public static final double kAxleToFrontPerimeter = 0;
+    public static final double kPivotAxleHeight = 0.2286; // All values in meters
+    public static final double kAxleToFrontPerimeter = 0.5588;
     public static final double kMaxExtensionHeight = 1.9812 - 0.05; // minus 5 centimeters of leeway
     public static final double kMaxFrameExtensionLimit = 1.2192 - 0.02; // minus 2 centimeters of leeway
-    public static final double kElevatorMaxExtensionOffset = 0; // L offset
+    public static final double kElevatorMaxExtensionOffset = 0.3683; // L offset
+    public static final double kGrabberToDetector = 0;
   }
 
   public static final class GrabberConstants {
