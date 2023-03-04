@@ -111,6 +111,12 @@ public final class Constants {
 
     public static final double kMinPivotPos = 0; // TODO find accurate min and max for pivot
     public static final double kMaxPivotPos = 90; // 0 is straight up
+
+    public static final double kPivotAxleHeight = 0; // All values in meters
+    public static final double kAxleToFrontPerimeter = 0;
+    public static final double kMaxExtensionHeight = 1.9812 - 0.05; // minus 5 centimeters of leeway
+    public static final double kMaxFrameExtensionLimit = 1.2192 - 0.02; // minus 2 centimeters of leeway
+    public static final double kElevatorMaxExtensionOffset = 0; // L offset
   }
 
   public static final class GrabberConstants {
