@@ -34,6 +34,15 @@ public final class Constants {
     public static final double kElevatorStartingPosition = 0;
     public static final double kElevatorLowPosition = 1;
     public static final double kElevatorHighPosition = 2;
+
+    public static final double kPPivotPID = 1;
+    public static final double kPivotMaxVelocity = 1;
+    public static final double kPivotMaxAcceleration = 1;
+
+    public static final double kPElevatorPID = 1;
+
+    public static final double kPivotTolerance = 1;
+    public static final double kElevatorTolerance = 1;
   }
 
   public static final class DriveConstants {

@@ -8,14 +8,16 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.ArmSubsystem;
 
 /** Drives the arm to a desired position. */
 public class ArmCommand extends CommandBase {
   private final ArmSubsystem m_subsystem;
 
-  private final ProfiledPIDController m_pivotPID = new ProfiledPIDController(0.03, 0, 0.002, new Constraints(1, 1));
-  private final PIDController m_elevatorPID = new PIDController(1.5, 0, 0);
+  private final ProfiledPIDController m_pivotPID = new ProfiledPIDController(ArmConstants.kPPivotPID, 0, 0,
+      new Constraints(ArmConstants.kPivotMaxVelocity, ArmConstants.kPivotMaxAcceleration));
+  private final PIDController m_elevatorPID = new PIDController(ArmConstants.kPElevatorPID, 0, 0);
 
   /**
    * Creates a new {@link ArmCommand}.
@@ -31,8 +33,8 @@ public class ArmCommand extends CommandBase {
     m_pivotPID.setGoal(pivotSetpoint);
     m_elevatorPID.setSetpoint(elevatorSetpoint);
 
-    m_pivotPID.setTolerance(10);
-    m_elevatorPID.setTolerance(1);
+    m_pivotPID.setTolerance(ArmConstants.kPivotTolerance);
+    m_elevatorPID.setTolerance(ArmConstants.kElevatorTolerance);
 
     m_pivotPID.enableContinuousInput(-180, 180);
   }
