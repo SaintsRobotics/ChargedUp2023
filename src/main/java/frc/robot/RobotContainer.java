@@ -25,6 +25,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.SnapRotateCommand;
+import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
 
@@ -35,6 +36,7 @@ import frc.robot.subsystems.GrabberSubsystem;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
 
@@ -59,6 +61,16 @@ public class RobotContainer {
    */
   public RobotContainer() {
     configureButtonBindings();
+
+    m_armSubsystem.setDefaultCommand(
+        new RunCommand(() -> m_armSubsystem.set(
+            MathUtil.applyDeadband(
+                -m_operatorController.getLeftY(),
+                OIConstants.kControllerDeadband),
+            MathUtil.applyDeadband(
+                -m_operatorController.getRightY(),
+                OIConstants.kControllerDeadband)),
+            m_armSubsystem));
 
     m_robotDrive.setDefaultCommand(
         // The left stick controls translation of the robot.

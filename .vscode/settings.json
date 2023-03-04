@@ -32,6 +32,7 @@
     "Deadband",
     "odometry",
     "pathplanner",
+    "Setpoint",
     "teleop",
     "wpilib",
     "wpilibj"
