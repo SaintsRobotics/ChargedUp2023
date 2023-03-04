@@ -18,6 +18,24 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
  * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final class ArmConstants {
+    public static final int kPivotMotorPort = 36;
+    public static final int kElevatorMotorPort = 34;
+    public static final int kPivotEncoderPort = 7;
+    public static final int kLowLimitSwitchPort = 9;
+    public static final int kHighLimitSwitchPort = 8;
+
+    public static final boolean kPivotMotorInverted = false;
+    public static final boolean kElevatorMotorInverted = true;
+
+    public static final double kPivotEncoderOffset = -191;
+    public static final double kElevatorEncoderPositionConversionFactor = (22 * 0.25 / 4.0) / 39.37;
+
+    public static final double kElevatorStartingPosition = 0;
+    public static final double kElevatorLowPosition = 1;
+    public static final double kElevatorHighPosition = 2;
+  }
+
   public static final class DriveConstants {
     public static final int kFrontLeftDriveMotorPort = 28;
     public static final int kRearLeftDriveMotorPort = 27;
