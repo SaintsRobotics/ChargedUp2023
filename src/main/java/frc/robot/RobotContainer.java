@@ -20,13 +20,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
-import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.SnapRotateCommand;
-import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
 
@@ -38,7 +36,6 @@ import frc.robot.subsystems.GrabberSubsystem;
  */
 public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  public final ArmSubsystem armSubsystem = new ArmSubsystem();
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
@@ -89,21 +86,6 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
-    // Left stick y axis controls pivot
-    // Right stick y axis controls extension
-    armSubsystem.setDefaultCommand(
-        new RunCommand(
-            () -> armSubsystem.setArmSpeeds(
-                MathUtil.applyDeadband(
-                    -m_operatorController.getLeftY(),
-                    OIConstants.kControllerDeadband)
-                    * ArmConstants.kMaxPivotSpeedPercent,
-                MathUtil.applyDeadband(
-                    -m_operatorController.getRightY(),
-                    OIConstants.kControllerDeadband)
-                    * ArmConstants.kMaxElevatorSpeedPercent),
-            armSubsystem));
-
     m_chooser.addOption("BottomCharger", "BottomCharger");
     m_chooser.addOption("BottomThreeObject", "BottomThreeObject");
     m_chooser.addOption("BottomTwoObject", "BottomTwoObject");
@@ -138,10 +120,6 @@ public class RobotContainer {
     // Operator Bindings
     new JoystickButton(m_operatorController, Button.kA.value)
         .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
-
-    new JoystickButton(m_operatorController, Button.kB.value)
-        .toggleOnTrue(new InstantCommand(armSubsystem::togglePID, armSubsystem))
-        .toggleOnFalse(new InstantCommand(armSubsystem::togglePID, armSubsystem));
 
     /*
      * DO NOT USE: ROBOT WILL BREAK
