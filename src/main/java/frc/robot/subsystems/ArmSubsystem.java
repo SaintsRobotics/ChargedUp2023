@@ -50,6 +50,11 @@ public class ArmSubsystem extends SubsystemBase {
     if (!m_maxLimit.get()) {
       m_elevatorMotor.getEncoder().setPosition(0.616);
     }
+
+    // Robot must not extend above a certain height
+    if (m_elevatorMotor.getEncoder().getPosition() > 1) {
+      m_elevatorMotor.set(-0.1);
+    }
   }
 
   /**
