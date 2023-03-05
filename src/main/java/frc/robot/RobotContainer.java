@@ -25,13 +25,13 @@ import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AutonDriveCommand;
-import frc.robot.commands.AutonTimerCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -45,167 +45,171 @@ import frc.robot.subsystems.GrabberSubsystem;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-    private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-    public final ArmSubsystem armSubsystem = new ArmSubsystem();
-    public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
+  private final DriveSubsystem m_robotDrive = new DriveSubsystem();
+  public final ArmSubsystem armSubsystem = new ArmSubsystem();
+  public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
 
-    private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
-    private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
-    private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
-    private final SendableChooser<String> m_chooser = new SendableChooser<>();
-    private final HashMap<String, Command> m_eventMap = new HashMap<>();
-    private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
-            m_robotDrive::getPose,
-            m_robotDrive::resetOdometry,
-            DriveConstants.kDriveKinematics,
-            new PIDConstants(DriveConstants.kPTranslation, 0, 0),
-            new PIDConstants(DriveConstants.kPRotation, 0, 0),
-            m_robotDrive::setModuleStates,
-            m_eventMap,
-            true,
-            m_robotDrive);
+  private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
+  private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
+  private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
+  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final HashMap<String, Command> m_eventMap = new HashMap<>();
+  private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
+      m_robotDrive::getPose,
+      m_robotDrive::resetOdometry,
+      DriveConstants.kDriveKinematics,
+      new PIDConstants(DriveConstants.kPTranslation, 0, 0),
+      new PIDConstants(DriveConstants.kPRotation, 0, 0),
+      m_robotDrive::setModuleStates,
+      m_eventMap,
+      true,
+      m_robotDrive);
 
-    /**
-     * The container for the robot. Contains subsystems, OI devices, and commands.
+  /**
+   * The container for the robot. Contains subsystems, OI devices, and commands.
+   */
+  public RobotContainer() {
+    configureButtonBindings();
+
+    m_robotDrive.setDefaultCommand(
+        // The left stick controls translation of the robot.
+        // Turning is controlled by the X axis of the right stick.
+        // Holding left trigger engages slow mode
+        new RunCommand(
+            () -> m_robotDrive.drive(
+                MathUtil.applyDeadband(
+                    -m_driverController.getLeftY(),
+                    OIConstants.kControllerDeadband)
+                    * DriveConstants.kMaxSpeedMetersPerSecond
+                    * (1 - m_driverController
+                        .getLeftTriggerAxis()
+                        * OIConstants.kSlowModeScalar)
+                    / 2,
+                MathUtil.applyDeadband(
+                    -m_driverController.getLeftX(),
+                    OIConstants.kControllerDeadband)
+                    * DriveConstants.kMaxSpeedMetersPerSecond
+                    * (1 - m_driverController
+                        .getLeftTriggerAxis()
+                        * OIConstants.kSlowModeScalar)
+                    / 2,
+                MathUtil.applyDeadband(
+                    -m_driverController.getRightX(),
+                    OIConstants.kControllerDeadband)
+                    * DriveConstants.kMaxAngularSpeedRadiansPerSecond
+                    / 2,
+                !m_driverController.getRightBumper()),
+            m_robotDrive));
+
+    // Left stick y axis controls pivot
+    // Right stick y axis controls extension
+    armSubsystem.setDefaultCommand(
+        new RunCommand(
+            () -> armSubsystem.setArmSpeeds(
+                MathUtil.applyDeadband(
+                    -m_operatorController.getLeftY(),
+                    OIConstants.kControllerDeadband)
+                    * ArmConstants.kMaxPivotSpeedPercent,
+                MathUtil.applyDeadband(
+                    -m_operatorController.getRightY(),
+                    OIConstants.kControllerDeadband)
+                    * ArmConstants.kMaxElevatorSpeedPercent),
+            armSubsystem));
+
+    m_chooser.addOption("BottomCharger", "BottomCharger");
+    m_chooser.addOption("BottomThreeObject", "BottomThreeObject");
+    m_chooser.addOption("BottomTwoObject", "BottomTwoObject");
+    m_chooser.addOption("MidBackCharger", "MidBackCharger");
+    m_chooser.addOption("MidFrontCharger", "MidFrontCharger");
+    m_chooser.addOption("TopCharger", "TopCharger");
+    m_chooser.addOption("TopThreeObject", "TopThreeObject");
+    m_chooser.addOption("TopTwoObject", "TopTwoObject");
+    SmartDashboard.putData(m_chooser);
+
+    m_eventMap.put("BalanceCommand", new BalanceCommand(m_robotDrive));
+  }
+
+  /**
+   * Use this method to define your button->command mappings. Buttons can be
+   * created by instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of
+   * its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
+   * {@link XboxController}), and then calling passing it to a
+   * {@link JoystickButton}.
+   */
+  private void configureButtonBindings() {
+
+    // Driver Bindings
+    new JoystickButton(m_driverController, Button.kStart.value)
+        .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
+
+    new JoystickButton(m_driverController, Button.kY.value)
+        .whileTrue(new BalanceCommand(m_robotDrive));
+    new JoystickButton(m_driverController, Button.kA.value)
+        .onTrue(new SnapRotateCommand(m_robotDrive));
+    new JoystickButton(m_driverController, Button.kX.value)
+        .onTrue(m_BalanceCommand);
+
+    // Operator Bindings
+    new JoystickButton(m_operatorController, Button.kA.value)
+        .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
+
+    new JoystickButton(m_operatorController, Button.kB.value)
+        .toggleOnTrue(new InstantCommand(armSubsystem::togglePID, armSubsystem))
+        .toggleOnFalse(new InstantCommand(armSubsystem::togglePID, armSubsystem));
+
+    /*
+     * DO NOT USE: ROBOT WILL BREAK
+     * new POVButton(m_operatorController, 0)
+     * .onTrue(
+     * new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up -
+     * Station
+     * 
+     * new POVButton(m_operatorController, 90)
+     * .onTrue(
+     * new InstantCommand(m_armSubsystem::goTop, m_armSubsystem)); // Left - Top
+     * 
+     * new POVButton(m_operatorController, 180)
+     * .onTrue(
+     * new InstantCommand(m_armSubsystem::goResting, m_armSubsystem)); // Down -
+     * Resting
+     * 
+     * new POVButton(m_operatorController, 270)
+     * .onTrue(
+     * new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
+     * 
      */
-    public RobotContainer() {
-        configureButtonBindings();
+  }
 
-        m_robotDrive.setDefaultCommand(
-                // The left stick controls translation of the robot.
-                // Turning is controlled by the X axis of the right stick.
-                // Holding left trigger engages slow mode
-                new RunCommand(
-                        () -> m_robotDrive.drive(
-                                MathUtil.applyDeadband(
-                                        -m_driverController.getLeftY(),
-                                        OIConstants.kControllerDeadband)
-                                        * DriveConstants.kMaxSpeedMetersPerSecond
-                                        * (1 - m_driverController.getLeftTriggerAxis() * OIConstants.kSlowModeScalar)
-                                        / 2,
-                                MathUtil.applyDeadband(
-                                        -m_driverController.getLeftX(),
-                                        OIConstants.kControllerDeadband)
-                                        * DriveConstants.kMaxSpeedMetersPerSecond
-                                        * (1 - m_driverController.getLeftTriggerAxis() * OIConstants.kSlowModeScalar)
-                                        / 2,
-                                MathUtil.applyDeadband(
-                                        -m_driverController.getRightX(),
-                                        OIConstants.kControllerDeadband)
-                                        * DriveConstants.kMaxAngularSpeedRadiansPerSecond
-                                        / 2,
-                                !m_driverController.getRightBumper()),
-                        m_robotDrive));
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    // Timer m_autonTimer = new Timer();
+    // m_autonTimer.start();
 
-        // Left stick y axis controls pivot
-        // Right stick y axis controls extension
-        armSubsystem.setDefaultCommand(
-                new RunCommand(
-                        () -> armSubsystem.setArmSpeeds(
-                                MathUtil.applyDeadband(
-                                        -m_operatorController.getLeftY(),
-                                        OIConstants.kControllerDeadband)
-                                        * ArmConstants.kMaxPivotSpeedPercent,
-                                MathUtil.applyDeadband(
-                                        -m_operatorController.getRightY(),
-                                        OIConstants.kControllerDeadband)
-                                        * ArmConstants.kMaxElevatorSpeedPercent),
-                        armSubsystem));
+    // String path;
+    // if (m_chooser.getSelected() != null) {
+    // path = m_chooser.getSelected();
+    // } else {
+    // return null;
+    // }
 
-        m_chooser.addOption("BottomCharger", "BottomCharger");
-        m_chooser.addOption("BottomThreeObject", "BottomThreeObject");
-        m_chooser.addOption("BottomTwoObject", "BottomTwoObject");
-        m_chooser.addOption("MidBackCharger", "MidBackCharger");
-        m_chooser.addOption("MidFrontCharger", "MidFrontCharger");
-        m_chooser.addOption("TopCharger", "TopCharger");
-        m_chooser.addOption("TopThreeObject", "TopThreeObject");
-        m_chooser.addOption("TopTwoObject", "TopTwoObject");
-        SmartDashboard.putData(m_chooser);
+    // return m_autoBuilder.fullAuto(
+    // PathPlanner.loadPathGroup(
+    // path,
+    // new PathConstraints(
+    // AutonConstants.maxVelocity,
+    // AutonConstants.maxAcceleration)));
 
-        m_eventMap.put("BalanceCommand", new BalanceCommand(m_robotDrive));
-    }
-
-    /**
-     * Use this method to define your button->command mappings. Buttons can be
-     * created by instantiating a {@link edu.wpi.first.wpilibj.GenericHID} or one of
-     * its subclasses ({@link edu.wpi.first.wpilibj.Joystick} or
-     * {@link XboxController}), and then calling passing it to a
-     * {@link JoystickButton}.
-     */
-    private void configureButtonBindings() {
-
-        // Driver Bindings
-        new JoystickButton(m_driverController, Button.kStart.value)
-                .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
-
-        new JoystickButton(m_driverController, Button.kY.value)
-                .whileTrue(new BalanceCommand(m_robotDrive));
-        new JoystickButton(m_driverController, Button.kA.value)
-                .onTrue(new SnapRotateCommand(m_robotDrive));
-        new JoystickButton(m_driverController, Button.kX.value)
-            .onTrue(m_BalanceCommand);
-
-        // Operator Bindings
-        new JoystickButton(m_operatorController, Button.kA.value)
-                .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
-
-        new JoystickButton(m_operatorController, Button.kB.value)
-                .toggleOnTrue(new InstantCommand(armSubsystem::togglePID, armSubsystem))
-                .toggleOnFalse(new InstantCommand(armSubsystem::togglePID, armSubsystem));
-
-        /*
-         * DO NOT USE: ROBOT WILL BREAK
-         * new POVButton(m_operatorController, 0)
-         * .onTrue(
-         * new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up -
-         * Station
-         * 
-         * new POVButton(m_operatorController, 90)
-         * .onTrue(
-         * new InstantCommand(m_armSubsystem::goTop, m_armSubsystem)); // Left - Top
-         * 
-         * new POVButton(m_operatorController, 180)
-         * .onTrue(
-         * new InstantCommand(m_armSubsystem::goResting, m_armSubsystem)); // Down -
-         * Resting
-         * 
-         * new POVButton(m_operatorController, 270)
-         * .onTrue(
-         * new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
-         * 
-         */
-    }
-
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        // Timer m_autonTimer = new Timer();
-        // m_autonTimer.start();
-
-        // String path;
-        // if (m_chooser.getSelected() != null) {
-        // path = m_chooser.getSelected();
-        // } else {
-        // return null;
-        // }
-
-        // return m_autoBuilder.fullAuto(
-        // PathPlanner.loadPathGroup(
-        // path,
-        // new PathConstraints(
-        // AutonConstants.maxVelocity,
-        // AutonConstants.maxAcceleration)));
-
-        return new SequentialCommandGroup(
-                // new ParallelDeadlineGroup(new AutonTimerCommand(1),
-                //     new RunCommand(() -> armSubsystem.setArmPos(20, 0.2), armSubsystem)),
-                // new ParallelDeadlineGroup(new AutonTimerCommand(2)),
-                //     new RunCommand(() -> armSubsystem.setArmPos(25, 0.2), null)
-                new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
-                new ParallelDeadlineGroup(new AutonTimerCommand(6), new AutonDriveCommand(m_robotDrive))//,
-                /*m_BalanceCommand*/);
-    }
+    return new SequentialCommandGroup(
+        new ParallelDeadlineGroup(new WaitCommand(1),
+            new RunCommand(() -> armSubsystem.setArmPos(20, 0.1), armSubsystem)),
+        new ParallelDeadlineGroup(new WaitCommand(2),
+            new RunCommand(() -> armSubsystem.setArmPos(45, 0.3), armSubsystem)),
+        new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
+        new ParallelDeadlineGroup(new WaitCommand(6), new AutonDriveCommand(m_robotDrive))
+    /* m_BalanceCommand */);
+  }
 }

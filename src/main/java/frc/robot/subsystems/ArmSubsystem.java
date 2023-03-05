@@ -84,13 +84,10 @@ public class ArmSubsystem extends SubsystemBase {
     double ps = m_pivotPID.calculate(m_pivotEncoder.getAbsolutePosition());
     double es = m_elevatorPID.calculate(getElevatorEncoder());
 
-    SmartDashboard.putNumber("Elevator Encoder", getElevatorEncoder() * 39.3); // inches
+    SmartDashboard.putNumber("Elevator Encoder", getElevatorEncoder()); //m
     // SmartDashboard.putNumber("elevator distance difference (length until max)", getElevatorMax() - getElevatorEncoder() * 39.3);
     SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getAbsolutePosition());
-    SmartDashboard.putNumber("elevator max extension", getElevatorMaxCheckpoints() * 39.3);
-    SmartDashboard.putNumber("theoretical distance past frame", 39.3 * (getElevatorEncoder() * Math.sin(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) - ArmConstants.kAxleToFrontPerimeter));
-    SmartDashboard.putNumber("theoretical height", 39.3 * (getElevatorEncoder() * Math.cos(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) + ArmConstants.kPivotAxleHeight));
-
+    SmartDashboard.putBoolean("seenSwitch", seenSwitch);
     /*
     //TODO: remove local variable and some smart dashboard outputs
     
