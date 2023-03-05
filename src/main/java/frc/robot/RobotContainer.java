@@ -197,6 +197,6 @@ public class RobotContainer {
     //             AutonConstants.maxVelocity,
     //             AutonConstants.maxAcceleration)));
 
-    return new ParallelDeadlineGroup(new AutonTimerCommand(1.5), new AutonDriveCommand(m_robotDrive));
+    return new ParallelDeadlineGroup(new AutonTimerCommand(6), new AutonDriveCommand(m_robotDrive));
   }
-}
+}                                                                                         
