@@ -283,6 +283,11 @@ public class ArmSubsystem extends SubsystemBase {
     m_elevatorPID.setSetpoint(m_elevatorPID.getSetpoint() + (elevatorSpeed * Robot.kDefaultPeriod));
   }
 
+  public void setArmPos(double pivotA, double elevatorP){
+    m_elevatorPID.setSetpoint(elevatorP);
+    m_pivotPID.setSetpoint(pivotA);
+  }
+
   /**
    * Converts elevator spark max encoder value to meters
    * 

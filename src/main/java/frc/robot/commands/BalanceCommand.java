@@ -27,7 +27,7 @@ public class BalanceCommand extends CommandBase {
   @Override
   public void execute() {
     m_subsystem.drive(
-        m_bangBang.calculate(m_subsystem.getGyroPitch(), 0) * 0.2,
+        m_bangBang.calculate(m_subsystem.getGyroPitch(), 0) * 0.3,
         0,
         0,
         true);
@@ -41,5 +41,5 @@ public class BalanceCommand extends CommandBase {
   @Override
   public boolean isFinished() {
     return m_bangBang.atSetpoint();
-  }
+  }                   
 }
