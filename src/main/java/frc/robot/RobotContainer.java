@@ -6,15 +6,10 @@ package frc.robot;
 
 import java.util.HashMap;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -22,13 +17,11 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.ParallelRaceGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.AutonDriveCommand;
@@ -204,12 +197,15 @@ public class RobotContainer {
     // AutonConstants.maxAcceleration)));
 
     return new SequentialCommandGroup(
-        new ParallelDeadlineGroup(new WaitCommand(1),
+        new ParallelDeadlineGroup(
+            new WaitCommand(1),
             new RunCommand(() -> armSubsystem.setArmPos(20, 0.1), armSubsystem)),
-        new ParallelDeadlineGroup(new WaitCommand(2),
+        new ParallelDeadlineGroup(
+            new WaitCommand(2),
             new RunCommand(() -> armSubsystem.setArmPos(45, 0.3), armSubsystem)),
         new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
-        new ParallelDeadlineGroup(new WaitCommand(6), new AutonDriveCommand(m_robotDrive))
-    /* m_BalanceCommand */);
+        new ParallelDeadlineGroup(
+            new WaitCommand(6),
+            new AutonDriveCommand(m_robotDrive)));
   }
 }
