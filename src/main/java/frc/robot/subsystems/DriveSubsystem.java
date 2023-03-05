@@ -187,7 +187,6 @@ public class DriveSubsystem extends SubsystemBase {
    * @return Current gyro pitch angle
    */
   public double getGyroPitch() {
-    // TODO check if we need pitch, yaw or roll on the new bot.
     return m_gyro.getPitch();
   }
 }

@@ -44,7 +44,6 @@ public class RobotContainer {
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
-  private final BalanceCommand m_BalanceCommand = new BalanceCommand(m_robotDrive);
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
@@ -139,8 +138,6 @@ public class RobotContainer {
         .whileTrue(new BalanceCommand(m_robotDrive));
     new JoystickButton(m_driverController, Button.kA.value)
         .onTrue(new SnapRotateCommand(m_robotDrive));
-    new JoystickButton(m_driverController, Button.kX.value)
-        .onTrue(m_BalanceCommand);
 
     // Operator Bindings
     new JoystickButton(m_operatorController, Button.kA.value)
@@ -206,6 +203,7 @@ public class RobotContainer {
         new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
         new ParallelDeadlineGroup(
             new WaitCommand(6),
-            new AutonDriveCommand(m_robotDrive)));
+            new AutonDriveCommand(m_robotDrive)),
+        new BalanceCommand(m_robotDrive));
   }
 }
