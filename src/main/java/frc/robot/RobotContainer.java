@@ -12,18 +12,24 @@ import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.AutonDriveCommand;
+import frc.robot.commands.AutonTimerCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -172,18 +178,25 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    String path;
-    if (m_chooser.getSelected() != null) {
-      path = m_chooser.getSelected();
-    } else {
-      return null;
-    }
+    // Timer m_autonTimer = new Timer();
+    // m_autonTimer.start();
 
-    return m_autoBuilder.fullAuto(
-        PathPlanner.loadPathGroup(
-            path,
-            new PathConstraints(
-                AutonConstants.maxVelocity,
-                AutonConstants.maxAcceleration)));
+    // String path;
+    // if (m_chooser.getSelected() != null) {
+    //   path = m_chooser.getSelected();
+    // } else {
+    //   return null;
+    // }
+
+    
+
+    // return m_autoBuilder.fullAuto(
+    //     PathPlanner.loadPathGroup(
+    //         path,
+    //         new PathConstraints(
+    //             AutonConstants.maxVelocity,
+    //             AutonConstants.maxAcceleration)));
+
+    return new ParallelDeadlineGroup(new AutonTimerCommand(1.5), new AutonDriveCommand(m_robotDrive));
   }
 }
