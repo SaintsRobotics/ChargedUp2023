@@ -46,6 +46,8 @@ public class ArmSubsystem extends SubsystemBase {
   //Keeps track if we want to stop PIDs
   private boolean stopPID = false;
 
+  private boolean forcing = false;
+
   /**
    * Constructs a {@link ArmSubsystem}.
    * Does not move arm above limit switch automatically and always moves arm to
@@ -77,6 +79,18 @@ public class ArmSubsystem extends SubsystemBase {
 
     seenSwitch = false;
     stopPID = false;
+  }
+
+  public void forceForwards(){
+    m_pivotMotor.set(0.2);
+    SmartDashboard.putString("turning", "tt");
+    forcing = true;
+  }
+
+  public void stopForce(){
+    m_pivotMotor.set(0);
+    SmartDashboard.putString("turning", "ttn");
+    forcing = false;
   }
 
   @Override
@@ -174,7 +188,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     //Stop pivoting backwards
     if (m_pivotPID.getSetpoint() < ArmConstants.kMinPivotPos + 3) {
-      m_pivotMotor.set(0);
+      if (!forcing) m_pivotMotor.set(0);
       
       //Stops oscilation (due to spring and low gravitational influence on torque)
       plock = true;
@@ -198,7 +212,8 @@ public class ArmSubsystem extends SubsystemBase {
     //TODO: add anti oscilation with POV setpoints (if any setpoint may cause oscilation, current anti-oscilation code via plock only works with manual control)
     if (seenSwitch || ps < 0 || m_pivotPID.getSetpoint() <= 20) {
       if (!stopPID)
-        m_pivotMotor.set(MathUtil.clamp(ps, -0.3, 0.3));
+        if (!forcing)
+          m_pivotMotor.set(MathUtil.clamp(ps, -0.3, 0.3));
     }
   
     if (!stopPID) {

@@ -147,6 +147,10 @@ public class RobotContainer {
         .toggleOnTrue(new InstantCommand(armSubsystem::togglePID, armSubsystem))
         .toggleOnFalse(new InstantCommand(armSubsystem::togglePID, armSubsystem));
 
+    new JoystickButton(m_operatorController, Button.kY.value)
+        .whileTrue(new InstantCommand(armSubsystem::forceForwards, armSubsystem))
+        .onFalse(new InstantCommand(armSubsystem::stopForce, armSubsystem));
+
     /*
      * DO NOT USE: ROBOT WILL BREAK
      * new POVButton(m_operatorController, 0)
