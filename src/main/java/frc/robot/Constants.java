@@ -81,18 +81,21 @@ public final class Constants {
   }
 
   public static final class ArmConstants {
+    public static final double floor2ArmBase = 10f / 39.37;
+    public static final double detector2tip = 42f / 39.37;
+
     public static final int kPivotMotorPort = 36;
     public static final int kElevatorMotorPort = 34;
     public static final int kPivotEncoderPort = 7;
     public static final double kPivotEncoderOffset = -191;
 
-    public static final double kMaxPivotSpeedPercent = 0.2;
+    public static final double kMaxPivotSpeedPercent = 7.5;
     public static final double kMaxElevatorSpeedPercent = 0.2;
 
     public static final int kMinLimitPort = 9;
     public static final int kMaxLimitPort = 8;
 
-    public static final double kRestingPivot = 0; // TODO: find correct angle values for pivot, radians
+    public static final double kRestingPivot = 0; // TODO: find correct angle values for pivot, degrees
     public static final double kMidPivot = 0;
     public static final double kTopPivot = 0;
     public static final double kStationPivot = 0;
@@ -107,10 +110,18 @@ public final class Constants {
     public static final double gearRatio = 4 / 1;
 
     public static final double kMinSwitchPos = 0;
-    public static final double kMaxSwitchPos = 0.61595 - 0.05;
+    public static final double kMaxSwitchPos = 0.42; //0.61595;
 
-    public static final double kMinPivotPos = 0; // TODO find accurate min and max for pivot
+    public static final double kMinPivotPos = 0; 
     public static final double kMaxPivotPos = 90; // 0 is straight up
+
+    public static final double kPivotAxleHeight = 0.2286; // All values in meters
+    public static final double kAxleToFrontPerimeter = 0.5588;
+    public static final double kMaxExtensionHeight = 1.9812 - 0.05; // minus 5 centimeters of leeway
+    public static final double kMaxFrameExtensionLimit = 1.2192 - 0.02; // minus 2 centimeters of leeway
+    public static final double kElevatorMaxExtensionOffset = 0.3683; // L offset
+    public static final double kGrabberToDetector = 40.5/39.3;
+    public static final double kLimitToAxle = 0.149678698451591;
   }
 
   public static final class GrabberConstants {
