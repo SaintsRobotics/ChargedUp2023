@@ -58,6 +58,9 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     m_pivotMotor.set(m_pivotSpeed);
+
+    // Elevator has the tendency to come down so we counter this by adding a small
+    // amount to the speed
     m_elevatorMotor.set(m_elevatorSpeed + (Math.cos(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) * 0.05));
 
     // Remove before merging
