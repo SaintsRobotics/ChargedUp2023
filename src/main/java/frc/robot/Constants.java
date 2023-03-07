@@ -35,6 +35,9 @@ public final class Constants {
     public static final double kElevatorLowPosition = 0.159;
     public static final double kElevatorHighPosition = 0.780;
 
+    public static final double kPivotMaxPosition = 39;
+    public static final double kPivotMinPosition = 12;
+
     public static final double kElevatorMaxPosition = 0.73;
     public static final double kElevatorMinPosition = 0.09;
 
