@@ -32,8 +32,8 @@ public final class Constants {
     public static final double kElevatorEncoderPositionConversionFactor = (22 * 0.25 / 4.0) / 39.37;
 
     public static final double kElevatorStartingPosition = 0;
-    public static final double kElevatorLowPosition = 1;
-    public static final double kElevatorHighPosition = 2;
+    public static final double kElevatorLowPosition = 0.159;
+    public static final double kElevatorHighPosition = 0.780;
 
     public static final double kPPivotPID = 1;
     public static final double kPivotMaxVelocity = 1;
