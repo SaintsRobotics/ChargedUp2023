@@ -6,6 +6,8 @@ package frc.robot;
 
 import java.util.HashMap;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
@@ -16,15 +18,12 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
-import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
-import frc.robot.commands.AutonDriveCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -119,6 +118,9 @@ public class RobotContainer {
     SmartDashboard.putData(m_chooser);
 
     m_eventMap.put("BalanceCommand", new BalanceCommand(m_robotDrive));
+    m_eventMap.put("OpenGrabber", new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
+    m_eventMap.put("ExtendArm", new InstantCommand());
+    m_eventMap.put("RetractArm", new InstantCommand());
   }
 
   /**
@@ -180,34 +182,18 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Timer m_autonTimer = new Timer();
-    // m_autonTimer.start();
+    String path;
+    if (m_chooser.getSelected() != null) {
+      path = m_chooser.getSelected();
+    } else {
+      return null;
+    }
 
-    // String path;
-    // if (m_chooser.getSelected() != null) {
-    // path = m_chooser.getSelected();
-    // } else {
-    // return null;
-    // }
-
-    // return m_autoBuilder.fullAuto(
-    // PathPlanner.loadPathGroup(
-    // path,
-    // new PathConstraints(
-    // AutonConstants.maxVelocity,
-    // AutonConstants.maxAcceleration)));
-
-    return new SequentialCommandGroup(
-        new ParallelDeadlineGroup(
-            new WaitCommand(1),
-            new RunCommand(() -> armSubsystem.setArmPos(20, 0.1), armSubsystem)),
-        new ParallelDeadlineGroup(
-            new WaitCommand(2),
-            new RunCommand(() -> armSubsystem.setArmPos(45, 0.3), armSubsystem)),
-        new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
-        new ParallelDeadlineGroup(
-            new WaitCommand(6),
-            new AutonDriveCommand(m_robotDrive)),
-        new BalanceCommand(m_robotDrive));
+    return m_autoBuilder.fullAuto(
+        PathPlanner.loadPathGroup(
+            path,
+            new PathConstraints(
+                AutonConstants.maxVelocity,
+                AutonConstants.maxAcceleration)));
   }
 }
