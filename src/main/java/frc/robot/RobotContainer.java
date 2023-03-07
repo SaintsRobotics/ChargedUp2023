@@ -139,11 +139,11 @@ public class RobotContainer {
         .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
 
     new JoystickButton(m_operatorController, Button.kB.value)
-        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(255, 255, 0))) // Yellow
-        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 255))); // Blue
+        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))) // Yellow
+        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 50))); // Blue
     new JoystickButton(m_operatorController, Button.kX.value)
-        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(138, 43, 226))) // Purple
-        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 255))); // Blue
+        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(27, 8, 44))) // Purple
+        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 50))); // Blue
 
     /*
      * DO NOT USE: ROBOT WILL BREAK
