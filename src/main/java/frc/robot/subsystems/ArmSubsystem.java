@@ -9,6 +9,7 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
@@ -19,10 +20,17 @@ public class ArmSubsystem extends SubsystemBase {
 
   private final CANCoder m_pivotEncoder = new CANCoder(ArmConstants.kPivotEncoderPort);
 
+  private final PIDController m_elevatorPID = new PIDController(0, 0, 0);
+
   /** Returns false when arm is detected. */
   private final DigitalInput m_lowLimitSwitch = new DigitalInput(ArmConstants.kLowLimitSwitchPort);
   /** Returns false when arm is detected. */
   private final DigitalInput m_highLimitSwitch = new DigitalInput(ArmConstants.kHighLimitSwitchPort);
+
+  private double m_pivotSpeed;
+  private double m_elevatorSpeed;
+
+  private double m_previousElevatorSpeed;
 
   /** Creates a new {@link ArmSubsystem}. */
   public ArmSubsystem() {
@@ -46,10 +54,18 @@ public class ArmSubsystem extends SubsystemBase {
       m_elevatorMotor.getEncoder().setPosition(ArmConstants.kElevatorHighPosition);
     }
 
-    // Robot must not extend above a certain height
-    if (m_elevatorMotor.getEncoder().getPosition() > 1) {
-      m_elevatorMotor.set(-0.1);
+    // When we stop moving the elevator, use the PID to hold its position instead of
+    // letting it slowly come down
+    double speed = m_elevatorSpeed;
+    if (speed == 0 && m_previousElevatorSpeed != 0) {
+      m_elevatorPID.setSetpoint(m_elevatorMotor.getEncoder().getPosition());
+    } else if (speed == 0) {
+      m_elevatorSpeed = m_elevatorPID.calculate(m_elevatorMotor.getEncoder().getPosition());
     }
+    m_previousElevatorSpeed = speed;
+
+    m_pivotMotor.set(m_pivotSpeed);
+    m_elevatorMotor.set(m_elevatorSpeed);
   }
 
   /**
@@ -59,8 +75,8 @@ public class ArmSubsystem extends SubsystemBase {
    * @param elevatorSpeed Elevator speed, -1.0 to 1.0
    */
   public void set(double pivotSpeed, double elevatorSpeed) {
-    m_pivotMotor.set(pivotSpeed);
-    m_elevatorMotor.set(elevatorSpeed);
+    m_pivotSpeed = pivotSpeed;
+    m_elevatorSpeed = elevatorSpeed;
   }
 
   /**
