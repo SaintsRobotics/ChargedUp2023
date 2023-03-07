@@ -9,8 +9,8 @@ import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
-import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 
@@ -20,8 +20,6 @@ public class ArmSubsystem extends SubsystemBase {
 
   private final CANCoder m_pivotEncoder = new CANCoder(ArmConstants.kPivotEncoderPort);
 
-  private final PIDController m_elevatorPID = new PIDController(0, 0, 0);
-
   /** Returns false when arm is detected. */
   private final DigitalInput m_lowLimitSwitch = new DigitalInput(ArmConstants.kLowLimitSwitchPort);
   /** Returns false when arm is detected. */
@@ -29,8 +27,6 @@ public class ArmSubsystem extends SubsystemBase {
 
   private double m_pivotSpeed;
   private double m_elevatorSpeed;
-
-  private double m_previousElevatorSpeed;
 
   /** Creates a new {@link ArmSubsystem}. */
   public ArmSubsystem() {
@@ -54,18 +50,12 @@ public class ArmSubsystem extends SubsystemBase {
       m_elevatorMotor.getEncoder().setPosition(ArmConstants.kElevatorHighPosition);
     }
 
-    // When we stop moving the elevator, use the PID to hold its position instead of
-    // letting it slowly come down
-    double speed = m_elevatorSpeed;
-    if (speed == 0 && m_previousElevatorSpeed != 0) {
-      m_elevatorPID.setSetpoint(m_elevatorMotor.getEncoder().getPosition());
-    } else if (speed == 0) {
-      m_elevatorSpeed = m_elevatorPID.calculate(m_elevatorMotor.getEncoder().getPosition());
-    }
-    m_previousElevatorSpeed = speed;
-
     m_pivotMotor.set(m_pivotSpeed);
-    m_elevatorMotor.set(m_elevatorSpeed);
+    m_elevatorMotor.set(m_elevatorSpeed + (Math.cos(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) * 0.05));
+
+    // Remove before merging
+    SmartDashboard.putNumber("pivot position", m_pivotEncoder.getAbsolutePosition());
+    SmartDashboard.putNumber("elevator position", m_elevatorMotor.getEncoder().getPosition());
   }
 
   /**
