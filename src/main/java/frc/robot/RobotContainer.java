@@ -6,8 +6,6 @@ package frc.robot;
 
 import java.util.HashMap;
 
-import com.pathplanner.lib.PathConstraints;
-import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
@@ -18,12 +16,15 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.AutonDriveCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -43,7 +44,6 @@ public class RobotContainer {
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
-
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
@@ -73,19 +73,23 @@ public class RobotContainer {
                     -m_driverController.getLeftY(),
                     OIConstants.kControllerDeadband)
                     * DriveConstants.kMaxSpeedMetersPerSecond
-                    * (1 - m_driverController.getLeftTriggerAxis() * OIConstants.kSlowModeScalar)
-                    / 3,
+                    * (1 - m_driverController
+                        .getLeftTriggerAxis()
+                        * OIConstants.kSlowModeScalar)
+                    / 2,
                 MathUtil.applyDeadband(
                     -m_driverController.getLeftX(),
                     OIConstants.kControllerDeadband)
                     * DriveConstants.kMaxSpeedMetersPerSecond
-                    * (1 - m_driverController.getLeftTriggerAxis() * OIConstants.kSlowModeScalar)
-                    / 3,
+                    * (1 - m_driverController
+                        .getLeftTriggerAxis()
+                        * OIConstants.kSlowModeScalar)
+                    / 2,
                 MathUtil.applyDeadband(
                     -m_driverController.getRightX(),
                     OIConstants.kControllerDeadband)
                     * DriveConstants.kMaxAngularSpeedRadiansPerSecond
-                    / 3,
+                    / 2,
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
@@ -143,6 +147,10 @@ public class RobotContainer {
         .toggleOnTrue(new InstantCommand(armSubsystem::togglePID, armSubsystem))
         .toggleOnFalse(new InstantCommand(armSubsystem::togglePID, armSubsystem));
 
+    new JoystickButton(m_operatorController, Button.kY.value)
+        .whileTrue(new InstantCommand(armSubsystem::forceForwards, armSubsystem))
+        .onFalse(new InstantCommand(armSubsystem::stopForce, armSubsystem));
+
     /*
      * DO NOT USE: ROBOT WILL BREAK
      * new POVButton(m_operatorController, 0)
@@ -172,18 +180,34 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    String path;
-    if (m_chooser.getSelected() != null) {
-      path = m_chooser.getSelected();
-    } else {
-      return null;
-    }
+    // Timer m_autonTimer = new Timer();
+    // m_autonTimer.start();
 
-    return m_autoBuilder.fullAuto(
-        PathPlanner.loadPathGroup(
-            path,
-            new PathConstraints(
-                AutonConstants.maxVelocity,
-                AutonConstants.maxAcceleration)));
+    // String path;
+    // if (m_chooser.getSelected() != null) {
+    // path = m_chooser.getSelected();
+    // } else {
+    // return null;
+    // }
+
+    // return m_autoBuilder.fullAuto(
+    // PathPlanner.loadPathGroup(
+    // path,
+    // new PathConstraints(
+    // AutonConstants.maxVelocity,
+    // AutonConstants.maxAcceleration)));
+
+    return new SequentialCommandGroup(
+        new ParallelDeadlineGroup(
+            new WaitCommand(1),
+            new RunCommand(() -> armSubsystem.setArmPos(20, 0.1), armSubsystem)),
+        new ParallelDeadlineGroup(
+            new WaitCommand(2),
+            new RunCommand(() -> armSubsystem.setArmPos(45, 0.3), armSubsystem)),
+        new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
+        new ParallelDeadlineGroup(
+            new WaitCommand(6),
+            new AutonDriveCommand(m_robotDrive)),
+        new BalanceCommand(m_robotDrive));
   }
 }

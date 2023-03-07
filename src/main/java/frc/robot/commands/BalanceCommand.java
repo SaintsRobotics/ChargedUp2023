@@ -4,7 +4,7 @@
 
 package frc.robot.commands;
 
-import edu.wpi.first.math.controller.BangBangController;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
@@ -12,7 +12,7 @@ import frc.robot.subsystems.DriveSubsystem;
 /** Uses a PID and the gyroscope to balance the robot on the charger. */
 public class BalanceCommand extends CommandBase {
   private final DriveSubsystem m_subsystem;
-  private final BangBangController m_bangBang = new BangBangController(DriveConstants.kToleranceBalance);
+  private final PIDController m_PID = new PIDController(0.025, 0, 0);
 
   /**
    * Creates a new {@link BalanceCommand}.
@@ -22,15 +22,17 @@ public class BalanceCommand extends CommandBase {
   public BalanceCommand(DriveSubsystem subsystem) {
     m_subsystem = subsystem;
     addRequirements(m_subsystem);
+
+    m_PID.setTolerance(DriveConstants.kToleranceBalance);
   }
 
   @Override
   public void execute() {
     m_subsystem.drive(
-        m_bangBang.calculate(m_subsystem.getGyroPitch(), 0) * 0.2,
+        m_PID.calculate(m_subsystem.getGyroPitch(), 0),
         0,
         0,
-        true);
+        false);
   }
 
   @Override
@@ -40,6 +42,6 @@ public class BalanceCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return m_bangBang.atSetpoint();
+    return false;
   }
 }

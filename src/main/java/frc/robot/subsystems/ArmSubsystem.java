@@ -19,7 +19,7 @@ import frc.robot.Robot;
 
 public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax m_pivotMotor = new CANSparkMax(ArmConstants.kPivotMotorPort,
-      MotorType.kBrushless); // TODO: TEST IF PIVOT MOTOR NEEDS TO BE INVERTED
+      MotorType.kBrushless);
   private final CANSparkMax m_elevatorMotor = new CANSparkMax(ArmConstants.kElevatorMotorPort,
       MotorType.kBrushless);
 
@@ -38,7 +38,6 @@ public class ArmSubsystem extends SubsystemBase {
 
   public boolean seenSwitch = false; // Elevator won't move down until we see the switch
 
-  //TODO: measure this later
   private double m_encoderElevatorOffset = -0.149678698451591; // Encoder offset, updtated whenever a limit switch goes LOW, in meters
   
   // Keeps track of whether we want to allow pivot to raise. This is used to stop the terrible oscilation when the pivot fully retracts (because the spring keeps pushing the arm away from the setpoint
@@ -46,6 +45,8 @@ public class ArmSubsystem extends SubsystemBase {
 
   //Keeps track if we want to stop PIDs
   private boolean stopPID = false;
+
+  private boolean forcing = false;
 
   /**
    * Constructs a {@link ArmSubsystem}.
@@ -80,10 +81,27 @@ public class ArmSubsystem extends SubsystemBase {
     stopPID = false;
   }
 
+  public void forceForwards(){
+    m_pivotMotor.set(0.2);
+    SmartDashboard.putString("turning", "tt");
+    forcing = true;
+  }
+
+  public void stopForce(){
+    m_pivotMotor.set(0);
+    SmartDashboard.putString("turning", "ttn");
+    forcing = false;
+  }
+
   @Override
   public void periodic() {
     double ps = m_pivotPID.calculate(m_pivotEncoder.getAbsolutePosition());
     double es = m_elevatorPID.calculate(getElevatorEncoder());
+
+    SmartDashboard.putNumber("Elevator Encoder", getElevatorEncoder()); //m
+    // SmartDashboard.putNumber("elevator distance difference (length until max)", getElevatorMax() - getElevatorEncoder() * 39.3);
+    SmartDashboard.putNumber("Pivot Encoder", m_pivotEncoder.getAbsolutePosition());
+    SmartDashboard.putBoolean("seenSwitch", seenSwitch);
     /*
     //TODO: remove local variable and some smart dashboard outputs
     
@@ -130,6 +148,10 @@ public class ArmSubsystem extends SubsystemBase {
       return;
     }
 
+    // if (seenSwitch) { // TODO: TEST instead of the 2 if statements below
+    //   m_elevatorPID.setSetpoint(MathUtil.clamp(m_elevatorPID.getSetpoint(), ArmConstants.kMinSwitchPos + 0.075, ArmConstants.kMaxSwitchPos - 0.01));
+    // }
+
     //Check for underextension (physical), if so increase the setpoint
     if (m_elevatorPID.getSetpoint() < (ArmConstants.kMinSwitchPos + 0.075) && seenSwitch) {
       m_elevatorPID.setSetpoint(ArmConstants.kMinSwitchPos + 0.075);
@@ -152,9 +174,21 @@ public class ArmSubsystem extends SubsystemBase {
       return;
     }
 
+    // SmartDashboard.putNumber("elevator distance difference (length until max)", (getElevatorMaxCheckpoints() - getElevatorEncoder()) * 39.3);
+    // SmartDashboard.putNumber("elevator", getElevatorEncoder());
+    // SmartDashboard.putNumber("max ext", getElevatorMaxCheckpoints());
+    // SmartDashboard.putBoolean("elevatorMaxCheck", m_elevatorPID.getSetpoint() > getElevatorMaxCheckpoints());
+    // if (m_elevatorPID.getSetpoint() > getElevatorMaxCheckpoints()) {
+    //   m_elevatorMotor.set(0);
+    //   m_elevatorPID.setSetpoint(getElevatorEncoder());
+    //   SmartDashboard.putNumber("elevatorMaxSetpoint", m_elevatorPID.getSetpoint());
+
+    //   return;
+    // }
+
     //Stop pivoting backwards
     if (m_pivotPID.getSetpoint() < ArmConstants.kMinPivotPos + 3) {
-      m_pivotMotor.set(0);
+      if (!forcing) m_pivotMotor.set(0);
       
       //Stops oscilation (due to spring and low gravitational influence on torque)
       plock = true;
@@ -178,13 +212,14 @@ public class ArmSubsystem extends SubsystemBase {
     //TODO: add anti oscilation with POV setpoints (if any setpoint may cause oscilation, current anti-oscilation code via plock only works with manual control)
     if (seenSwitch || ps < 0 || m_pivotPID.getSetpoint() <= 20) {
       if (!stopPID)
-        m_pivotMotor.set(MathUtil.clamp(ps, -0.3, 0.3)); // TODO: adjust clamp value
+        if (!forcing)
+          m_pivotMotor.set(MathUtil.clamp(ps, -0.3, 0.3));
     }
   
     if (!stopPID) {
       double motorSpeed = MathUtil.clamp(es, -0.25, 0.25)
-      + (0.015 * Math.cos(m_pivotEncoder.getPosition()));
-      m_elevatorMotor.set(motorSpeed); // TODO: take angle into account
+      + (0.015 * Math.cos(m_pivotEncoder.getAbsolutePosition()));
+      m_elevatorMotor.set(motorSpeed);
       SmartDashboard.putNumber("motorSpeed", motorSpeed);
     } else {
       SmartDashboard.putNumber("motorSpeed", 999);
@@ -260,6 +295,11 @@ public class ArmSubsystem extends SubsystemBase {
     m_elevatorPID.setSetpoint(m_elevatorPID.getSetpoint() + (elevatorSpeed * Robot.kDefaultPeriod));
   }
 
+  public void setArmPos(double pivotA, double elevatorP){
+    m_elevatorPID.setSetpoint(elevatorP);
+    m_pivotPID.setSetpoint(pivotA);
+  }
+
   /**
    * Converts elevator spark max encoder value to meters
    * 
@@ -287,4 +327,48 @@ public class ArmSubsystem extends SubsystemBase {
     // should setPositionConversionFactor on the motor rather than using
     // encoderToMeters
   }
+
+  // private double getElevatorMaxCheckpoints () {
+  //   double pivotEncoderVal = MathUtil.clamp(m_pivotEncoder.getAbsolutePosition(), 0, 90);
+  //   if (pivotEncoderVal >= 0 && pivotEncoderVal <= ArmConstants.kTopPivot) {
+  //     return 0;
+  //   }
+  //   if (pivotEncoderVal <= ArmConstants.kMidPivot)
+  // }
+
+  private double getElevatorMaxCheckpoints () {
+    double pivotEncoderVal = Math.toRadians(MathUtil.clamp(m_pivotEncoder.getAbsolutePosition(), 0, 90));
+    
+    double max_extension = (ArmConstants.kMaxFrameExtensionLimit + ArmConstants.kAxleToFrontPerimeter) / (pivotEncoderVal == 0 ? 1.0e-10 : Math.sin(pivotEncoderVal));
+    max_extension -= ArmConstants.detector2tip + ArmConstants.kLimitToAxle;
+
+    double max_height = (ArmConstants.kMaxExtensionHeight) / (pivotEncoderVal == Math.PI/2 ? 1.0e-10 : Math.cos(pivotEncoderVal));
+    max_height -= ArmConstants.floor2ArmBase + ArmConstants.detector2tip;
+
+    return Math.min(max_height, max_extension);
+  }
+
+  private double getElevatorMax() {
+    double maxHeight = 999;
+    double maxExtension = 999;
+    double pivotEncoderValue = MathUtil.clamp(m_pivotEncoder.getAbsolutePosition(), 0, 90); // Ensures that the pivot encoder does not update between calls
+
+    // grabberToDetector = value between the limit switch detector and the tip of the grabber
+    // extensionLimit = horizontal distance between limit switch and the front of frame
+
+    
+    
+    if (pivotEncoderValue != 0) {
+      maxExtension = (ArmConstants.kMaxFrameExtensionLimit + ArmConstants.kAxleToFrontPerimeter)/Math.sin(Math.toRadians(pivotEncoderValue));
+    }
+    if (pivotEncoderValue != 90) {
+      maxHeight = (ArmConstants.kMaxExtensionHeight - ArmConstants.kPivotAxleHeight)/Math.cos(Math.toRadians(pivotEncoderValue));
+    }
+
+    SmartDashboard.putNumber("maxHeight", maxHeight * 39.3);
+    SmartDashboard.putNumber("maxExtension", maxExtension * 39.3);
+  
+    return Math.min(maxHeight, maxExtension) - ArmConstants.kElevatorMaxExtensionOffset; // TODO: Check math with Greg
+  }
 }
+
