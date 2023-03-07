@@ -66,7 +66,7 @@ public class RobotContainer {
         new RunCommand(() -> m_armSubsystem.set(
             MathUtil.applyDeadband(
                 -m_operatorController.getLeftY(),
-                OIConstants.kControllerDeadband) * 0.05,
+                OIConstants.kControllerDeadband) * 0.15,
             MathUtil.applyDeadband(
                 -m_operatorController.getRightY(),
                 OIConstants.kControllerDeadband) * 0.1),
