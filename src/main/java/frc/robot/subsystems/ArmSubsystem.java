@@ -50,6 +50,13 @@ public class ArmSubsystem extends SubsystemBase {
       m_elevatorMotor.getEncoder().setPosition(ArmConstants.kElevatorHighPosition);
     }
 
+    // Prevents elevator from extending until it hits the stop
+    if (m_elevatorMotor.getEncoder().getPosition() < ArmConstants.kElevatorMinPosition && m_elevatorSpeed < 0) {
+      m_elevatorSpeed = 0;
+    } else if (m_elevatorMotor.getEncoder().getPosition() > ArmConstants.kElevatorMaxPosition && m_elevatorSpeed > 0) {
+      m_elevatorSpeed = 0;
+    }
+
     m_pivotMotor.set(m_pivotSpeed);
     m_elevatorMotor.set(m_elevatorSpeed + (Math.cos(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) * 0.05));
 
