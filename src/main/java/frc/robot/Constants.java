@@ -38,8 +38,12 @@ public final class Constants {
     public static final double kPivotMaxPosition = 39;
     public static final double kPivotMinPosition = 12;
 
+    /** Maximum distance the elevator can extend before hitting the stop. */
     public static final double kElevatorMaxPosition = 0.73;
     public static final double kElevatorMinPosition = 0.09;
+
+    /** Maximum height legal for the game. */
+    public static final double kMaxGameHeight = 0.5;
 
     public static final double kPivotMaxSpeed = 0.15;
     public static final double kElevatorMaxSpeed = 0.1;

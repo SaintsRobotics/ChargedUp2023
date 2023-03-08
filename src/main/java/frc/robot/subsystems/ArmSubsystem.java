@@ -65,6 +65,13 @@ public class ArmSubsystem extends SubsystemBase {
       m_elevatorSpeed = 0;
     }
 
+    // If arm is above legal height, bring it down
+    double heightOverLimit = m_elevatorMotor.getEncoder().getPosition()
+        - ArmConstants.kMaxGameHeight / Math.sin(Math.toRadians(m_pivotEncoder.getAbsolutePosition()));
+    if (heightOverLimit > 0) {
+      m_elevatorSpeed = -heightOverLimit;
+    }
+
     m_pivotMotor.set(m_pivotSpeed);
 
     // Elevator has the tendency to come down so we counter this by adding a small
