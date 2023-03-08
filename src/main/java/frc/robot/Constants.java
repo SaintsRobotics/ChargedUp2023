@@ -41,6 +41,9 @@ public final class Constants {
     public static final double kElevatorMaxPosition = 0.73;
     public static final double kElevatorMinPosition = 0.09;
 
+    public static final double kPivotMaxSpeed = 0.15;
+    public static final double kElevatorMaxSpeed = 0.1;
+
     public static final double kPPivotPID = 1;
     public static final double kPivotMaxVelocity = 1;
     public static final double kPivotMaxAcceleration = 1;
