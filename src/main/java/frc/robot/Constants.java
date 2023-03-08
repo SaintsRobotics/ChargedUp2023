@@ -135,6 +135,11 @@ public final class Constants {
     public static final int kCompressorMaximumPressure = 110;
   }
 
+  public static final class LEDConstants {
+    public static final int kLEDPort = 0;
+    public static final int kLEDLength = 29;
+  }
+
   public static final class OIConstants {
     public static final int kDriverControllerPort = 0;
     public static final int kOperatorControllerPort = 1;

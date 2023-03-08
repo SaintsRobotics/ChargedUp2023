@@ -30,6 +30,7 @@ import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -41,6 +42,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final ArmSubsystem armSubsystem = new ArmSubsystem();
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
+  private final LEDSubsystem m_LEDSubsystem = new LEDSubsystem();
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
@@ -143,6 +145,13 @@ public class RobotContainer {
     new JoystickButton(m_operatorController, Button.kA.value)
         .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
 
+    new JoystickButton(m_operatorController, Button.kStart.value)
+        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))) // Yellow
+        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 50))); // Blue
+    new JoystickButton(m_operatorController, Button.kBack.value)
+        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(27, 8, 44))) // Purple
+        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 50))); // Blue
+
     new JoystickButton(m_operatorController, Button.kB.value)
         .toggleOnTrue(new InstantCommand(armSubsystem::togglePID, armSubsystem))
         .toggleOnFalse(new InstantCommand(armSubsystem::togglePID, armSubsystem));
@@ -150,6 +159,7 @@ public class RobotContainer {
     new JoystickButton(m_operatorController, Button.kY.value)
         .whileTrue(new InstantCommand(armSubsystem::forceForwards, armSubsystem))
         .onFalse(new InstantCommand(armSubsystem::stopForce, armSubsystem));
+
 
     /*
      * DO NOT USE: ROBOT WILL BREAK
