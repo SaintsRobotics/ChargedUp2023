@@ -29,7 +29,7 @@ public final class Constants {
     public static final boolean kElevatorMotorInverted = true;
 
     public static final double kPivotEncoderOffset = 168;
-    public static final double kElevatorEncoderPositionConversionFactor = (22 * 0.25 / 4.0) / 39.37;
+    public static final double kElevatorEncoderPositionConversionFactor = 0.035;
 
     public static final double kElevatorStartingPosition = 0;
     public static final double kElevatorLowPosition = 0.159;
