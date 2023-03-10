@@ -5,8 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.ArmSubsystem;
@@ -15,8 +14,7 @@ import frc.robot.subsystems.ArmSubsystem;
 public class ArmCommand extends CommandBase {
   private final ArmSubsystem m_subsystem;
 
-  private final ProfiledPIDController m_pivotPID = new ProfiledPIDController(ArmConstants.kPPivotPID, 0, 0,
-      new Constraints(ArmConstants.kPivotMaxVelocity, ArmConstants.kPivotMaxAcceleration));
+  private final PIDController m_pivotPID = new PIDController(ArmConstants.kPPivotPID, 0, 0);
   private final PIDController m_elevatorPID = new PIDController(ArmConstants.kPElevatorPID, 0, 0);
 
   /**
@@ -30,7 +28,7 @@ public class ArmCommand extends CommandBase {
     m_subsystem = subsystem;
     addRequirements(m_subsystem);
 
-    m_pivotPID.setGoal(pivotSetpoint);
+    m_pivotPID.setSetpoint(pivotSetpoint);
     m_elevatorPID.setSetpoint(elevatorSetpoint);
 
     m_pivotPID.setTolerance(ArmConstants.kPivotTolerance);

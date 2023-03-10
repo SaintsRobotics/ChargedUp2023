@@ -18,8 +18,10 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.ArmCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -134,6 +136,11 @@ public class RobotContainer {
     // Operator Bindings
     new JoystickButton(m_operatorController, Button.kA.value)
         .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
+
+    // Deploys arm when left bumper is held and retracts when released
+    new JoystickButton(m_operatorController, Button.kLeftBumper.value)
+        .onTrue(new ArmCommand(m_armSubsystem, 38, 0.38))
+        .onFalse(new ArmCommand(m_armSubsystem, ArmConstants.kPivotMinPosition, ArmConstants.kElevatorMinPosition));
 
     new JoystickButton(m_operatorController, Button.kStart.value)
         .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))) // Yellow

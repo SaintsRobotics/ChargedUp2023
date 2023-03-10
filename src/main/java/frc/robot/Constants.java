@@ -48,14 +48,11 @@ public final class Constants {
     public static final double kPivotMaxSpeed = 0.15;
     public static final double kElevatorMaxSpeed = 0.1;
 
-    public static final double kPPivotPID = 1;
-    public static final double kPivotMaxVelocity = 1;
-    public static final double kPivotMaxAcceleration = 1;
-
-    public static final double kPElevatorPID = 1;
+    public static final double kPPivotPID = 0.2;
+    public static final double kPElevatorPID = 30;
 
     public static final double kPivotTolerance = 1;
-    public static final double kElevatorTolerance = 1;
+    public static final double kElevatorTolerance = 0.005;
   }
 
   public static final class DriveConstants {
