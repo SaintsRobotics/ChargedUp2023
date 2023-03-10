@@ -11,7 +11,6 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 
@@ -77,10 +76,6 @@ public class ArmSubsystem extends SubsystemBase {
     // Elevator has the tendency to come down so we counter this by adding a small
     // amount to the speed
     m_elevatorMotor.set(m_elevatorSpeed + (Math.cos(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) * 0.05));
-
-    // Remove before merging
-    SmartDashboard.putNumber("pivot position", m_pivotEncoder.getAbsolutePosition());
-    SmartDashboard.putNumber("elevator position", m_elevatorMotor.getEncoder().getPosition());
   }
 
   /**
