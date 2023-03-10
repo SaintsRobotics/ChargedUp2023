@@ -45,6 +45,9 @@ public final class Constants {
     /** Maximum height legal for the game. */
     public static final double kMaxGameHeight = 0.5;
 
+    public static final double kPivotFeedForwardCoefficient = 0.03;
+    public static final double kElevatorFeedForwardCoefficient = 0.05;
+
     public static final double kPivotMaxSpeed = 0.25;
     public static final double kElevatorMaxSpeed = 0.1;
 

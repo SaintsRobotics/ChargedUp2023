@@ -72,8 +72,12 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     // Counters the effect of gravity with a small feed forward
-    m_pivotMotor.set(m_pivotSpeed - (Math.sin(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) * 0.03));
-    m_elevatorMotor.set(m_elevatorSpeed + (Math.cos(Math.toRadians(m_pivotEncoder.getAbsolutePosition())) * 0.05));
+    m_pivotMotor.set(m_pivotSpeed
+        - (Math.sin(Math.toRadians(m_pivotEncoder.getAbsolutePosition()))
+            * ArmConstants.kPivotFeedForwardCoefficient));
+    m_elevatorMotor.set(m_elevatorSpeed
+        + (Math.cos(Math.toRadians(m_pivotEncoder.getAbsolutePosition()))
+            * ArmConstants.kElevatorFeedForwardCoefficient));
   }
 
   /**
