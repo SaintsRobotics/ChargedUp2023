@@ -45,7 +45,7 @@ public final class Constants {
     /** Maximum height legal for the game. */
     public static final double kMaxGameHeight = 0.3;
 
-    public static final double kPivotMaxSpeed = 0.15;
+    public static final double kPivotMaxSpeed = 0.25;
     public static final double kElevatorMaxSpeed = 0.1;
 
     public static final double kPPivotPID = 0.2;
