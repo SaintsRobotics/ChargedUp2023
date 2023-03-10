@@ -161,8 +161,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Timer m_autonTimer = new Timer();
-    // m_autonTimer.start();
 
     // String path;
     // if (m_chooser.getSelected() != null) {
@@ -179,7 +177,7 @@ public class RobotContainer {
     // AutonConstants.maxAcceleration)));
 
     return new SequentialCommandGroup(
-        new ArmCommand(m_armSubsystem, 20, 0.3),
+        new ArmCommand(m_armSubsystem, 45, 0.3),
         new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
         new ParallelDeadlineGroup(
             new WaitCommand(6),
