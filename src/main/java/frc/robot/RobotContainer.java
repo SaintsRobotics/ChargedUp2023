@@ -16,12 +16,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ArmCommand;
+import frc.robot.commands.AutonDriveCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -140,7 +144,8 @@ public class RobotContainer {
     // Deploys arm when left bumper is held and retracts when released
     new JoystickButton(m_operatorController, Button.kLeftBumper.value)
         .onTrue(new ArmCommand(m_armSubsystem, 38, 0.38))
-        .onFalse(new ArmCommand(m_armSubsystem, ArmConstants.kPivotMinPosition, ArmConstants.kElevatorMinPosition));
+        .onFalse(new ArmCommand(m_armSubsystem, ArmConstants.kPivotMinPosition,
+            ArmConstants.kElevatorMinPosition));
 
     new JoystickButton(m_operatorController, Button.kStart.value)
         .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))) // Yellow
@@ -173,19 +178,12 @@ public class RobotContainer {
     // AutonConstants.maxVelocity,
     // AutonConstants.maxAcceleration)));
 
-    // return new SequentialCommandGroup(
-    // new ParallelDeadlineGroup(
-    // new WaitCommand(1),
-    // new RunCommand(() -> armSubsystem.setArmPos(20, 0.1), armSubsystem)),
-    // new ParallelDeadlineGroup(
-    // new WaitCommand(2),
-    // new RunCommand(() -> armSubsystem.setArmPos(45, 0.3), armSubsystem)),
-    // new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
-    // new ParallelDeadlineGroup(
-    // new WaitCommand(6),
-    // new AutonDriveCommand(m_robotDrive)),
-    // new BalanceCommand(m_robotDrive));
-
-    return null;
+    return new SequentialCommandGroup(
+        new ArmCommand(m_armSubsystem, 20, 0.3),
+        new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
+        new ParallelDeadlineGroup(
+            new WaitCommand(6),
+            new AutonDriveCommand(m_robotDrive)),
+        new BalanceCommand(m_robotDrive));
   }
 }
