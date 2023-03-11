@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 
@@ -69,6 +70,13 @@ public class ArmSubsystem extends SubsystemBase {
         - (ArmConstants.kMaxGameHeight / Math.cos(Math.toRadians(m_pivotEncoder.getAbsolutePosition())));
     if (heightOverLimit > 0 && m_elevatorSpeed > -heightOverLimit * 2) {
       m_elevatorSpeed = -heightOverLimit * 2;
+    }
+
+    // If arm is above legal extension, bring it in
+    double extensionOverLimit = m_elevatorMotor.getEncoder().getPosition()
+        - (ArmConstants.kMaxGameExtension / Math.sin(Math.toRadians(m_pivotEncoder.getAbsolutePosition())));
+    if (extensionOverLimit > 0 && m_elevatorSpeed > -extensionOverLimit * 2) {
+      m_elevatorSpeed = -extensionOverLimit * 2;
     }
 
     // Counters the effect of gravity with a small feed forward

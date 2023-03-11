@@ -35,15 +35,16 @@ public final class Constants {
     public static final double kElevatorLowPosition = 0.159;
     public static final double kElevatorHighPosition = 0.780;
 
-    public static final double kPivotMaxPosition = 39;
+    public static final double kPivotMaxPosition = 87;
     public static final double kPivotMinPosition = 12;
 
     /** Maximum distance the elevator can extend before hitting the stop. */
     public static final double kElevatorMaxPosition = 0.73;
-    public static final double kElevatorMinPosition = 0.09;
+    public static final double kElevatorMinPosition = 0.2;
 
     /** Maximum height legal for the game. */
     public static final double kMaxGameHeight = 0.5;
+    public static final double kMaxGameExtension = 0.4;
 
     public static final double kPivotFeedForwardCoefficient = 0.03;
     public static final double kElevatorFeedForwardCoefficient = 0.05;
