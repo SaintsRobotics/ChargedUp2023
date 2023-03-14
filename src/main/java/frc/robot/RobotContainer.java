@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.RunCommand;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutonConstants;
@@ -46,7 +48,10 @@ public class RobotContainer {
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
-  private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  //Sendable Choosers for auton
+  private final SendableChooser<String> m_autonDistance = new SendableChooser<>();
+  //private final SendableChooser<String> m
+
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
       m_robotDrive::getPose,
@@ -105,17 +110,16 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
-    m_chooser.addOption("BottomCharger", "BottomCharger");
-    m_chooser.addOption("BottomThreeObject", "BottomThreeObject");
-    m_chooser.addOption("BottomTwoObject", "BottomTwoObject");
-    m_chooser.addOption("MidBackCharger", "MidBackCharger");
-    m_chooser.addOption("MidFrontCharger", "MidFrontCharger");
-    m_chooser.addOption("TopCharger", "TopCharger");
-    m_chooser.addOption("TopThreeObject", "TopThreeObject");
-    m_chooser.addOption("TopTwoObject", "TopTwoObject");
-    SmartDashboard.putData(m_chooser);
+    m_autonDistance.addOption("Far", "Far");
+    m_autonDistance.addOption("Charger", "Charger");
+    SmartDashboard.putData(m_autonDistance);
 
-    m_eventMap.put("BalanceCommand", new BalanceCommand(m_robotDrive));
+   m_eventMap.put("DropHigh", new SequentialCommandGroup( //TODO: tune these
+    new ArmCommand(m_armSubsystem, 45, 1.5),
+    new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
+    new WaitCommand(0.5)));
+
+    m_eventMap.put("Balance", new BalanceCommand(m_robotDrive));
   }
 
   /**
@@ -160,13 +164,11 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-
-    String path;
-    if (m_chooser.getSelected() == null) {
-      return null;
+    if (m_autonDistance.getSelected() == null){
+        return null;
     }
-
-    path = m_chooser.getSelected();
+    
+    String path = m_autonDistance.getSelected();
 
     return m_autoBuilder.fullAuto(
         PathPlanner.loadPathGroup(

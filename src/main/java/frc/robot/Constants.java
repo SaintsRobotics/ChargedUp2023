@@ -145,7 +145,7 @@ public final class Constants {
   }
 
   public static final class AutonConstants {
-    public static final int maxVelocity = 4;
-    public static final int maxAcceleration = 3;
+    public static final double maxVelocity = 2;
+    public static final double maxAcceleration = 1.5;
   }
 }
