@@ -146,7 +146,7 @@ public class RobotContainer {
     new POVButton(m_operatorController, 90).onTrue(new ArmCommand(m_armSubsystem, 43, 1.42));
     new POVButton(m_operatorController, 180).onTrue(new ArmCommand(m_armSubsystem, 49, 1.58));
     new POVButton(m_operatorController, 270)
-        .onTrue(new ArmCommand(m_armSubsystem, ArmConstants.kPivotMinPosition, ArmConstants.kElevatorMinPosition));
+        .onTrue(new ArmCommand(m_armSubsystem, 34, ArmConstants.kElevatorMinPosition));
 
     new JoystickButton(m_operatorController, Button.kStart.value)
         .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))) // Yellow

@@ -58,18 +58,22 @@ public class ArmSubsystem extends SubsystemBase {
       m_pivotSpeed = 0;
     }
 
-    // Prevents arm from hitting motor mount
-    if (m_pivotEncoder.getAbsolutePosition() > 30
-        && m_elevatorMotor.getEncoder().getPosition() < ArmConstants.kElevatorMinPosition
-        && m_pivotSpeed > 0) {
-      m_pivotSpeed = 0;
-    }
-
     // Prevents elevator from extending until it hits the stop
     if (m_elevatorMotor.getEncoder().getPosition() < ArmConstants.kElevatorMinPosition && m_elevatorSpeed < 0) {
       m_elevatorSpeed = 0;
     } else if (m_elevatorMotor.getEncoder().getPosition() > ArmConstants.kElevatorMaxPosition && m_elevatorSpeed > 0) {
       m_elevatorSpeed = 0;
+    }
+
+    // Prevents arm from hitting motor mount
+    if (m_pivotEncoder.getAbsolutePosition() > 45
+        && m_elevatorMotor.getEncoder().getPosition() < 1.42) {
+      if (m_pivotSpeed > 0) {
+        m_pivotSpeed = 0;
+      }
+      if (m_elevatorSpeed < 0) {
+        m_elevatorSpeed = 0;
+      }
     }
 
     // If arm is above legal height, bring it down

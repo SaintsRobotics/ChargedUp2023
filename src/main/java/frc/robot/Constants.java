@@ -40,7 +40,7 @@ public final class Constants {
 
     /** Maximum distance the elevator can extend before hitting the stop. */
     public static final double kElevatorMaxPosition = 1.99;
-    public static final double kElevatorMinPosition = 1.419;
+    public static final double kElevatorMinPosition = 1.25;
 
     /** Maximum height legal for the game. */
     public static final double kMaxGameHeight = 1.727;
