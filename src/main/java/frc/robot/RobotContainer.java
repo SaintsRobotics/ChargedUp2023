@@ -112,6 +112,7 @@ public class RobotContainer {
 
     m_autonDistance.addOption("Far", "Far");
     m_autonDistance.addOption("Charger", "Charger");
+    m_autonDistance.addOption("Near", "Near");
     SmartDashboard.putData(m_autonDistance);
 
    m_eventMap.put("DropHigh", new SequentialCommandGroup( //TODO: tune these
