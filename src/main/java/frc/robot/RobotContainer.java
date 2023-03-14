@@ -21,9 +21,11 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
+import frc.robot.commands.ArmCommand;
 import frc.robot.commands.AutonDriveCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.SnapRotateCommand;
@@ -39,8 +41,8 @@ import frc.robot.subsystems.LEDSubsystem;
  * (including subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
-  public final ArmSubsystem armSubsystem = new ArmSubsystem();
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
   private final LEDSubsystem m_LEDSubsystem = new LEDSubsystem();
 
@@ -65,10 +67,13 @@ public class RobotContainer {
   public RobotContainer() {
     configureButtonBindings();
 
+    
+    /* The left stick controls translation of the robot.
+    * Turning is controlled by the X axis of the right stick.
+    * Holding left trigger engages slow mode
+    */
     m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        // Holding left trigger engages slow mode
+        
         new RunCommand(
             () -> m_robotDrive.drive(
                 MathUtil.applyDeadband(
@@ -94,21 +99,20 @@ public class RobotContainer {
                     / 2,
                 !m_driverController.getRightBumper()),
             m_robotDrive));
-
-    // Left stick y axis controls pivot
-    // Right stick y axis controls extension
-    armSubsystem.setDefaultCommand(
-        new RunCommand(
-            () -> armSubsystem.setArmSpeeds(
-                MathUtil.applyDeadband(
-                    -m_operatorController.getLeftY(),
-                    OIConstants.kControllerDeadband)
-                    * ArmConstants.kMaxPivotSpeedPercent,
-                MathUtil.applyDeadband(
-                    -m_operatorController.getRightY(),
-                    OIConstants.kControllerDeadband)
-                    * ArmConstants.kMaxElevatorSpeedPercent),
-            armSubsystem));
+    /*
+    * Left joytick's y-axis controlls pivot angle (upright is 0, down is 90)
+    * Right joytick's y-axis controlls elevtator exentsion
+    * A-button toggles grabber (set to closed on initialize)
+    */
+    m_armSubsystem.setDefaultCommand(
+        new RunCommand(() -> m_armSubsystem.set(
+            MathUtil.applyDeadband(
+                -m_operatorController.getLeftY(),
+                OIConstants.kControllerDeadband),
+            MathUtil.applyDeadband(
+                -m_operatorController.getRightY(),
+                OIConstants.kControllerDeadband)),
+            m_armSubsystem));
 
     m_chooser.addOption("BottomCharger", "BottomCharger");
     m_chooser.addOption("BottomThreeObject", "BottomThreeObject");
@@ -145,43 +149,18 @@ public class RobotContainer {
     new JoystickButton(m_operatorController, Button.kA.value)
         .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
 
+    new POVButton(m_operatorController, 0).onTrue(new ArmCommand(m_armSubsystem, 49, 1.96));
+    new POVButton(m_operatorController, 90).onTrue(new ArmCommand(m_armSubsystem, 43, 1.42));
+    new POVButton(m_operatorController, 180).onTrue(new ArmCommand(m_armSubsystem, 49, 1.58));
+    new POVButton(m_operatorController, 270)
+        .onTrue(new ArmCommand(m_armSubsystem, 34, ArmConstants.kElevatorMinPosition));
+
     new JoystickButton(m_operatorController, Button.kStart.value)
         .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))) // Yellow
         .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 50))); // Blue
     new JoystickButton(m_operatorController, Button.kBack.value)
         .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(27, 8, 44))) // Purple
         .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 50))); // Blue
-
-    new JoystickButton(m_operatorController, Button.kB.value)
-        .toggleOnTrue(new InstantCommand(armSubsystem::togglePID, armSubsystem))
-        .toggleOnFalse(new InstantCommand(armSubsystem::togglePID, armSubsystem));
-
-    new JoystickButton(m_operatorController, Button.kY.value)
-        .whileTrue(new InstantCommand(armSubsystem::forceForwards, armSubsystem))
-        .onFalse(new InstantCommand(armSubsystem::stopForce, armSubsystem));
-
-
-    /*
-     * DO NOT USE: ROBOT WILL BREAK
-     * new POVButton(m_operatorController, 0)
-     * .onTrue(
-     * new InstantCommand(m_armSubsystem::goStation, m_armSubsystem)); // Up -
-     * Station
-     * 
-     * new POVButton(m_operatorController, 90)
-     * .onTrue(
-     * new InstantCommand(m_armSubsystem::goTop, m_armSubsystem)); // Left - Top
-     * 
-     * new POVButton(m_operatorController, 180)
-     * .onTrue(
-     * new InstantCommand(m_armSubsystem::goResting, m_armSubsystem)); // Down -
-     * Resting
-     * 
-     * new POVButton(m_operatorController, 270)
-     * .onTrue(
-     * new InstantCommand(m_armSubsystem::goMid, m_armSubsystem)); // Right - Mid
-     * 
-     */
   }
 
   /**
@@ -190,8 +169,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // Timer m_autonTimer = new Timer();
-    // m_autonTimer.start();
 
     // String path;
     // if (m_chooser.getSelected() != null) {
@@ -208,12 +185,7 @@ public class RobotContainer {
     // AutonConstants.maxAcceleration)));
 
     return new SequentialCommandGroup(
-        new ParallelDeadlineGroup(
-            new WaitCommand(1),
-            new RunCommand(() -> armSubsystem.setArmPos(20, 0.1), armSubsystem)),
-        new ParallelDeadlineGroup(
-            new WaitCommand(2),
-            new RunCommand(() -> armSubsystem.setArmPos(45, 0.3), armSubsystem)),
+        new ArmCommand(m_armSubsystem, 45, 0.3),
         new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
         new ParallelDeadlineGroup(
             new WaitCommand(6),

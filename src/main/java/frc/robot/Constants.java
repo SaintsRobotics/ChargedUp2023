@@ -18,6 +18,50 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
  * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final class ArmConstants {
+    public static final int kPivotMotorPort = 36;
+    public static final int kElevatorMotorPort = 34;
+    public static final int kPivotEncoderPort = 7;
+    public static final int kLowLimitSwitchPort = 9;
+    public static final int kHighLimitSwitchPort = 8;
+
+    public static final boolean kPivotMotorInverted = false;
+    public static final boolean kElevatorMotorInverted = true;
+
+    public static final double kPivotEncoderOffset = 168;
+    public static final double kElevatorEncoderPositionConversionFactor = 0.035;
+
+    public static final double kElevatorStartingPosition = 1.219;
+    public static final double kElevatorLowPosition = 1.378;
+    public static final double kElevatorHighPosition = 1.999;
+
+    public static final double kPivotMaxPosition = 87;
+    public static final double kPivotMinPosition = 12;
+
+    /** Maximum distance the elevator can extend before hitting the stop. */
+    public static final double kElevatorMaxPosition = 1.99;
+    public static final double kElevatorMinPosition = 1.25;
+
+    public static final double kMotorMountPivotLimit = 45;
+    public static final double kMotorMountElevatorLimit = 1.42;
+
+    /** Maximum height legal for the game. */
+    public static final double kMaxGameHeight = 1.727;
+    public static final double kMaxGameExtension = 1.68;
+
+    public static final double kPivotFeedForwardCoefficient = 0.03;
+    public static final double kElevatorFeedForwardCoefficient = 0.05;
+
+    public static final double kPivotMaxSpeed = 0.25;
+    public static final double kElevatorMaxSpeed = 0.1;
+
+    public static final double kPPivotPID = 0.2;
+    public static final double kPElevatorPID = 30;
+
+    public static final double kPivotTolerance = 1;
+    public static final double kElevatorTolerance = 0.005;
+  }
+
   public static final class DriveConstants {
     public static final int kFrontLeftDriveMotorPort = 28;
     public static final int kRearLeftDriveMotorPort = 27;
@@ -78,50 +122,6 @@ public final class Constants {
 
     public static final double kPModuleTurningController = -0.3;
 
-  }
-
-  public static final class ArmConstants {
-    public static final double floor2ArmBase = 10f / 39.37;
-    public static final double detector2tip = 42f / 39.37;
-
-    public static final int kPivotMotorPort = 36;
-    public static final int kElevatorMotorPort = 34;
-    public static final int kPivotEncoderPort = 7;
-    public static final double kPivotEncoderOffset = -191;
-
-    public static final double kMaxPivotSpeedPercent = 7.5;
-    public static final double kMaxElevatorSpeedPercent = 0.2;
-
-    public static final int kMinLimitPort = 9;
-    public static final int kMaxLimitPort = 8;
-
-    public static final double kRestingPivot = 0; // TODO: find correct angle values for pivot, degrees
-    public static final double kMidPivot = 0;
-    public static final double kTopPivot = 0;
-    public static final double kStationPivot = 0;
-
-    public static final double kRestingPos = 0; // TODO: measure correct positions, meters
-    public static final double kMidPos = 0;
-    public static final double kTopPos = 0;
-    public static final double kStationPos = 0;
-
-    public static final int sproketTeeth = 22;
-    public static final double inchPerTeeth = 0.25;
-    public static final double gearRatio = 4 / 1;
-
-    public static final double kMinSwitchPos = 0;
-    public static final double kMaxSwitchPos = 0.42; //0.61595;
-
-    public static final double kMinPivotPos = 0; 
-    public static final double kMaxPivotPos = 90; // 0 is straight up
-
-    public static final double kPivotAxleHeight = 0.2286; // All values in meters
-    public static final double kAxleToFrontPerimeter = 0.5588;
-    public static final double kMaxExtensionHeight = 1.9812 - 0.05; // minus 5 centimeters of leeway
-    public static final double kMaxFrameExtensionLimit = 1.2192 - 0.02; // minus 2 centimeters of leeway
-    public static final double kElevatorMaxExtensionOffset = 0.3683; // L offset
-    public static final double kGrabberToDetector = 40.5/39.3;
-    public static final double kLimitToAxle = 0.149678698451591;
   }
 
   public static final class GrabberConstants {

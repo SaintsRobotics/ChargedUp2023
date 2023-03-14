@@ -28,10 +28,12 @@
   "java.test.defaultConfig": "WPIlibUnitTests",
   "cSpell.words": [
     "AHRS",
+    "Auton",
     "Brushless",
     "Deadband",
     "odometry",
     "pathplanner",
+    "Setpoint",
     "teleop",
     "wpilib",
     "wpilibj"
