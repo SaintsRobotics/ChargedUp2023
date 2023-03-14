@@ -42,6 +42,9 @@ public final class Constants {
     public static final double kElevatorMaxPosition = 1.99;
     public static final double kElevatorMinPosition = 1.25;
 
+    public static final double kMotorMountPivotLimit = 45;
+    public static final double kMotorMountElevatorLimit = 1.42;
+
     /** Maximum height legal for the game. */
     public static final double kMaxGameHeight = 1.727;
     public static final double kMaxGameExtension = 1.68;

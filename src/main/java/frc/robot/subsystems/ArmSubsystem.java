@@ -66,8 +66,8 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     // Prevents arm from hitting motor mount
-    if (m_pivotEncoder.getAbsolutePosition() > 45
-        && m_elevatorMotor.getEncoder().getPosition() < 1.42) {
+    if (m_pivotEncoder.getAbsolutePosition() > ArmConstants.kMotorMountPivotLimit
+        && m_elevatorMotor.getEncoder().getPosition() < ArmConstants.kMotorMountElevatorLimit) {
       if (m_pivotSpeed > 0) {
         m_pivotSpeed = 0;
       }
