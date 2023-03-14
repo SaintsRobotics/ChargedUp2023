@@ -4,10 +4,15 @@
 
 package frc.robot.subsystems;
 
+import java.util.Optional;
+
+import org.photonvision.EstimatedRobotPose;
+
 import com.kauailabs.navx.frc.AHRS;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -19,6 +24,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import frc.robot.Constants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Robot;
 
@@ -54,18 +60,22 @@ public class DriveSubsystem extends SubsystemBase {
   private final AHRS m_gyro = new AHRS();
   private double m_gyroAngle;
 
-  private final PIDController m_headingCorrectionPID = new PIDController(5, 0, 0); // TODO: tune heading correction PID
+  private final PIDController m_headingCorrectionPID = new PIDController(5, 0, 0); // TODO: tune this
   private final Timer m_headingCorrectionTimer;
 
-  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(
-      DriveConstants.kDriveKinematics,
-      m_gyro.getRotation2d(),
-      new SwerveModulePosition[] {
-          m_frontLeft.getPosition(),
-          m_frontRight.getPosition(),
-          m_rearLeft.getPosition(),
-          m_rearRight.getPosition()
-      });
+  private final SwerveDrivePoseEstimator m_swervePoseEstimator;
+  private final PhotonCameraWrapper m_photonCamera = new PhotonCameraWrapper();
+  private Optional<EstimatedRobotPose> result;
+
+  private SwerveModulePosition[] m_swerveModulePositions = new SwerveModulePosition[] {
+      m_frontLeft.getPosition(),
+      m_frontRight.getPosition(),
+      m_rearLeft.getPosition(),
+      m_rearRight.getPosition()
+  };
+
+  private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(DriveConstants.kDriveKinematics,
+      m_gyro.getRotation2d(), m_swerveModulePositions);
 
   private final Field2d m_field = new Field2d();
 
@@ -77,18 +87,21 @@ public class DriveSubsystem extends SubsystemBase {
     m_headingCorrectionPID.setSetpoint(MathUtil.angleModulus(m_gyro.getRotation2d().getRadians()));
     m_headingCorrectionTimer = new Timer();
     m_headingCorrectionTimer.start();
+
+    m_swervePoseEstimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, m_gyro.getRotation2d(),
+        m_swerveModulePositions, m_odometry.getPoseMeters());
   }
 
   @Override
   public void periodic() {
-    m_odometry.update(
-        Robot.isReal() ? m_gyro.getRotation2d() : new Rotation2d(m_gyroAngle),
-        new SwerveModulePosition[] {
-            m_frontLeft.getPosition(),
-            m_frontRight.getPosition(),
-            m_rearLeft.getPosition(),
-            m_rearRight.getPosition()
-        });
+    m_swerveModulePositions = new SwerveModulePosition[] {
+        m_frontLeft.getPosition(),
+        m_frontRight.getPosition(),
+        m_rearLeft.getPosition(),
+        m_rearRight.getPosition()
+    };
+
+    m_odometry.update(Robot.isReal() ? m_gyro.getRotation2d() : new Rotation2d(m_gyroAngle), m_swerveModulePositions);
 
     m_field.setRobotPose(m_odometry.getPoseMeters());
 
@@ -96,6 +109,28 @@ public class DriveSubsystem extends SubsystemBase {
     SmartDashboard.putNumber("pitch", m_gyro.getPitch());
     SmartDashboard.putNumber("yaw", m_gyro.getYaw());
     SmartDashboard.putNumber("roll", m_gyro.getRoll());
+
+    // Check if we have a camera
+    if (!m_photonCamera.camera.isConnected()) {
+      SmartDashboard.putString("Vision Status", "No camera connected: " +
+          "Check if coprocessor is connected and that camera is plugged in.");
+    }
+
+    // Check if we have april tags
+    result = m_photonCamera.getEstimatedGlobalPose(m_odometry.getPoseMeters());
+
+    if (!m_photonCamera.camera.getLatestResult().hasTargets()) {
+      SmartDashboard.putString("Vision Status", "No AprilTags detected");
+    } else {
+      SmartDashboard.putString("Vision Status", "AprilTags detected");
+    }
+
+    // if we have an estimated pose, update pose using pose estimator
+    if (result.isPresent()) {
+      EstimatedRobotPose camPose = result.get();
+      m_swervePoseEstimator.resetPosition(m_gyro.getRotation2d(), m_swerveModulePositions, m_odometry.getPoseMeters());
+      m_swervePoseEstimator.addVisionMeasurement(camPose.estimatedPose.toPose2d(), camPose.timestampSeconds);
+    }
   }
 
   /**
@@ -142,7 +177,7 @@ public class DriveSubsystem extends SubsystemBase {
 
     double currentAngle = MathUtil.angleModulus(m_gyro.getRotation2d().getRadians());
 
-    if ((xSpeed == 0 && ySpeed == 0) || m_headingCorrectionTimer.get() < DriveConstants.kTurningStopTime) {
+    if ((xSpeed == 0 && ySpeed == 0) || m_headingCorrectionTimer.get() < Constants.DriveConstants.kTurningStopTime) {
       m_headingCorrectionPID.setSetpoint(currentAngle);
     } else {
       rotation = m_headingCorrectionPID.calculate(currentAngle);
@@ -189,4 +224,5 @@ public class DriveSubsystem extends SubsystemBase {
   public double getGyroPitch() {
     return m_gyro.getPitch();
   }
+
 }
