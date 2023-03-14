@@ -67,20 +67,13 @@ public class RobotContainer {
   public RobotContainer() {
     configureButtonBindings();
 
-    m_armSubsystem.setDefaultCommand(
-        new RunCommand(() -> m_armSubsystem.set(
-            MathUtil.applyDeadband(
-                -m_operatorController.getLeftY(),
-                OIConstants.kControllerDeadband),
-            MathUtil.applyDeadband(
-                -m_operatorController.getRightY(),
-                OIConstants.kControllerDeadband)),
-            m_armSubsystem));
-
+    
+    /* The left stick controls translation of the robot.
+    * Turning is controlled by the X axis of the right stick.
+    * Holding left trigger engages slow mode
+    */
     m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        // Holding left trigger engages slow mode
+        
         new RunCommand(
             () -> m_robotDrive.drive(
                 MathUtil.applyDeadband(
@@ -106,6 +99,20 @@ public class RobotContainer {
                     / 2,
                 !m_driverController.getRightBumper()),
             m_robotDrive));
+    /*
+    * Left joytick's y-axis controlls pivot angle (upright is 0, down is 90)
+    * Right joytick's y-axis controlls elevtator exentsion
+    * A-button toggles grabber (set to closed on initialize)
+    */
+    m_armSubsystem.setDefaultCommand(
+        new RunCommand(() -> m_armSubsystem.set(
+            MathUtil.applyDeadband(
+                -m_operatorController.getLeftY(),
+                OIConstants.kControllerDeadband),
+            MathUtil.applyDeadband(
+                -m_operatorController.getRightY(),
+                OIConstants.kControllerDeadband)),
+            m_armSubsystem));
 
     m_chooser.addOption("BottomCharger", "BottomCharger");
     m_chooser.addOption("BottomThreeObject", "BottomThreeObject");
