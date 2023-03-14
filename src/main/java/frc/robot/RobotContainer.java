@@ -48,9 +48,9 @@ public class RobotContainer {
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
-  //Sendable Choosers for auton
+  // Sendable Choosers for auton
   private final SendableChooser<String> m_autonDistance = new SendableChooser<>();
-  //private final SendableChooser<String> m
+  // private final SendableChooser<String> m
 
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
@@ -115,10 +115,10 @@ public class RobotContainer {
     m_autonDistance.addOption("Near", "Near");
     SmartDashboard.putData(m_autonDistance);
 
-   m_eventMap.put("DropHigh", new SequentialCommandGroup( //TODO: tune these
-    new ArmCommand(m_armSubsystem, 45, 1.5),
-    new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
-    new WaitCommand(0.5)));
+    m_eventMap.put("DropHigh", new SequentialCommandGroup( // TODO: tune these
+        new ArmCommand(m_armSubsystem, 45, 1.5),
+        new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
+        new WaitCommand(0.5)));
 
     m_eventMap.put("Balance", new BalanceCommand(m_robotDrive));
   }
@@ -165,10 +165,10 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    if (m_autonDistance.getSelected() == null){
-        return null;
+    if (m_autonDistance.getSelected() == null) {
+      return null;
     }
-    
+
     String path = m_autonDistance.getSelected();
 
     return m_autoBuilder.fullAuto(
