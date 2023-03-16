@@ -4,6 +4,14 @@
       "window": {
         "visible": true
       }
+    },
+    "RoboRIO": {
+      "6V Rail": {
+        "open": true
+      },
+      "window": {
+        "visible": true
+      }
     }
   },
   "NTProvider": {
@@ -52,8 +60,5 @@
         "open": true
       }
     }
-  },
-  "NetworkTables View": {
-    "visible": false
   }
 }

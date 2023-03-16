@@ -33,6 +33,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.PhotonCameraWrapper;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -45,6 +46,8 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
   private final LEDSubsystem m_LEDSubsystem = new LEDSubsystem();
+  private final ShuffleboardWrapper m_ShuffleboardWrapper = new ShuffleboardWrapper("Default");
+  private final PhotonCameraWrapper m_camera = new PhotonCameraWrapper();
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
@@ -125,6 +128,8 @@ public class RobotContainer {
     SmartDashboard.putData(m_chooser);
 
     m_eventMap.put("BalanceCommand", new BalanceCommand(m_robotDrive));
+
+    m_ShuffleboardWrapper.addCamera(m_camera.camera);    
   }
 
   /**

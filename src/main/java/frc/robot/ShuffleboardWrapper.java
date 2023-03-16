@@ -1,5 +1,7 @@
 package frc.robot;
 
+import org.photonvision.PhotonCamera;
+
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
@@ -43,8 +45,13 @@ public class ShuffleboardWrapper {
    */
   public void addSubsystem(ArmSubsystem sys){
     arm  = (ArmSubsystemExtractor)sys;
-    Shuffleboard.getTab(m_name).getLayout("Arm", BuiltInLayouts.kList).withPosition(1, 0).withSize(1, 4);
+    Shuffleboard.getTab(m_name).getLayout("Arm", BuiltInLayouts.kList).withPosition(1, 0).withSize(1, 3);
     Shuffleboard.getTab(m_name).getLayout("Arm").addNumber("Extension", () -> arm.getExtension());
     Shuffleboard.getTab(m_name).getLayout("Arm").addNumber("Angle", () -> arm.getPivot());
+  }
+
+  public void addCamera(PhotonCamera cam){
+    Shuffleboard.getTab(m_name).getLayout("Camera", BuiltInLayouts.kGrid).withPosition(0, 3).withSize(2, 2);
+    Shuffleboard.getTab(m_name).getLayout("Camera").addCamera("Robot", "MS HD", "http://127.0.0.1:1181/stream.mjpg", "http://photonvision.local:1181/stream.mjpg");
   }
 }

@@ -160,29 +160,29 @@ public final class Constants {
     public static final int maxVelocity = 4;
     public static final int maxAcceleration = 3;
     public static final double kTurningStopTime = 0.2; // TODO: tune this
+  }
 
-    public static final class VisionConstants {
+  public static final class VisionConstants {
 
-      public static final String kCameraName = "Microsoft_LifeCam_HD-3000";
+    public static final String kCameraName = "Microsoft_LifeCam_HD-3000";
 
-      // X and Y are from true center of the robot, Angle is from front of the robot.
-      public static final Transform3d kCameraOffset = new Transform3d(new Translation3d(0.5, 0, 0.5),
-          new Rotation3d(0, 0, 0));
-      // Currently set as cam mounted facing forward, half a meter forward of center,
-      // half a meter up from center. // TODO adjust vision offset values
+    // X and Y are from true center of the robot, Angle is from front of the robot.
+    public static final Transform3d kCameraOffset = new Transform3d(new Translation3d(0.5, 0, 0.5),
+        new Rotation3d(0, 0, 0));
+    // Currently set as cam mounted facing forward, half a meter forward of center,
+    // half a meter up from center. // TODO adjust vision offset values
 
-      public static final AprilTagFieldLayout kAprilTagFieldLayout = loadFieldLayout();
+    public static final AprilTagFieldLayout kAprilTagFieldLayout = loadFieldLayout();
 
-      // Need this method to catch error thrown by AprilTagFieldLayout because it
-      // complains about the file path
-      private static AprilTagFieldLayout loadFieldLayout() {
-        try {
-          return AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
-        } catch (IOException ioe) {
-          DriverStation.reportError("Failed to load AprilTagFieldLayout, no vision estimation available",
-              ioe.getStackTrace());
-          return null;
-        }
+    // Need this method to catch error thrown by AprilTagFieldLayout because it
+    // complains about the file path
+    private static AprilTagFieldLayout loadFieldLayout() {
+      try {
+        return AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+      } catch (IOException ioe) {
+        DriverStation.reportError("Failed to load AprilTagFieldLayout, no vision estimation available",
+            ioe.getStackTrace());
+        return null;
       }
     }
   }
