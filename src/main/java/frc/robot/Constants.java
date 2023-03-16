@@ -47,7 +47,7 @@ public final class Constants {
 
     /** Maximum height legal for the game. */
     public static final double kMaxGameHeight = 1.727;
-    public static final double kMaxGameExtension = 1.68;
+    public static final double kMaxGameExtension = 1.681;
 
     public static final double kPivotFeedForwardCoefficient = 0.03;
     public static final double kElevatorFeedForwardCoefficient = 0.05;
@@ -101,7 +101,7 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     public static final double kMaxSpeedMetersPerSecond = 3.6576;
-    public static final double kMaxAngularSpeedRadiansPerSecond = 15.24;
+    public static final double kMaxAngularSpeedRadiansPerSecond = 15.24/3;
 
     public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
 

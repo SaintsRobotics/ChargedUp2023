@@ -96,6 +96,9 @@ public class RobotContainer {
                     -m_driverController.getRightX(),
                     OIConstants.kControllerDeadband)
                     * DriveConstants.kMaxAngularSpeedRadiansPerSecond
+                    * (1 - m_driverController
+                        .getLeftTriggerAxis()
+                        * OIConstants.kSlowModeScalar)
                     / 2,
                 !m_driverController.getRightBumper()),
             m_robotDrive));
