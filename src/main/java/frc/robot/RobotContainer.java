@@ -114,8 +114,8 @@ public class RobotContainer {
     m_autonDistance.addOption("Near", "Near");
     SmartDashboard.putData(m_autonDistance);
 
-    m_eventMap.put("DropHigh", new SequentialCommandGroup( // TODO: tune these
-        new ArmCommand(m_armSubsystem, 45, 1.5),
+    m_eventMap.put("DropHigh", new SequentialCommandGroup(
+        new ArmCommand(m_armSubsystem, 49, 1.96),
         new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
         new WaitCommand(0.5)));
 
