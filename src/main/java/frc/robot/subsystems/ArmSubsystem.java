@@ -17,9 +17,9 @@ import frc.robot.Constants.ArmConstants;
 
 public class ArmSubsystem extends SubsystemBase {
   private final CANSparkMax m_pivotMotor = new CANSparkMax(ArmConstants.kPivotMotorPort, MotorType.kBrushless);
-  private final CANSparkMax m_elevatorMotor = new CANSparkMax(ArmConstants.kElevatorMotorPort, MotorType.kBrushless);
+  protected final CANSparkMax m_elevatorMotor = new CANSparkMax(ArmConstants.kElevatorMotorPort, MotorType.kBrushless);
 
-  private final CANCoder m_pivotEncoder = new CANCoder(ArmConstants.kPivotEncoderPort);
+  protected final CANCoder m_pivotEncoder = new CANCoder(ArmConstants.kPivotEncoderPort);
 
   /** Returns false when arm is detected. */
   private final DigitalInput m_lowLimitSwitch = new DigitalInput(ArmConstants.kLowLimitSwitchPort);
