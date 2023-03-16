@@ -22,6 +22,7 @@ import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
+import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DriveConstants;
@@ -81,9 +82,7 @@ public class RobotContainer {
             m_armSubsystem));
 
     m_robotDrive.setDefaultCommand(
-        // The left stick controls translation of the robot.
-        // Turning is controlled by the X axis of the right stick.
-        // Holding left trigger engages slow mode
+        
         new RunCommand(
             () -> m_robotDrive.drive(
                 MathUtil.applyDeadband(
@@ -150,6 +149,11 @@ public class RobotContainer {
         .onTrue(new ArmCommand(m_armSubsystem, 38, 0.38))
         .onFalse(new ArmCommand(m_armSubsystem, ArmConstants.kPivotMinPosition,
             ArmConstants.kElevatorMinPosition));
+    new POVButton(m_operatorController, 0).onTrue(new ArmCommand(m_armSubsystem, 49, 1.96));
+    new POVButton(m_operatorController, 90).onTrue(new ArmCommand(m_armSubsystem, 43, 1.42));
+    new POVButton(m_operatorController, 180).onTrue(new ArmCommand(m_armSubsystem, 49, 1.58));
+    new POVButton(m_operatorController, 270)
+        .onTrue(new ArmCommand(m_armSubsystem, 34, ArmConstants.kElevatorMinPosition));
 
     new JoystickButton(m_operatorController, Button.kStart.value)
         .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))) // Yellow

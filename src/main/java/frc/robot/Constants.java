@@ -39,19 +39,23 @@ public final class Constants {
     public static final double kPivotEncoderOffset = 168;
     public static final double kElevatorEncoderPositionConversionFactor = 0.035;
 
-    public static final double kElevatorStartingPosition = 0;
-    public static final double kElevatorLowPosition = 0.159;
-    public static final double kElevatorHighPosition = 0.780;
+    public static final double kElevatorStartingPosition = 1.219;
+    public static final double kElevatorLowPosition = 1.378;
+    public static final double kElevatorHighPosition = 1.999;
 
-    public static final double kPivotMaxPosition = 39;
+    public static final double kPivotMaxPosition = 87;
     public static final double kPivotMinPosition = 12;
 
     /** Maximum distance the elevator can extend before hitting the stop. */
-    public static final double kElevatorMaxPosition = 0.73;
-    public static final double kElevatorMinPosition = 0.09;
+    public static final double kElevatorMaxPosition = 1.99;
+    public static final double kElevatorMinPosition = 1.25;
+
+    public static final double kMotorMountPivotLimit = 45;
+    public static final double kMotorMountElevatorLimit = 1.42;
 
     /** Maximum height legal for the game. */
-    public static final double kMaxGameHeight = 0.5;
+    public static final double kMaxGameHeight = 1.727;
+    public static final double kMaxGameExtension = 1.68;
 
     public static final double kPivotFeedForwardCoefficient = 0.03;
     public static final double kElevatorFeedForwardCoefficient = 0.05;

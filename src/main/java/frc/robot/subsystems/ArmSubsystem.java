@@ -11,6 +11,7 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DigitalInput;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 
@@ -64,11 +65,29 @@ public class ArmSubsystem extends SubsystemBase {
       m_elevatorSpeed = 0;
     }
 
+    // Prevents arm from hitting motor mount
+    if (m_pivotEncoder.getAbsolutePosition() > ArmConstants.kMotorMountPivotLimit
+        && m_elevatorMotor.getEncoder().getPosition() < ArmConstants.kMotorMountElevatorLimit) {
+      if (m_pivotSpeed > 0) {
+        m_pivotSpeed = 0;
+      }
+      if (m_elevatorSpeed < 0) {
+        m_elevatorSpeed = 0;
+      }
+    }
+
     // If arm is above legal height, bring it down
     double heightOverLimit = m_elevatorMotor.getEncoder().getPosition()
         - (ArmConstants.kMaxGameHeight / Math.cos(Math.toRadians(m_pivotEncoder.getAbsolutePosition())));
     if (heightOverLimit > 0 && m_elevatorSpeed > -heightOverLimit * 2) {
       m_elevatorSpeed = -heightOverLimit * 2;
+    }
+
+    // If arm is above legal extension, bring it in
+    double extensionOverLimit = m_elevatorMotor.getEncoder().getPosition()
+        - (ArmConstants.kMaxGameExtension / Math.sin(Math.toRadians(m_pivotEncoder.getAbsolutePosition())));
+    if (extensionOverLimit > 0 && m_elevatorSpeed > -extensionOverLimit * 2) {
+      m_elevatorSpeed = -extensionOverLimit * 2;
     }
 
     // Counters the effect of gravity with a small feed forward
@@ -78,6 +97,11 @@ public class ArmSubsystem extends SubsystemBase {
     m_elevatorMotor.set(m_elevatorSpeed
         + (Math.cos(Math.toRadians(m_pivotEncoder.getAbsolutePosition()))
             * ArmConstants.kElevatorFeedForwardCoefficient));
+
+    SmartDashboard.putNumber("elevator encoder", getElevatorPosition());
+    SmartDashboard.putNumber("pivot encoder", getPivotPosition());
+    SmartDashboard.putNumber("pivot speed", m_pivotMotor.get());
+    SmartDashboard.putNumber("elevator speed", m_elevatorMotor.get());
   }
 
   /**
