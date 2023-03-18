@@ -69,6 +69,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final Field2d m_field = new Field2d();
 
+  private double m_currentXSpeed = 0;
+  private double m_currentYSpeed = 0;
+
   /** Creates a new {@link DriveSubsystem}. */
   public DriveSubsystem() {
     SmartDashboard.putData("Field", m_field);
@@ -141,8 +144,11 @@ public class DriveSubsystem extends SubsystemBase {
     double rotation = rot;
 
     double currentAngle = MathUtil.angleModulus(m_gyro.getRotation2d().getRadians());
+    
+    m_currentXSpeed = calculateAcceleration(m_currentXSpeed, xSpeed, 0.1, 0.1);
+    m_currentYSpeed = calculateAcceleration(m_currentYSpeed, ySpeed, 0.1, 0.1);
 
-    if ((xSpeed == 0 && ySpeed == 0) || m_headingCorrectionTimer.get() < DriveConstants.kTurningStopTime) {
+    if ((m_currentXSpeed == 0 && m_currentYSpeed == 0) || m_headingCorrectionTimer.get() < DriveConstants.kTurningStopTime) {
       m_headingCorrectionPID.setSetpoint(currentAngle);
     } else {
       rotation = m_headingCorrectionPID.calculate(currentAngle);
@@ -150,9 +156,9 @@ public class DriveSubsystem extends SubsystemBase {
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotation,
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(m_currentXSpeed, m_currentYSpeed, rotation,
                 Robot.isReal() ? m_gyro.getRotation2d() : new Rotation2d(m_gyroAngle))
-            : new ChassisSpeeds(xSpeed, ySpeed, rotation));
+            : new ChassisSpeeds(m_currentXSpeed, m_currentYSpeed, rotation));
     setModuleStates(swerveModuleStates);
   }
 
@@ -188,5 +194,26 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getGyroPitch() {
     return m_gyro.getPitch();
+  }
+
+  /**
+   * Calculates a speed, taking into account an acceleration parameter
+   * @param currentSpeed The current speed that is being accelerated
+   * @param desiredSpeed The speed to target
+
+   * @param deceleration The constant amount to decelerate by
+   * @param acceleration The coefficient of acceleration
+   * @return The new speed to use
+   */
+  private static double calculateAcceleration(double currentSpeed, double desiredSpeed, double deceleration, double acceleration) {
+    if (desiredSpeed == 0) {
+      return currentSpeed + -Math.signum(currentSpeed) * deceleration;
+    } else if (desiredSpeed < 0) {
+      return Math.max(desiredSpeed, currentSpeed + (desiredSpeed * acceleration));
+    } else if (desiredSpeed > 0) {
+      return Math.min(desiredSpeed, currentSpeed + (desiredSpeed * acceleration));
+    }
+
+    return 0;
   }
 }
