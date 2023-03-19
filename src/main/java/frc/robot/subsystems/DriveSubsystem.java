@@ -207,7 +207,11 @@ public class DriveSubsystem extends SubsystemBase {
    */
   private static double calculateAcceleration(double currentSpeed, double desiredSpeed, double deceleration, double acceleration) {
     if (desiredSpeed == 0) {
-      return currentSpeed + -Math.signum(currentSpeed) * deceleration;
+      if (currentSpeed >= -deceleration && currentSpeed <= deceleration) {
+        return 0;
+      }
+
+      return currentSpeed + (-Math.signum(currentSpeed) * deceleration);
     } else if (desiredSpeed < 0) {
       return Math.max(desiredSpeed, currentSpeed + (desiredSpeed * acceleration));
     } else if (desiredSpeed > 0) {
