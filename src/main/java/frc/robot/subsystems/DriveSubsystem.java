@@ -206,15 +206,14 @@ public class DriveSubsystem extends SubsystemBase {
    * @return The new speed to use
    */
   private static double calculateAcceleration(double currentSpeed, double desiredSpeed, double deceleration, double acceleration) {
-    return desiredSpeed; // TODO Error in this code, return here temporary, with return acts normally
-    // if (desiredSpeed == 0) {
-    //   return currentSpeed + -Math.signum(currentSpeed) * deceleration;
-    // } else if (desiredSpeed < 0) {
-    //   return Math.max(desiredSpeed, currentSpeed + (desiredSpeed * acceleration));
-    // } else if (desiredSpeed > 0) {
-    //   return Math.min(desiredSpeed, currentSpeed + (desiredSpeed * acceleration));
-    // }
+    if (desiredSpeed == 0) {
+      return currentSpeed + -Math.signum(currentSpeed) * deceleration;
+    } else if (desiredSpeed < 0) {
+      return Math.max(desiredSpeed, currentSpeed + (desiredSpeed * acceleration));
+    } else if (desiredSpeed > 0) {
+      return Math.min(desiredSpeed, currentSpeed + (desiredSpeed * acceleration));
+    }
 
-    // return 0;
+    return 0;
   }
 }
