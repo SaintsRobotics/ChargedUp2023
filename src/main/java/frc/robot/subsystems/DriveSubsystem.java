@@ -144,11 +144,12 @@ public class DriveSubsystem extends SubsystemBase {
     double rotation = rot;
 
     double currentAngle = MathUtil.angleModulus(m_gyro.getRotation2d().getRadians());
-    
-    m_currentXSpeed = calculateAcceleration(m_currentXSpeed, xSpeed, 0.1, 0.1);
-    m_currentYSpeed = calculateAcceleration(m_currentYSpeed, ySpeed, 0.1, 0.1);
 
-    if ((m_currentXSpeed == 0 && m_currentYSpeed == 0) || m_headingCorrectionTimer.get() < DriveConstants.kTurningStopTime) {
+    m_currentXSpeed = calculateAcceleration(m_currentXSpeed, xSpeed);
+    m_currentYSpeed = calculateAcceleration(m_currentYSpeed, ySpeed);
+
+    if ((m_currentXSpeed == 0 && m_currentYSpeed == 0)
+        || m_headingCorrectionTimer.get() < DriveConstants.kTurningStopTime) {
       m_headingCorrectionPID.setSetpoint(currentAngle);
     } else {
       rotation = m_headingCorrectionPID.calculate(currentAngle);
@@ -197,27 +198,20 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Calculates a speed, taking into account an acceleration parameter
-   * @param currentSpeed The current speed that is being accelerated
-   * @param desiredSpeed The speed to target
-
-   * @param deceleration The constant amount to decelerate by
-   * @param acceleration The coefficient of acceleration
-   * @return The new speed to use
+   * Slowly accelerates the bot to the desired speed.
+   * 
+   * @param currentSpeed The current speed.
+   * @param desiredSpeed The desired speed.
+   * 
+   * @return The new speed to use.
    */
-  private static double calculateAcceleration(double currentSpeed, double desiredSpeed, double deceleration, double acceleration) {
-    if (desiredSpeed == 0) {
-      if (currentSpeed >= -deceleration && currentSpeed <= deceleration) {
-        return 0;
-      }
-
-      return currentSpeed + (-Math.signum(currentSpeed) * deceleration);
-    } else if (desiredSpeed < 0) {
-      return Math.max(desiredSpeed, currentSpeed + (desiredSpeed * acceleration));
-    } else if (desiredSpeed > 0) {
-      return Math.min(desiredSpeed, currentSpeed + (desiredSpeed * acceleration));
+  private double calculateAcceleration(double currentSpeed, double desiredSpeed) {
+    if (Math.abs(currentSpeed - desiredSpeed) < DriveConstants.kSpeedIncreasePerPeriod) {
+      return desiredSpeed;
+    } else if (currentSpeed > desiredSpeed) {
+      return currentSpeed - DriveConstants.kSpeedIncreasePerPeriod;
+    } else {
+      return currentSpeed + DriveConstants.kSpeedIncreasePerPeriod;
     }
-
-    return 0;
   }
 }

@@ -67,13 +67,13 @@ public class RobotContainer {
   public RobotContainer() {
     configureButtonBindings();
 
-    
-    /* The left stick controls translation of the robot.
-    * Turning is controlled by the X axis of the right stick.
-    * Holding left trigger engages slow mode
-    */
+    /*
+     * The left stick controls translation of the robot.
+     * Turning is controlled by the X axis of the right stick.
+     * Holding left trigger engages slow mode
+     */
     m_robotDrive.setDefaultCommand(
-        
+
         new RunCommand(
             () -> m_robotDrive.drive(
                 MathUtil.applyDeadband(
@@ -83,7 +83,7 @@ public class RobotContainer {
                     * (1 - m_driverController
                         .getLeftTriggerAxis()
                         * OIConstants.kSlowModeScalar)
-                    / 2,
+                    * 0.8,
                 MathUtil.applyDeadband(
                     -m_driverController.getLeftX(),
                     OIConstants.kControllerDeadband)
@@ -91,7 +91,7 @@ public class RobotContainer {
                     * (1 - m_driverController
                         .getLeftTriggerAxis()
                         * OIConstants.kSlowModeScalar)
-                    / 2,
+                    * 0.8,
                 MathUtil.applyDeadband(
                     -m_driverController.getRightX(),
                     OIConstants.kControllerDeadband)
@@ -100,10 +100,10 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
     /*
-    * Left joytick's y-axis controlls pivot angle (upright is 0, down is 90)
-    * Right joytick's y-axis controlls elevtator exentsion
-    * A-button toggles grabber (set to closed on initialize)
-    */
+     * Left joytick's y-axis controlls pivot angle (upright is 0, down is 90)
+     * Right joytick's y-axis controlls elevtator exentsion
+     * A-button toggles grabber (set to closed on initialize)
+     */
     m_armSubsystem.setDefaultCommand(
         new RunCommand(() -> m_armSubsystem.set(
             MathUtil.applyDeadband(
