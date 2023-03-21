@@ -111,13 +111,19 @@ public class RobotContainer {
 
     m_autonDistance.addOption("Far", "Far");
     m_autonDistance.addOption("Charger", "Charger");
+    m_autonDistance.addOption("Charger-comms", "Charger-comms");
     m_autonDistance.addOption("Near", "Near");
+    m_autonDistance.addOption("FarTwoObject", "FarTwoObject");
     SmartDashboard.putData(m_autonDistance);
 
     m_eventMap.put("DropHigh", new SequentialCommandGroup(
         new ArmCommand(m_armSubsystem, 49, 1.96),
         new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
         new WaitCommand(0.5)));
+
+    m_eventMap.put("PickUp", new SequentialCommandGroup(
+        new ArmCommand(m_armSubsystem, 85, 1.5),
+        new InstantCommand(grabberSubsystem::toggle, grabberSubsystem)));
 
     m_eventMap.put("Balance", new BalanceCommand(m_robotDrive));
   }

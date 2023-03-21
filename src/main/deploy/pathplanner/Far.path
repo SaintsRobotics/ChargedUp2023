@@ -26,22 +26,22 @@
     },
     {
       "anchorPoint": {
-        "x": 6.109847113311249,
-        "y": 0.9593923443166044
+        "x": 6.0262953675078625,
+        "y": 0.9152999521468661
       },
       "prevControl": {
-        "x": 5.257053918363157,
-        "y": 0.9664989542745057
+        "x": 5.972269426612439,
+        "y": 0.9007333648850905
       },
       "nextControl": null,
-      "holonomicAngle": -180.0,
+      "holonomicAngle": 0.0,
       "isReversal": false,
       "velOverride": null,
       "isLocked": false,
       "isStopPoint": false,
       "stopEvent": {
         "names": [
-          "LowerArm"
+          "PickUp"
         ],
         "executionBehavior": "parallel",
         "waitBehavior": "none",

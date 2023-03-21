@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.Robot;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.ArmSubsystem;
 
@@ -50,6 +51,6 @@ public class ArmCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return m_pivotPID.atSetpoint() && m_elevatorPID.atSetpoint();
+    return !Robot.isReal() || (m_pivotPID.atSetpoint() && m_elevatorPID.atSetpoint());
   }
 }
