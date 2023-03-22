@@ -18,6 +18,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -82,7 +83,7 @@ public class RobotContainer {
             m_armSubsystem));
 
     m_robotDrive.setDefaultCommand(
-        
+
         new RunCommand(
             () -> m_robotDrive.drive(
                 MathUtil.applyDeadband(
@@ -116,14 +117,18 @@ public class RobotContainer {
     m_autonDistance.addOption("FarTwoObject", "FarTwoObject");
     SmartDashboard.putData(m_autonDistance);
 
-    m_eventMap.put("DropHigh", new SequentialCommandGroup(
-        new ArmCommand(m_armSubsystem, 49, 1.96),
-        new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
-        new WaitCommand(0.5)));
+    m_eventMap.put("DropHigh",
+        new SequentialCommandGroup(
+            new ArmCommand(m_armSubsystem, 38, 1.8),
+            new ArmCommand(m_armSubsystem, 51.998, 1.99),
+            new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
+            new WaitCommand(0.5)));
 
-    m_eventMap.put("PickUp", new SequentialCommandGroup(
-        new ArmCommand(m_armSubsystem, 85, 1.5),
-        new InstantCommand(grabberSubsystem::toggle, grabberSubsystem)));
+    m_eventMap.put("PickUp",
+        new SequentialCommandGroup(
+            new ArmCommand(m_armSubsystem, 85, 1.5),
+            new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
+            new WaitCommand(0.5)));
 
     m_eventMap.put("Balance", new BalanceCommand(m_robotDrive));
   }
@@ -177,6 +182,18 @@ public class RobotContainer {
   public Command getAutonomousCommand() {
     if (m_autonDistance.getSelected() == null) {
       return null;
+    }
+
+    if (m_autonDistance.getSelected() == "Near") {
+      return new SequentialCommandGroup(
+          new ArmCommand(m_armSubsystem, 38, 1.8),
+          new ArmCommand(m_armSubsystem, 51.998, 1.99),
+          new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
+          new WaitCommand(0.5),
+          new ParallelDeadlineGroup(
+              new WaitCommand(4),
+              new RunCommand(() -> m_robotDrive.drive(-0.8, 0, 0, false), m_robotDrive),
+              new ArmCommand(m_armSubsystem, 34, ArmConstants.kElevatorMinPosition)));
     }
 
     String path = m_autonDistance.getSelected();
