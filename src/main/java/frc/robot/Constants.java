@@ -36,7 +36,7 @@ public final class Constants {
     public static final boolean kPivotMotorInverted = false;
     public static final boolean kElevatorMotorInverted = true;
 
-    public static final double kPivotEncoderOffset = 168;
+    public static final double kPivotEncoderOffset = 169;
     public static final double kElevatorEncoderPositionConversionFactor = 0.035;
 
     public static final double kElevatorStartingPosition = 1.219;
@@ -67,7 +67,7 @@ public final class Constants {
     public static final double kPElevatorPID = 30;
 
     public static final double kPivotTolerance = 1;
-    public static final double kElevatorTolerance = 0.005;
+    public static final double kElevatorTolerance = 0.01;
   }
 
   public static final class DriveConstants {
@@ -160,14 +160,16 @@ public final class Constants {
     public static final double maxVelocity = 2;
     public static final double maxAcceleration = 1.5;
   }
-  
+
   public static final class VisionConstants {
 
     public static final String kCameraName = "Microsoft_LifeCam_HD-3000";
 
     // X and Y are from true center of the robot, Angle is from front of the robot.
-    public static final Transform3d kCameraOffset = new Transform3d(new Translation3d(0.5, 0, 0.5), new Rotation3d(0, 0, 0)); 
-    // Currently set as cam mounted facing forward, half a meter forward of center, half a meter up from center. // TODO adjust vision offset values
+    public static final Transform3d kCameraOffset = new Transform3d(new Translation3d(0.5, 0, 0.5),
+        new Rotation3d(0, 0, 0));
+    // Currently set as cam mounted facing forward, half a meter forward of center,
+    // half a meter up from center. // TODO adjust vision offset values
 
     public static final AprilTagFieldLayout kAprilTagFieldLayout = loadFieldLayout();
 
