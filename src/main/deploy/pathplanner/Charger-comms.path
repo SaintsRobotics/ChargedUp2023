@@ -2,13 +2,13 @@
   "waypoints": [
     {
       "anchorPoint": {
-        "x": 1.8,
-        "y": 2.9
+        "x": 1.789342363215113,
+        "y": 2.7532813076675873
       },
       "prevControl": null,
       "nextControl": {
-        "x": 2.8,
-        "y": 2.9
+        "x": 2.7893423632151135,
+        "y": 2.7532813076675873
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -27,15 +27,15 @@
     {
       "anchorPoint": {
         "x": 6.210831648182634,
-        "y": 2.9
+        "y": 2.75
       },
       "prevControl": {
         "x": 5.210831648182634,
-        "y": 2.9
+        "y": 2.75
       },
       "nextControl": {
         "x": 7.210831648182634,
-        "y": 2.9
+        "y": 2.75
       },
       "holonomicAngle": 180.0,
       "isReversal": false,
@@ -52,11 +52,11 @@
     {
       "anchorPoint": {
         "x": 3.9521075727234325,
-        "y": 2.9
+        "y": 2.75
       },
       "prevControl": {
         "x": 2.9521075727234325,
-        "y": 2.9
+        "y": 2.75
       },
       "nextControl": null,
       "holonomicAngle": 180.0,
@@ -74,5 +74,12 @@
       }
     }
   ],
-  "markers": []
+  "markers": [
+    {
+      "position": 0.0,
+      "names": [
+        "RetractArm"
+      ]
+    }
+  ]
 }
