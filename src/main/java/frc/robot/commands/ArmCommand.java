@@ -58,6 +58,6 @@ public class ArmCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return !Robot.isReal() || (m_pivotPID.atSetpoint() && m_elevatorPID.atSetpoint()) || m_timer.hasElapsed(5);
+    return !Robot.isReal() || (m_pivotPID.atSetpoint() && m_elevatorPID.atSetpoint()) || m_timer.hasElapsed(3);
   }
 }
