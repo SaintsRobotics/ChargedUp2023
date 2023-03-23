@@ -193,7 +193,9 @@ public class RobotContainer {
                 PathPlanner.loadPathGroup(
                         path,
                         new PathConstraints(
-                                AutonConstants.maxVelocity,
+                                AutonConstants.maxVelocity - (
+                                    path.equals("Charger-comms") ? 0.75 : 0
+                                ),
                                 AutonConstants.maxAcceleration)));
     }
 }
