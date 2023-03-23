@@ -152,18 +152,18 @@ public class RobotContainer {
     new JoystickButton(m_operatorController, Button.kA.value)
         .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
 
-    new POVButton(m_operatorController, 0).onTrue(new ArmCommand(m_armSubsystem, 49, 1.96));
+    new POVButton(m_operatorController, 0).onTrue(new SequentialCommandGroup(
+        new ArmCommand(m_armSubsystem, 38, 1.8),
+        new ArmCommand(m_armSubsystem, 51.998, 1.99)));
     new POVButton(m_operatorController, 90).onTrue(new ArmCommand(m_armSubsystem, 43, 1.42));
     new POVButton(m_operatorController, 180).onTrue(new ArmCommand(m_armSubsystem, 49, 1.58));
     new POVButton(m_operatorController, 270)
         .onTrue(new ArmCommand(m_armSubsystem, 34, ArmConstants.kElevatorMinPosition));
 
-    new JoystickButton(m_operatorController, Button.kStart.value)
-        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))) // Yellow
-        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 50))); // Blue
-    new JoystickButton(m_operatorController, Button.kBack.value)
-        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(27, 8, 44))) // Purple
-        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 50))); // Blue
+    new JoystickButton(m_operatorController, Button.kLeftBumper.value)
+        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))); // Yellow
+    new JoystickButton(m_operatorController, Button.kRightBumper.value)
+        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(27, 8, 44))); // Purple
   }
 
   /**
