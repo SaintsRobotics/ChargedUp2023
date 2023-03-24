@@ -4,8 +4,16 @@
 
 package frc.robot;
 
+import java.io.IOException;
+
+import edu.wpi.first.apriltag.AprilTagFieldLayout;
+import edu.wpi.first.apriltag.AprilTagFields;
+import edu.wpi.first.math.geometry.Rotation3d;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.DriverStation;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -28,7 +36,7 @@ public final class Constants {
     public static final boolean kPivotMotorInverted = false;
     public static final boolean kElevatorMotorInverted = true;
 
-    public static final double kPivotEncoderOffset = 168;
+    public static final double kPivotEncoderOffset = 169;
     public static final double kElevatorEncoderPositionConversionFactor = 0.035;
 
     public static final double kElevatorStartingPosition = 1.219;
@@ -59,7 +67,7 @@ public final class Constants {
     public static final double kPElevatorPID = 30;
 
     public static final double kPivotTolerance = 1;
-    public static final double kElevatorTolerance = 0.005;
+    public static final double kElevatorTolerance = 0.01;
   }
 
   public static final class DriveConstants {
@@ -105,8 +113,6 @@ public final class Constants {
 
     public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
 
-    public static final double kPTranslation = 0.5;
-    public static final double kPRotation = 0.5;
     public static final double kPSnapRotate = 6;
 
     public static final double kToleranceBalance = 3.5;
@@ -131,7 +137,7 @@ public final class Constants {
 
     public static final int kCompressorModuleID = 1;
 
-    public static final int kCompressorMinimumPressure = 70;
+    public static final int kCompressorMinimumPressure = 85;
     public static final int kCompressorMaximumPressure = 110;
   }
 
@@ -149,7 +155,32 @@ public final class Constants {
   }
 
   public static final class AutonConstants {
-    public static final int maxVelocity = 4;
-    public static final int maxAcceleration = 3;
+    public static final double maxVelocity = 2;
+    public static final double maxAcceleration = 1.5;
+  }
+
+  public static final class VisionConstants {
+
+    public static final String kCameraName = "Microsoft_LifeCam_HD-3000";
+
+    // X and Y are from true center of the robot, Angle is from front of the robot.
+    public static final Transform3d kCameraOffset = new Transform3d(new Translation3d(0.5, 0, 0.5),
+        new Rotation3d(0, 0, 0));
+    // Currently set as cam mounted facing forward, half a meter forward of center,
+    // half a meter up from center. // TODO adjust vision offset values
+
+    public static final AprilTagFieldLayout kAprilTagFieldLayout = loadFieldLayout();
+
+    // Need this method to catch error thrown by AprilTagFieldLayout because it
+    // complains about the file path
+    private static AprilTagFieldLayout loadFieldLayout() {
+      try {
+        return AprilTagFieldLayout.loadFromResource(AprilTagFields.k2023ChargedUp.m_resourceFile);
+      } catch (IOException ioe) {
+        DriverStation.reportError("Failed to load AprilTagFieldLayout, no vision estimation available",
+            ioe.getStackTrace());
+        return null;
+      }
+    }
   }
 }
