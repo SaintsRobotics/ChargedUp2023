@@ -5,8 +5,10 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Robot;
 import frc.robot.subsystems.ArmSubsystem;
 
 /** Drives the arm to a desired position. */
@@ -15,6 +17,7 @@ public class ArmCommand extends CommandBase {
 
   private final PIDController m_pivotPID = new PIDController(ArmConstants.kPPivotPID, 0, 0);
   private final PIDController m_elevatorPID = new PIDController(ArmConstants.kPElevatorPID, 0, 0);
+  private final Timer m_timer = new Timer();
 
   /**
    * Creates a new {@link ArmCommand}.
@@ -37,6 +40,11 @@ public class ArmCommand extends CommandBase {
   }
 
   @Override
+  public void initialize() {
+    m_timer.restart();
+  }
+
+  @Override
   public void execute() {
     m_subsystem.set(
         m_pivotPID.calculate(m_subsystem.getPivotPosition()),
@@ -50,6 +58,6 @@ public class ArmCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
-    return m_pivotPID.atSetpoint() && m_elevatorPID.atSetpoint();
+    return !Robot.isReal() || (m_pivotPID.atSetpoint() && m_elevatorPID.atSetpoint()) || m_timer.hasElapsed(3);
   }
 }
