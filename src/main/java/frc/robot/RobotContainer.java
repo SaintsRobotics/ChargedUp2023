@@ -92,7 +92,7 @@ public class RobotContainer {
                     * (1 - m_driverController
                         .getLeftTriggerAxis()
                         * OIConstants.kSlowModeScalar)
-                    / 2,
+                    / 1.5,
                 MathUtil.applyDeadband(
                     -m_driverController.getLeftX(),
                     OIConstants.kControllerDeadband)
@@ -100,11 +100,14 @@ public class RobotContainer {
                     * (1 - m_driverController
                         .getLeftTriggerAxis()
                         * OIConstants.kSlowModeScalar)
-                    / 2,
+                    / 1.5,
                 MathUtil.applyDeadband(
                     -m_driverController.getRightX(),
                     OIConstants.kControllerDeadband)
                     * DriveConstants.kMaxAngularSpeedRadiansPerSecond
+                    * (1 - m_driverController
+                        .getLeftTriggerAxis()
+                        * OIConstants.kSlowModeScalar)
                     / 2,
                 !m_driverController.getRightBumper()),
             m_robotDrive));
@@ -156,11 +159,6 @@ public class RobotContainer {
     new JoystickButton(m_operatorController, Button.kA.value)
         .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
 
-    // Deploys arm when left bumper is held and retracts when released
-    new JoystickButton(m_operatorController, Button.kLeftBumper.value)
-        .onTrue(new ArmCommand(m_armSubsystem, 38, 0.38))
-        .onFalse(new ArmCommand(m_armSubsystem, ArmConstants.kPivotMinPosition,
-            ArmConstants.kElevatorMinPosition));
     new POVButton(m_operatorController, 0).onTrue(new SequentialCommandGroup(
         new ArmCommand(m_armSubsystem, 38, 1.8),
         new ArmCommand(m_armSubsystem, 51.998, 1.99)));
@@ -169,12 +167,10 @@ public class RobotContainer {
     new POVButton(m_operatorController, 270)
         .onTrue(new ArmCommand(m_armSubsystem, 34, ArmConstants.kElevatorMinPosition));
 
-    new JoystickButton(m_operatorController, Button.kStart.value)
-        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))) // Yellow
-        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 50))); // Blue
-    new JoystickButton(m_operatorController, Button.kBack.value)
-        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(27, 8, 44))) // Purple
-        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 50))); // Blue
+    new JoystickButton(m_operatorController, Button.kLeftBumper.value)
+        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))); // Yellow
+    new JoystickButton(m_operatorController, Button.kRightBumper.value)
+        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(27, 8, 44))); // Purple
   }
 
   /**
