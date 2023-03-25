@@ -90,7 +90,7 @@ public class RobotContainer {
                     * (1 - m_driverController
                         .getLeftTriggerAxis()
                         * OIConstants.kSlowModeScalar)
-                    / 1.5,
+                    * 0.8,
                 MathUtil.applyDeadband(
                     -m_driverController.getLeftX(),
                     OIConstants.kControllerDeadband)
@@ -98,7 +98,7 @@ public class RobotContainer {
                     * (1 - m_driverController
                         .getLeftTriggerAxis()
                         * OIConstants.kSlowModeScalar)
-                    / 1.5,
+                    * 0.8,
                 MathUtil.applyDeadband(
                     -m_driverController.getRightX(),
                     OIConstants.kControllerDeadband)

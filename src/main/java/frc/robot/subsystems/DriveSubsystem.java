@@ -78,6 +78,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final Field2d m_field = new Field2d();
 
+  private double m_currentXSpeed = 0;
+  private double m_currentYSpeed = 0;
+
   /** Creates a new {@link DriveSubsystem}. */
   public DriveSubsystem() {
     SmartDashboard.putData("Field", m_field);
@@ -176,7 +179,11 @@ public class DriveSubsystem extends SubsystemBase {
 
     double currentAngle = MathUtil.angleModulus(m_gyro.getRotation2d().getRadians());
 
-    if ((xSpeed == 0 && ySpeed == 0) || m_headingCorrectionTimer.get() < DriveConstants.kTurningStopTime) {
+    m_currentXSpeed = calculateAcceleration(m_currentXSpeed, xSpeed);
+    m_currentYSpeed = calculateAcceleration(m_currentYSpeed, ySpeed);
+
+    if ((m_currentXSpeed == 0 && m_currentYSpeed == 0)
+        || m_headingCorrectionTimer.get() < DriveConstants.kTurningStopTime) {
       m_headingCorrectionPID.setSetpoint(currentAngle);
     } else {
       rotation = m_headingCorrectionPID.calculate(currentAngle);
@@ -184,9 +191,9 @@ public class DriveSubsystem extends SubsystemBase {
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotation,
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(m_currentXSpeed, m_currentYSpeed, rotation,
                 Robot.isReal() ? m_gyro.getRotation2d() : new Rotation2d(m_gyroAngle))
-            : new ChassisSpeeds(xSpeed, ySpeed, rotation));
+            : new ChassisSpeeds(m_currentXSpeed, m_currentYSpeed, rotation));
     setModuleStates(swerveModuleStates);
   }
 
@@ -222,5 +229,23 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getGyroPitch() {
     return m_gyro.getPitch();
+  }
+
+  /**
+   * Slowly accelerates the bot to the desired speed.
+   * 
+   * @param currentSpeed The current speed.
+   * @param desiredSpeed The desired speed.
+   * 
+   * @return The new speed to use.
+   */
+  private double calculateAcceleration(double currentSpeed, double desiredSpeed) {
+    if (Math.abs(currentSpeed - desiredSpeed) < DriveConstants.kSpeedIncreasePerPeriod) {
+      return desiredSpeed;
+    } else if (currentSpeed > desiredSpeed) {
+      return currentSpeed - DriveConstants.kSpeedIncreasePerPeriod;
+    } else {
+      return currentSpeed + DriveConstants.kSpeedIncreasePerPeriod;
+    }
   }
 }
