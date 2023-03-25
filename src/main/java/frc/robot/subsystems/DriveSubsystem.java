@@ -176,7 +176,7 @@ public class DriveSubsystem extends SubsystemBase {
    *                      field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    if (fieldRelative != isRel){
+    if (fieldRelative != wasRelative){
       xSpeed = 0;
       ySpeed = 0;
       rot = 0;
@@ -185,7 +185,7 @@ public class DriveSubsystem extends SubsystemBase {
       m_rotLimiter.reset(0);
     }
 
-    isRel = fieldRelative;
+    wasRelative = fieldRelative;
 
     if (rot != 0) {
       m_headingCorrectionTimer.reset();
@@ -213,7 +213,7 @@ public class DriveSubsystem extends SubsystemBase {
     setModuleStates(swerveModuleStates);
   }
 
-  private boolean isRel = false;
+  private boolean wasRelative = false;
   /**
    * Sets the swerve ModuleStates.
    *
