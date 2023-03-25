@@ -12,6 +12,7 @@ import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -109,6 +110,24 @@ public class RobotContainer {
                     / 2,
                 !m_driverController.getRightBumper()),
             m_robotDrive));
+
+    m_LEDSubsystem.setDefaultCommand(new RunCommand(new Runnable() {
+      private Timer timer = new Timer();
+      private boolean init = false;
+      private boolean wasRed = false;
+
+      public void run() {
+        if (!init) {
+          init = true;
+          timer.restart();
+        }
+        if (timer.hasElapsed(0.3) && m_robotDrive.isTipped()) {
+          m_LEDSubsystem.setLED(wasRed ? 0 : 255, 0, 0);
+          wasRed = !wasRed;
+          timer.restart();
+        }
+      }
+    }, m_LEDSubsystem));
 
     m_chooser.addOption("Far", "Far");
     m_chooser.addOption("Charger", "Charger");

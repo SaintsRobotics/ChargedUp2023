@@ -248,4 +248,8 @@ public class DriveSubsystem extends SubsystemBase {
       return currentSpeed + DriveConstants.kSpeedIncreasePerPeriod;
     }
   }
+
+  public boolean isTipped(){
+    return Math.abs(m_gyro.getPitch()) > 5 || Math.abs(m_gyro.getRoll()) > 5 || Math.abs(m_gyro.getYaw()) > 5;
+  }
 }
