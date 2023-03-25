@@ -6,6 +6,8 @@ package frc.robot;
 
 import java.util.HashMap;
 
+import com.pathplanner.lib.PathConstraints;
+import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
@@ -16,17 +18,16 @@ import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ArmCommand;
-import frc.robot.commands.AutonDriveCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -49,13 +50,14 @@ public class RobotContainer {
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
       m_robotDrive::getPose,
       m_robotDrive::resetOdometry,
       DriveConstants.kDriveKinematics,
-      new PIDConstants(DriveConstants.kPTranslation, 0, 0),
-      new PIDConstants(DriveConstants.kPRotation, 0, 0),
+      new PIDConstants(0, 0, 0),
+      new PIDConstants(0, 0, 0),
       m_robotDrive::setModuleStates,
       m_eventMap,
       true,
@@ -67,11 +69,16 @@ public class RobotContainer {
   public RobotContainer() {
     configureButtonBindings();
 
-    /*
-     * The left stick controls translation of the robot.
-     * Turning is controlled by the X axis of the right stick.
-     * Holding left trigger engages slow mode
-     */
+    m_armSubsystem.setDefaultCommand(
+        new RunCommand(() -> m_armSubsystem.set(
+            MathUtil.applyDeadband(
+                -m_operatorController.getLeftY(),
+                OIConstants.kControllerDeadband),
+            MathUtil.applyDeadband(
+                -m_operatorController.getRightY(),
+                OIConstants.kControllerDeadband)),
+            m_armSubsystem));
+
     m_robotDrive.setDefaultCommand(
 
         new RunCommand(
@@ -96,35 +103,36 @@ public class RobotContainer {
                     -m_driverController.getRightX(),
                     OIConstants.kControllerDeadband)
                     * DriveConstants.kMaxAngularSpeedRadiansPerSecond
+                    * (1 - m_driverController
+                        .getLeftTriggerAxis()
+                        * OIConstants.kSlowModeScalar)
                     / 2,
                 !m_driverController.getRightBumper()),
             m_robotDrive));
-    /*
-     * Left joytick's y-axis controlls pivot angle (upright is 0, down is 90)
-     * Right joytick's y-axis controlls elevtator exentsion
-     * A-button toggles grabber (set to closed on initialize)
-     */
-    m_armSubsystem.setDefaultCommand(
-        new RunCommand(() -> m_armSubsystem.set(
-            MathUtil.applyDeadband(
-                -m_operatorController.getLeftY(),
-                OIConstants.kControllerDeadband),
-            MathUtil.applyDeadband(
-                -m_operatorController.getRightY(),
-                OIConstants.kControllerDeadband)),
-            m_armSubsystem));
 
-    m_chooser.addOption("BottomCharger", "BottomCharger");
-    m_chooser.addOption("BottomThreeObject", "BottomThreeObject");
-    m_chooser.addOption("BottomTwoObject", "BottomTwoObject");
-    m_chooser.addOption("MidBackCharger", "MidBackCharger");
-    m_chooser.addOption("MidFrontCharger", "MidFrontCharger");
-    m_chooser.addOption("TopCharger", "TopCharger");
-    m_chooser.addOption("TopThreeObject", "TopThreeObject");
-    m_chooser.addOption("TopTwoObject", "TopTwoObject");
+    m_chooser.addOption("Far", "Far");
+    m_chooser.addOption("Charger", "Charger");
+    m_chooser.addOption("Charger-comms", "Charger-comms");
+    m_chooser.addOption("Near", "Near");
+    m_chooser.addOption("FarTwoObject", "FarTwoObject");
     SmartDashboard.putData(m_chooser);
 
-    m_eventMap.put("BalanceCommand", new BalanceCommand(m_robotDrive));
+    m_eventMap.put("DropHigh",
+        new SequentialCommandGroup(
+            new ArmCommand(m_armSubsystem, 38, 1.8),
+            new ArmCommand(m_armSubsystem, 51.998, 1.99),
+            new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
+            new WaitCommand(0.5)));
+
+    m_eventMap.put("RetractArm", new ArmCommand(m_armSubsystem, 34, ArmConstants.kElevatorMinPosition));
+
+    m_eventMap.put("PickUp",
+        new SequentialCommandGroup(
+            new ArmCommand(m_armSubsystem, 85, 1.5),
+            new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
+            new WaitCommand(0.5)));
+
+    m_eventMap.put("Balance", new BalanceCommand(m_robotDrive));
   }
 
   /**
@@ -149,18 +157,18 @@ public class RobotContainer {
     new JoystickButton(m_operatorController, Button.kA.value)
         .onTrue(new InstantCommand(grabberSubsystem::toggle, grabberSubsystem));
 
-    new POVButton(m_operatorController, 0).onTrue(new ArmCommand(m_armSubsystem, 49, 1.96));
+    new POVButton(m_operatorController, 0).onTrue(new SequentialCommandGroup(
+        new ArmCommand(m_armSubsystem, 38, 1.8),
+        new ArmCommand(m_armSubsystem, 51.998, 1.99)));
     new POVButton(m_operatorController, 90).onTrue(new ArmCommand(m_armSubsystem, 43, 1.42));
     new POVButton(m_operatorController, 180).onTrue(new ArmCommand(m_armSubsystem, 49, 1.58));
     new POVButton(m_operatorController, 270)
         .onTrue(new ArmCommand(m_armSubsystem, 34, ArmConstants.kElevatorMinPosition));
 
-    new JoystickButton(m_operatorController, Button.kStart.value)
-        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))) // Yellow
-        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 50))); // Blue
-    new JoystickButton(m_operatorController, Button.kBack.value)
-        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(27, 8, 44))) // Purple
-        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(0, 0, 50))); // Blue
+    new JoystickButton(m_operatorController, Button.kLeftBumper.value)
+        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))); // Yellow
+    new JoystickButton(m_operatorController, Button.kRightBumper.value)
+        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(27, 8, 44))); // Purple
   }
 
   /**
@@ -169,27 +177,17 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
+    if (m_chooser.getSelected() == null) {
+      return null;
+    }
 
-    // String path;
-    // if (m_chooser.getSelected() != null) {
-    // path = m_chooser.getSelected();
-    // } else {
-    // return null;
-    // }
+    String path = m_chooser.getSelected();
 
-    // return m_autoBuilder.fullAuto(
-    // PathPlanner.loadPathGroup(
-    // path,
-    // new PathConstraints(
-    // AutonConstants.maxVelocity,
-    // AutonConstants.maxAcceleration)));
-
-    return new SequentialCommandGroup(
-        new ArmCommand(m_armSubsystem, 45, 0.3),
-        new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
-        new ParallelDeadlineGroup(
-            new WaitCommand(6),
-            new AutonDriveCommand(m_robotDrive)),
-        new BalanceCommand(m_robotDrive));
+    return m_autoBuilder.fullAuto(
+        PathPlanner.loadPathGroup(
+            path,
+            new PathConstraints(
+                AutonConstants.maxVelocity - (path.equals("Charger-comms") ? 0.75 : 0),
+                AutonConstants.maxAcceleration)));
   }
 }

@@ -20,8 +20,8 @@ public class LEDSubsystem extends SubsystemBase {
     m_LED.setData(m_LEDBuffer);
     m_LED.start();
 
-    // Blue when bot turns on.
-    setLED(0, 0, 50);
+    // Yellow when bot turns on.
+    setLED(50, 50, 0);
 
     SmartDashboard.putString("led", m_LEDBuffer.getLED(1).toString());
   }

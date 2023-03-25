@@ -5,6 +5,7 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
@@ -13,6 +14,7 @@ import frc.robot.subsystems.DriveSubsystem;
 public class SnapRotateCommand extends CommandBase {
     private final DriveSubsystem m_subsystem;
     private final PIDController m_PID = new PIDController(DriveConstants.kPSnapRotate, 0, 0);
+    private final Timer m_timer = new Timer();
 
     /**
      * Creates a new {@link SnapRotateCommand}.
@@ -30,6 +32,7 @@ public class SnapRotateCommand extends CommandBase {
     @Override
     public void initialize() {
         m_PID.setSetpoint(Math.round(m_subsystem.getPose().getRotation().getRadians() / (Math.PI / 2)) * (Math.PI / 2));
+        m_timer.restart();
     }
 
     @Override
@@ -48,6 +51,6 @@ public class SnapRotateCommand extends CommandBase {
 
     @Override
     public boolean isFinished() {
-        return m_PID.atSetpoint();
+        return m_PID.atSetpoint() || m_timer.hasElapsed(3);
     }
 }
