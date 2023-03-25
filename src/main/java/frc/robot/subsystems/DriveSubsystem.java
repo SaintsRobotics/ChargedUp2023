@@ -63,6 +63,8 @@ public class DriveSubsystem extends SubsystemBase {
   private final PIDController m_headingCorrectionPID = new PIDController(5, 0, 0); // TODO: tune this
   private final Timer m_headingCorrectionTimer;
 
+  private boolean wasRelative = false;
+  
   private final SwerveDrivePoseEstimator m_swervePoseEstimator;
   private final PhotonCameraWrapper m_photonCamera = new PhotonCameraWrapper();
   private Optional<EstimatedRobotPose> result;
@@ -176,7 +178,7 @@ public class DriveSubsystem extends SubsystemBase {
    *                      field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    if (fieldRelative != wasRelative){
+    if (fieldRelative != wasRelative) {
       xSpeed = 0;
       ySpeed = 0;
       rot = 0;
@@ -213,7 +215,7 @@ public class DriveSubsystem extends SubsystemBase {
     setModuleStates(swerveModuleStates);
   }
 
-  private boolean wasRelative = false;
+
   /**
    * Sets the swerve ModuleStates.
    *
