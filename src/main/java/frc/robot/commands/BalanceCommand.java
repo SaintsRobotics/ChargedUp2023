@@ -5,39 +5,63 @@
 package frc.robot.commands;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 
 /** Uses a PID and the gyroscope to balance the robot on the charger. */
 public class BalanceCommand extends CommandBase {
-  private final DriveSubsystem m_subsystem;
+  private final DriveSubsystem m_driveSubsystem;
+  private final LEDSubsystem m_LEDSubsystem;
   private final PIDController m_PID = new PIDController(0.025, 0, 0);
+  private final Timer m_timer = new Timer();
+  private boolean m_isRed;
+  private int fade = 255;
 
   /**
    * Creates a new {@link BalanceCommand}.
    * 
-   * @param subsystem The required subsystem.
+   * @param driveSubsystem The required subsystem.
    */
-  public BalanceCommand(DriveSubsystem subsystem) {
-    m_subsystem = subsystem;
-    addRequirements(m_subsystem);
+  public BalanceCommand(DriveSubsystem driveSubsystem, LEDSubsystem LEDSubsystem) {
+    m_driveSubsystem = driveSubsystem;
+    m_LEDSubsystem = LEDSubsystem;
+    addRequirements(m_driveSubsystem, m_LEDSubsystem);
 
     m_PID.setTolerance(DriveConstants.kToleranceBalance);
   }
 
   @Override
+  public void initialize() {
+    m_timer.restart();
+    fade = 255;
+  }
+
+  @Override
   public void execute() {
-    m_subsystem.drive(
-        m_PID.calculate(m_subsystem.getGyroPitch(), 0),
+    m_driveSubsystem.drive(
+        m_PID.calculate(m_driveSubsystem.getGyroPitch(), 0),
         0,
         0,
         false);
+
+    if (m_timer.hasElapsed(0.1) && m_PID.atSetpoint()) {
+      m_LEDSubsystem.setLED(0, fade, 0);
+      fade = (fade - 32) % 256;
+      m_timer.reset();
+    } else if (m_timer.hasElapsed(0.3)) {
+      fade = 255;
+      m_LEDSubsystem.setLED(m_isRed ? 0 : 255, 0, 0);
+      m_isRed = !m_isRed;
+      m_timer.reset();
+    }
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_subsystem.drive(0, 0, 0, false);
+    m_driveSubsystem.drive(0, 0, 0, false);
   }
 
   @Override
