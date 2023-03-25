@@ -76,7 +76,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final SwerveDriveOdometry m_odometry = new SwerveDriveOdometry(DriveConstants.kDriveKinematics,
       m_gyro.getRotation2d(), m_swerveModulePositions);
 
-  private final Field2d m_field = new Field2d();
+  protected final Field2d m_field = new Field2d();
 
   /** Creates a new {@link DriveSubsystem}. */
   public DriveSubsystem() {

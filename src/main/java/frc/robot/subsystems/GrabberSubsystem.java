@@ -17,8 +17,8 @@ import frc.robot.Constants.GrabberConstants;
 
 public class GrabberSubsystem extends SubsystemBase {
     
-    private PneumaticHub pHub;
-    private DoubleSolenoid solenoid0;
+    protected PneumaticHub pHub;
+    protected DoubleSolenoid solenoid0;
     public boolean enableCompressor = true;
 
     public GrabberSubsystem() {
