@@ -13,6 +13,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -77,6 +78,13 @@ public class DriveSubsystem extends SubsystemBase {
       m_gyro.getRotation2d(), m_swerveModulePositions);
 
   private final Field2d m_field = new Field2d();
+
+  private final SlewRateLimiter m_xLimiter = new SlewRateLimiter(
+      DriveConstants.maxDirectionalAcceleration);
+  private final SlewRateLimiter m_yLimiter = new SlewRateLimiter(
+      DriveConstants.maxDirectionalAcceleration);
+  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(
+      DriveConstants.maxRotationalAcceleration);
 
   /** Creates a new {@link DriveSubsystem}. */
   public DriveSubsystem() {
@@ -168,6 +176,17 @@ public class DriveSubsystem extends SubsystemBase {
    *                      field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    if (fieldRelative != isRel){
+      xSpeed = 0;
+      ySpeed = 0;
+      rot = 0;
+      m_xLimiter.reset(0);
+      m_yLimiter.reset(0);
+      m_rotLimiter.reset(0);
+    }
+
+    isRel = fieldRelative;
+
     if (rot != 0) {
       m_headingCorrectionTimer.reset();
     }
@@ -182,6 +201,10 @@ public class DriveSubsystem extends SubsystemBase {
       rotation = m_headingCorrectionPID.calculate(currentAngle);
     }
 
+    xSpeed = m_xLimiter.calculate(xSpeed);
+    ySpeed = m_yLimiter.calculate(ySpeed);
+    rotation = m_rotLimiter.calculate(rotation);
+
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
             ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotation,
@@ -190,6 +213,7 @@ public class DriveSubsystem extends SubsystemBase {
     setModuleStates(swerveModuleStates);
   }
 
+  private boolean isRel = false;
   /**
    * Sets the swerve ModuleStates.
    *
