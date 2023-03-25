@@ -116,6 +116,7 @@ public class RobotContainer {
       private boolean init = false;
       private boolean wasRed = false;
 
+      @Override
       public void run() {
         if (!init) {
           init = true;
