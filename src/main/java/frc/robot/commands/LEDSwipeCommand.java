@@ -26,9 +26,7 @@ public class LEDSwipeCommand extends CommandBase {
   private final LEDSubsystem m_subsystem;
   private final Type m_type;
 
-  private final int m_r;
-  private final int m_g;
-  private final int m_b;
+  private final int m_r, m_g, m_b;
 
   private final boolean m_changeColor;
 
