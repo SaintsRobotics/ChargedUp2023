@@ -13,6 +13,10 @@ public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED m_LED = new AddressableLED(LEDConstants.kLEDPort);
   private AddressableLEDBuffer m_LEDBuffer = new AddressableLEDBuffer(LEDConstants.kLEDLength);
 
+  private int m_r;
+  private int m_g;
+  private int m_b;
+
   /** Creates a new {@link LEDSubsystem}. */
   public LEDSubsystem() {
     m_LED.setLength(LEDConstants.kLEDLength);
@@ -31,8 +35,10 @@ public class LEDSubsystem extends SubsystemBase {
    * @param b Blue 0-255
    */
   public void setLED(int i, int r, int g, int b) {
-    m_LEDBuffer.setRGB(i, r, g, b);
-    m_LED.setData(m_LEDBuffer);
+    if (i >= 0 && i < LEDConstants.kLEDLength) {
+      m_LEDBuffer.setRGB(i, r, g, b);
+      m_LED.setData(m_LEDBuffer);
+    }
   }
 
   /**
@@ -47,6 +53,19 @@ public class LEDSubsystem extends SubsystemBase {
       m_LEDBuffer.setRGB(i, r, g, b);
     }
     m_LED.setData(m_LEDBuffer);
+
+    m_r = r;
+    m_g = g;
+    m_b = b;
+  }
+
+  /**
+   * Resets individual LED to previous value.
+   * 
+   * @param i index of LED
+   */
+  public void unsetLED(int i) {
+    setLED(i, m_r, m_g, m_b);
   }
 
   /** Resets the LED to the default color (yellow) */
