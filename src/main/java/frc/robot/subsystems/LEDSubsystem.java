@@ -16,7 +16,7 @@ public class LEDSubsystem extends SubsystemBase {
 
   /** Creates a new {@link LEDSubsystem}. */ 
   public LEDSubsystem() {
-    m_LED.setLength(LEDConstants.kLEDLength); // 29
+    m_LED.setLength(/*28 ---*/LEDConstants/*--- 28 ---*/./*--- 28 ---*/kLEDLength/*<--- 28*/);
     m_LED.setData(m_LEDBuffer);
     m_LED.start();
 
