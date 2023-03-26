@@ -36,7 +36,7 @@ public class BalanceCommand extends CommandBase {
   @Override
   public void initialize() {
     m_timer.restart();
-    fade = 255;
+    fade = 50;
   }
 
   @Override
@@ -49,11 +49,11 @@ public class BalanceCommand extends CommandBase {
 
     if (m_timer.hasElapsed(0.1) && m_PID.atSetpoint()) {
       m_LEDSubsystem.setLED(0, fade, 0);
-      fade = (fade - 32) % 256;
+      fade = (fade - 10) % 51;
       m_timer.reset();
     } else if (m_timer.hasElapsed(0.3)) {
       fade = 255;
-      m_LEDSubsystem.setLED(m_isRed ? 0 : 255, 0, 0);
+      m_LEDSubsystem.setLED(m_isRed ? 0 : 50, 0, 0);
       m_isRed = !m_isRed;
       m_timer.reset();
     }

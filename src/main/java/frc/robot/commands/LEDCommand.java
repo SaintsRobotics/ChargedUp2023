@@ -37,7 +37,7 @@ public class LEDCommand extends CommandBase {
   @Override
   public void execute() {
     if (m_timer.hasElapsed(0.3) && m_isTipped.getAsBoolean()) {
-      m_LEDSubsystem.setLED(m_isRed ? 0 : 255, 0, 0);
+      m_LEDSubsystem.setLED(m_isRed ? 0 : 50, 0, 0);
       m_isRed = !m_isRed;
       m_timer.restart();
     }
