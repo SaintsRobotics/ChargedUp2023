@@ -7,7 +7,6 @@ package frc.robot.commands;
 import java.util.Queue;
 import java.util.function.BooleanSupplier;
 
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
@@ -21,17 +20,16 @@ public class LEDCommand extends CommandBase {
   private final Timer m_effectTimer = new Timer();
   private final BooleanSupplier m_isTipped;
 
-  private AddressableLEDBuffer m_buf;
-
   private Queue<SequentialCommandGroup> m_effectQueue;
 
   /**
    * Default command for LED subystem. Flashes red when tipped.
    * 
-   * @param subsystem      The required subsystem.
+   * @param subsystem       The required subsystem.
    * @param booleanSupplier Supplier that returns true if the robot is tipped.
    */
-  public LEDCommand(LEDSubsystem subsystem, BooleanSupplier booleanSupplier, Queue<SequentialCommandGroup> effectQueue) {
+  public LEDCommand(LEDSubsystem subsystem, BooleanSupplier booleanSupplier,
+      Queue<SequentialCommandGroup> effectQueue) {
     m_LEDSubsystem = subsystem;
     m_isTipped = booleanSupplier;
     m_effectQueue = effectQueue;
@@ -40,7 +38,6 @@ public class LEDCommand extends CommandBase {
 
   @Override
   public void initialize() {
-    m_buf = m_LEDSubsystem.getState();
     m_timer.restart();
     m_effectTimer.restart();
   }
@@ -49,8 +46,9 @@ public class LEDCommand extends CommandBase {
   public void execute() {
     if (m_timer.hasElapsed(0.4) && m_isTipped.getAsBoolean()) {
       SequentialCommandGroup cmd = new SequentialCommandGroup(new LEDEffectCommand(
-        m_LEDSubsystem, EffectType.blink, 100, 0, 0, 0.2, () -> { return false; }
-      ));
+          m_LEDSubsystem, EffectType.blink, 100, 0, 0, 0.2, () -> {
+            return false;
+          }));
 
       cmd.schedule();
 
@@ -60,16 +58,20 @@ public class LEDCommand extends CommandBase {
 
     if (m_effectTimer.hasElapsed(5)) {
       SequentialCommandGroup cmd = new SequentialCommandGroup(
-          new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1, m_isTipped),
-          new WaitCommand(0.1),
-          new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1, m_isTipped),
+          new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.12, m_isTipped),
+          new WaitCommand(0.12),
+          new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.12, m_isTipped),
+          new LEDAlternateCommand(m_LEDSubsystem,
+          0, 0, 100, 0, 100, 0, 0.2, 6),
           new LEDEffectCommand(m_LEDSubsystem, EffectType.swipeUp, 0, 0, 100, 0.02, m_isTipped),
           new LEDEffectCommand(m_LEDSubsystem, EffectType.midSplit, 0, 0, 100, 0.02, m_isTipped),
           new LEDEffectCommand(m_LEDSubsystem, EffectType.swipeDown, 0, 0, 100, 0.02, m_isTipped),
-          new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1, m_isTipped),
-          new WaitCommand(0.1),
-          new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1, m_isTipped));
-      
+          new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.12, m_isTipped),
+          new WaitCommand(0.12),
+          new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.12, m_isTipped),
+          new LEDAlternateCommand(m_LEDSubsystem,
+              0, 0, 100, 0, 100, 0, 0.2, 6));
+
       cmd.schedule();
       m_effectQueue.add(cmd);
       m_effectTimer.reset();
@@ -78,6 +80,6 @@ public class LEDCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    m_LEDSubsystem.setState(m_buf);
+    
   }
 }

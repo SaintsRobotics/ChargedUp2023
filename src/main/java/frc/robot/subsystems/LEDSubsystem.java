@@ -48,15 +48,21 @@ public class LEDSubsystem extends SubsystemBase {
    * @param g Green 0-255
    * @param b Blue 0-255
    */
-  public void setLED(int r, int g, int b) {
+  public void setLED(int r, int g, int b, boolean store) {
     for (var i = 0; i < LEDConstants.kLEDLength; i++) {
       m_LEDBuffer.setRGB(i, r, g, b);
     }
     m_LED.setData(m_LEDBuffer);
 
-    m_r = r;
-    m_g = g;
-    m_b = b;
+    if (store) {
+      m_r = r;
+      m_g = g;
+      m_b = b;
+    }
+  }
+
+  public void setLED(int r, int g, int b){
+    setLED(r, g, b, true);
   }
 
   /**
@@ -68,6 +74,12 @@ public class LEDSubsystem extends SubsystemBase {
     setLED(i, m_r, m_g, m_b);
   }
 
+  public void setLED(int i) {
+    m_r = (int) (m_LEDBuffer.getLED(i).red * 255);
+    m_b = (int) (m_LEDBuffer.getLED(i).blue * 255);
+    m_g = (int) (m_LEDBuffer.getLED(i).green * 255);
+  }
+
   /** Resets the LED to the default color (yellow) */
   public void setCone() {
     setLED(100, 100, 0);
@@ -75,14 +87,5 @@ public class LEDSubsystem extends SubsystemBase {
 
   public void setCube() {
     setLED(100, 0, 100);
-  }
-
-  public AddressableLEDBuffer getState(){
-    return m_LEDBuffer;
-  }
-
-  public void setState(AddressableLEDBuffer buf){
-    m_LEDBuffer = buf;
-    m_LED.setData(m_LEDBuffer);
   }
 }
