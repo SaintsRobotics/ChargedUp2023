@@ -11,7 +11,7 @@ import frc.robot.Constants.LEDConstants;
 
 public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED m_LED = new AddressableLED(LEDConstants.kLEDPort);
-  private final AddressableLEDBuffer m_LEDBuffer = new AddressableLEDBuffer(LEDConstants.kLEDLength);
+  private AddressableLEDBuffer m_LEDBuffer = new AddressableLEDBuffer(LEDConstants.kLEDLength);
 
   /** Creates a new {@link LEDSubsystem}. */
   public LEDSubsystem() {
@@ -19,7 +19,7 @@ public class LEDSubsystem extends SubsystemBase {
     m_LED.setData(m_LEDBuffer);
     m_LED.start();
 
-    resetLED();
+    setCone();
   }
 
   /**
@@ -50,7 +50,20 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   /** Resets the LED to the default color (yellow) */
-  public void resetLED() {
-    setLED(50, 50, 0);
+  public void setCone() {
+    setLED(100, 100, 0);
+  }
+
+  public void setCube() {
+    setLED(100, 0, 100);
+  }
+
+  public AddressableLEDBuffer getState(){
+    return m_LEDBuffer;
+  }
+
+  public void setState(AddressableLEDBuffer buf){
+    m_LEDBuffer = buf;
+    m_LED.setData(m_LEDBuffer);
   }
 }
