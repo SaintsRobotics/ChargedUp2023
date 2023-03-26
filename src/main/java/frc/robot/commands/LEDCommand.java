@@ -21,7 +21,6 @@ public class LEDCommand extends CommandBase {
   private final Timer m_effectTimer = new Timer();
   private final BooleanSupplier m_isTipped;
 
-  private boolean m_isRed;
   private AddressableLEDBuffer m_buf;
 
   private Queue<SequentialCommandGroup> m_effectQueue;
@@ -48,13 +47,18 @@ public class LEDCommand extends CommandBase {
 
   @Override
   public void execute() {
-    if (m_timer.hasElapsed(0.15) && m_isTipped.getAsBoolean()) {
-      m_LEDSubsystem.setLED(m_isRed ? 0 : 100, 0, 0);
-      m_isRed = !m_isRed;
+    if (m_timer.hasElapsed(0.4) && m_isTipped.getAsBoolean()) {
+      SequentialCommandGroup cmd = new SequentialCommandGroup(new LEDEffectCommand(
+        m_LEDSubsystem, EffectType.blink, 100, 0, 0, 0.2, () -> { return false; }
+      ));
+
+      cmd.schedule();
+
+      m_effectQueue.add(cmd);
       m_timer.restart();
     }
 
-    if (m_effectTimer.hasElapsed(10)) {
+    if (m_effectTimer.hasElapsed(5)) {
       SequentialCommandGroup cmd = new SequentialCommandGroup(
           new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1, m_isTipped),
           new WaitCommand(0.1),
