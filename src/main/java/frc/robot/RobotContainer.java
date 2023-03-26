@@ -12,7 +12,6 @@ import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -30,6 +29,7 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.BalanceCommand;
+import frc.robot.commands.LEDCommand;
 import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
@@ -111,24 +111,7 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
-    m_LEDSubsystem.setDefaultCommand(new RunCommand(new Runnable() {
-      private Timer timer = new Timer();
-      private boolean init = false;
-      private boolean wasRed = false;
-
-      @Override
-      public void run() {
-        if (!init) {
-          init = true;
-          timer.restart();
-        }
-        if (timer.hasElapsed(0.3) && m_robotDrive.isTipped()) {
-          m_LEDSubsystem.setLED(wasRed ? 0 : 255, 0, 0);
-          wasRed = !wasRed;
-          timer.restart();
-        }
-      }
-    }, m_LEDSubsystem));
+    m_LEDSubsystem.setDefaultCommand(new LEDCommand(m_LEDSubsystem, m_robotDrive::isTipped));
 
     m_chooser.addOption("Far", "Far");
     m_chooser.addOption("Charger", "Charger");
