@@ -30,7 +30,9 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.LEDCommand;
+import frc.robot.commands.LEDEffectCommand;
 import frc.robot.commands.SnapRotateCommand;
+import frc.robot.commands.LEDEffectCommand.EffectType;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
@@ -172,6 +174,18 @@ public class RobotContainer {
         .onTrue(new InstantCommand(m_LEDSubsystem::resetLED));
     new JoystickButton(m_operatorController, Button.kRightBumper.value)
         .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(27, 8, 44))); // Purple
+
+    new JoystickButton(m_operatorController, Button.kStart.value)
+        .onTrue(new LEDEffectCommand(m_LEDSubsystem, EffectType.blink,
+            0,
+            (int)m_operatorController.getLeftTriggerAxis() * 255 + 255,
+            (int)m_operatorController.getRightTriggerAxis() * 255, 1));
+
+    new JoystickButton(m_operatorController, Button.kBack.value)
+        .onTrue(new LEDEffectCommand(m_LEDSubsystem, EffectType.swipe,
+            (int) SmartDashboard.getNumber("R", 0),
+            (int) SmartDashboard.getNumber("G", 0),
+            (int) SmartDashboard.getNumber("B", 0), 1));
   }
 
   /**

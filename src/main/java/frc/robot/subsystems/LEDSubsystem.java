@@ -23,6 +23,19 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   /**
+   * Sets individual LED
+   * 
+   * @param i index of LED
+   * @param r Red 0-255
+   * @param g Green 0-255
+   * @param b Blue 0-255
+   */
+  public void setLED(int i, int r, int g, int b) {
+    m_LEDBuffer.setRGB(i, r, g, b);
+    m_LED.setData(m_LEDBuffer);
+  }
+
+  /**
    * Sets the rgb value for all LEDs.
    * 
    * @param r Red 0-255
