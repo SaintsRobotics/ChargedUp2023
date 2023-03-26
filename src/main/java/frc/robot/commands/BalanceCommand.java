@@ -4,21 +4,24 @@
 
 package frc.robot.commands;
 
+import java.util.Queue;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.commands.LEDEffectCommand.EffectType;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
 
 /** Uses a PID and the gyroscope to balance the robot on the charger. */
 public class BalanceCommand extends CommandBase {
   private final DriveSubsystem m_driveSubsystem;
-  private final LEDSubsystem m_LEDSubsystem;
   private final PIDController m_PID = new PIDController(0.025, 0, 0);
   private final Timer m_timer = new Timer();
-  private boolean m_isRed;
-  private int fade = 255;
+  private final LEDSubsystem m_LEDSubsystem;
+  private final Queue<SequentialCommandGroup> m_effectQueue;
 
   /**
    * Creates a new {@link BalanceCommand}.
@@ -26,18 +29,20 @@ public class BalanceCommand extends CommandBase {
    * @param driveSubsystem The required drive subsystem.
    * @param LEDSubsystem   The required LED subsystem.
    */
-  public BalanceCommand(DriveSubsystem driveSubsystem, LEDSubsystem LEDSubsystem) {
+  public BalanceCommand(DriveSubsystem driveSubsystem, LEDSubsystem LEDSubsystem,
+      Queue<SequentialCommandGroup> effectQueue) {
     m_driveSubsystem = driveSubsystem;
-    m_LEDSubsystem = LEDSubsystem;
-    addRequirements(m_driveSubsystem, m_LEDSubsystem);
+    addRequirements(m_driveSubsystem);
 
+    m_effectQueue = effectQueue;
+
+    m_LEDSubsystem = LEDSubsystem;
     m_PID.setTolerance(DriveConstants.kToleranceBalance);
   }
 
   @Override
   public void initialize() {
     m_timer.restart();
-    fade = 50;
   }
 
   @Override
@@ -48,14 +53,29 @@ public class BalanceCommand extends CommandBase {
         0,
         false);
 
-    if (m_timer.hasElapsed(0.1) && m_PID.atSetpoint()) {
-      m_LEDSubsystem.setLED(0, fade, 0);
-      fade = (fade - 10) % 51;
+    if (m_timer.hasElapsed(1) && m_PID.atSetpoint()) {
+      SequentialCommandGroup cmd = new SequentialCommandGroup(
+          new LEDEffectCommand(
+              m_LEDSubsystem, EffectType.swipeUp, 0, 100, 0, 0.02, () -> {
+                return false;
+              }),
+          new LEDEffectCommand(
+              m_LEDSubsystem, EffectType.swipeDown, 0, 100, 0, 0.02, () -> {
+                return false;
+              }));
+
+      cmd.schedule();
+      m_effectQueue.add(cmd);
       m_timer.reset();
-    } else if (m_timer.hasElapsed(0.3)) {
-      fade = 50;
-      m_LEDSubsystem.setLED(m_isRed ? 0 : 50, 0, 0);
-      m_isRed = !m_isRed;
+
+    } else if (m_timer.hasElapsed(0.6)) {
+      SequentialCommandGroup cmd = new SequentialCommandGroup(new LEDEffectCommand(
+          m_LEDSubsystem, EffectType.blink, 100, 75, 0, 0.2, () -> {
+            return false;
+          }));
+
+      cmd.schedule();
+      m_effectQueue.add(cmd);
       m_timer.reset();
     }
   }
@@ -63,6 +83,5 @@ public class BalanceCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_driveSubsystem.drive(0, 0, 0, false);
-    m_LEDSubsystem.resetLED();
   }
 }

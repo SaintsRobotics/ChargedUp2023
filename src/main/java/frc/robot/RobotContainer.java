@@ -5,6 +5,8 @@
 package frc.robot;
 
 import java.util.HashMap;
+import java.util.Queue;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -53,6 +55,7 @@ public class RobotContainer {
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
+  private final Queue<SequentialCommandGroup> m_effectQueue = new LinkedBlockingDeque<SequentialCommandGroup>();
 
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
@@ -113,7 +116,7 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
-    m_LEDSubsystem.setDefaultCommand(new LEDCommand(m_LEDSubsystem, m_robotDrive::isTipped));
+    m_LEDSubsystem.setDefaultCommand(new LEDCommand(m_LEDSubsystem, m_robotDrive::isTipped, m_effectQueue));
 
     m_chooser.addOption("Far", "Far");
     m_chooser.addOption("Charger", "Charger");
@@ -137,7 +140,7 @@ public class RobotContainer {
             new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
             new WaitCommand(0.5)));
 
-    m_eventMap.put("Balance", new BalanceCommand(m_robotDrive, m_LEDSubsystem));
+    m_eventMap.put("Balance", new BalanceCommand(m_robotDrive, m_LEDSubsystem, m_effectQueue));
   }
 
   /**
@@ -154,7 +157,7 @@ public class RobotContainer {
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
 
     new JoystickButton(m_driverController, Button.kY.value)
-        .whileTrue(new BalanceCommand(m_robotDrive, m_LEDSubsystem));
+        .whileTrue(new BalanceCommand(m_robotDrive, m_LEDSubsystem, m_effectQueue));
     new JoystickButton(m_driverController, Button.kA.value)
         .onTrue(new SnapRotateCommand(m_robotDrive));
 
@@ -171,21 +174,34 @@ public class RobotContainer {
         .onTrue(new ArmCommand(m_armSubsystem, 34, ArmConstants.kElevatorMinPosition));
 
     new JoystickButton(m_operatorController, Button.kLeftBumper.value)
-        .onTrue(new InstantCommand(m_LEDSubsystem::resetLED));
+        .onTrue(new SequentialCommandGroup(
+            new InstantCommand(() -> {
+              for (SequentialCommandGroup i : m_effectQueue)
+                i.cancel();
+              m_effectQueue.clear();
+            }),
+            new InstantCommand(m_LEDSubsystem::setCone)));
     new JoystickButton(m_operatorController, Button.kRightBumper.value)
-        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(27, 8, 44))); // Purple
+        .onTrue(new SequentialCommandGroup(
+            new InstantCommand(() -> {
+              for (SequentialCommandGroup i : m_effectQueue)
+                i.cancel();
+              m_effectQueue.clear();
+            }),
+            new InstantCommand(m_LEDSubsystem::setCube)));
 
     new JoystickButton(m_operatorController, Button.kStart.value)
-        .onTrue(new LEDEffectCommand(m_LEDSubsystem, EffectType.blink,
-            0,
-            (int)m_operatorController.getLeftTriggerAxis() * 255 + 255,
-            (int)m_operatorController.getRightTriggerAxis() * 255, 1));
+        .onTrue(new SequentialCommandGroup(
+            new LEDEffectCommand(m_LEDSubsystem, EffectType.swipeUp, 0, 0, 100, 0.02, () -> m_robotDrive.isTipped()),
+            new LEDEffectCommand(m_LEDSubsystem, EffectType.midSplit, 0, 0, 100, 0.02, () -> m_robotDrive.isTipped()),
+            new LEDEffectCommand(m_LEDSubsystem, EffectType.swipeDown, 0, 0, 100, 0.02,
+                () -> m_robotDrive.isTipped())));
 
     new JoystickButton(m_operatorController, Button.kBack.value)
-        .onTrue(new LEDEffectCommand(m_LEDSubsystem, EffectType.swipe,
-            (int) SmartDashboard.getNumber("R", 0),
-            (int) SmartDashboard.getNumber("G", 0),
-            (int) SmartDashboard.getNumber("B", 0), 1));
+        .onTrue(new SequentialCommandGroup(
+            new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1, () -> m_robotDrive.isTipped()),
+            new WaitCommand(0.1),
+            new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1, () -> m_robotDrive.isTipped())));
   }
 
   /**
