@@ -6,7 +6,6 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 
@@ -14,16 +13,13 @@ public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED m_LED = new AddressableLED(LEDConstants.kLEDPort);
   private final AddressableLEDBuffer m_LEDBuffer = new AddressableLEDBuffer(LEDConstants.kLEDLength);
 
-  /** Creates a new {@link LEDSubsystem}. */ 
+  /** Creates a new {@link LEDSubsystem}. */
   public LEDSubsystem() {
     m_LED.setLength(LEDConstants.kLEDLength);
     m_LED.setData(m_LEDBuffer);
     m_LED.start();
 
-    // Yellow when bot turns on.
-    setLED(50, 50, 0);
-
-    SmartDashboard.putString("led", m_LEDBuffer.getLED(1).toString());
+    resetLED();
   }
 
   /**
@@ -38,6 +34,10 @@ public class LEDSubsystem extends SubsystemBase {
       m_LEDBuffer.setRGB(i, r, g, b);
     }
     m_LED.setData(m_LEDBuffer);
-    SmartDashboard.putString("led", m_LEDBuffer.getLED(1).toString());
+  }
+
+  /** Resets the LED to the default color (yellow) */
+  public void resetLED() {
+    setLED(50, 50, 0);
   }
 }

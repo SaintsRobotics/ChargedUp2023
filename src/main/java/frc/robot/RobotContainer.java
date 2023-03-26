@@ -152,8 +152,7 @@ public class RobotContainer {
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
 
     new JoystickButton(m_driverController, Button.kY.value)
-        .whileTrue(new BalanceCommand(m_robotDrive, m_LEDSubsystem))
-        .onFalse(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0)));
+        .whileTrue(new BalanceCommand(m_robotDrive, m_LEDSubsystem));
     new JoystickButton(m_driverController, Button.kA.value)
         .onTrue(new SnapRotateCommand(m_robotDrive));
 
@@ -170,7 +169,7 @@ public class RobotContainer {
         .onTrue(new ArmCommand(m_armSubsystem, 34, ArmConstants.kElevatorMinPosition));
 
     new JoystickButton(m_operatorController, Button.kLeftBumper.value)
-        .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(50, 50, 0))); // Yellow
+        .onTrue(new InstantCommand(m_LEDSubsystem::resetLED));
     new JoystickButton(m_operatorController, Button.kRightBumper.value)
         .onTrue(new InstantCommand(() -> m_LEDSubsystem.setLED(27, 8, 44))); // Purple
   }

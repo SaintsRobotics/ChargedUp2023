@@ -23,7 +23,8 @@ public class BalanceCommand extends CommandBase {
   /**
    * Creates a new {@link BalanceCommand}.
    * 
-   * @param driveSubsystem The required subsystem.
+   * @param driveSubsystem The required drive subsystem.
+   * @param LEDSubsystem   The required LED subsystem.
    */
   public BalanceCommand(DriveSubsystem driveSubsystem, LEDSubsystem LEDSubsystem) {
     m_driveSubsystem = driveSubsystem;
@@ -52,7 +53,7 @@ public class BalanceCommand extends CommandBase {
       fade = (fade - 10) % 51;
       m_timer.reset();
     } else if (m_timer.hasElapsed(0.3)) {
-      fade = 255;
+      fade = 50;
       m_LEDSubsystem.setLED(m_isRed ? 0 : 50, 0, 0);
       m_isRed = !m_isRed;
       m_timer.reset();
@@ -62,10 +63,6 @@ public class BalanceCommand extends CommandBase {
   @Override
   public void end(boolean interrupted) {
     m_driveSubsystem.drive(0, 0, 0, false);
-  }
-
-  @Override
-  public boolean isFinished() {
-    return false;
+    m_LEDSubsystem.resetLED();
   }
 }
