@@ -11,9 +11,16 @@ import frc.robot.subsystems.LEDSubsystem;
 
 public class LEDSwipeCommand extends CommandBase {
   public enum Type {
-    kDown,
     kUp,
-    kDouble
+    kDown,
+    kDouble,
+    kSplit,
+    kJoin,
+    kDoubleUp,
+    kDoubleDown,
+    kLowDouble,
+    kHighDouble,
+    kDoubleDouble
   }
 
   private final LEDSubsystem m_subsystem;
@@ -23,6 +30,8 @@ public class LEDSwipeCommand extends CommandBase {
   private final int m_g;
   private final int m_b;
 
+  private final boolean m_changeColor;
+
   private final Timer m_timer = new Timer();
 
   private int m_LEDIndex;
@@ -30,13 +39,14 @@ public class LEDSwipeCommand extends CommandBase {
   /**
    * Creates a new {@link LEDSwipeCommand}.
    * 
-   * @param subsystem The required subsystem.
-   * @param type      Type of swipe.
-   * @param r         Red component (0-255)
-   * @param g         Green component (0-255)
-   * @param b         Blue component (0-255)
+   * @param subsystem   The required subsystem.
+   * @param type        Type of swipe.
+   * @param r           Red component (0-255)
+   * @param g           Green component (0-255)
+   * @param b           Blue component (0-255)
+   * @param changeColor Whether the LEDs should end with the given color.
    */
-  public LEDSwipeCommand(LEDSubsystem subsystem, Type type, int r, int g, int b) {
+  public LEDSwipeCommand(LEDSubsystem subsystem, Type type, int r, int g, int b, boolean changeColor) {
     m_subsystem = subsystem;
     addRequirements(m_subsystem);
 
@@ -45,6 +55,8 @@ public class LEDSwipeCommand extends CommandBase {
     m_r = r;
     m_g = g;
     m_b = b;
+
+    m_changeColor = changeColor;
   }
 
   @Override
@@ -55,25 +67,51 @@ public class LEDSwipeCommand extends CommandBase {
 
   @Override
   public void execute() {
+    int max = LEDConstants.kLEDLength - 1;
+    int half = LEDConstants.kLEDLength / 2;
     if (m_timer.hasElapsed(LEDConstants.kSwipeTime)) {
       switch (m_type) {
-        case kDown:
-          m_subsystem.setLED(m_LEDIndex, m_r, m_g, m_b);
-          m_subsystem.unsetLED(
-              m_LEDIndex - LEDConstants.kSwipeOverlap);
-          break;
         case kUp:
-          m_subsystem.setLED(LEDConstants.kLEDLength - 1 - m_LEDIndex, m_r, m_g, m_b);
-          m_subsystem.unsetLED(
-              LEDConstants.kLEDLength - 1 - m_LEDIndex + LEDConstants.kSwipeOverlap);
+          setLED(m_LEDIndex, m_LEDIndex - LEDConstants.kSwipeOverlap);
+          break;
+        case kDown:
+          setLED(max - m_LEDIndex, max - m_LEDIndex + LEDConstants.kSwipeOverlap);
           break;
         case kDouble:
-          m_subsystem.setLED(m_LEDIndex, m_r, m_g, m_b);
-          m_subsystem.unsetLED(
-              m_LEDIndex - LEDConstants.kSwipeOverlap);
-          m_subsystem.setLED(LEDConstants.kLEDLength - 1 - m_LEDIndex, m_r, m_g, m_b);
-          m_subsystem.unsetLED(
-              LEDConstants.kLEDLength - 1 - m_LEDIndex + LEDConstants.kSwipeOverlap);
+          setLED(m_LEDIndex, m_LEDIndex - LEDConstants.kSwipeOverlap);
+          setLED(max - m_LEDIndex, max - m_LEDIndex + LEDConstants.kSwipeOverlap);
+          break;
+        case kSplit:
+          setLED((m_LEDIndex % half) + half, ((m_LEDIndex - LEDConstants.kSwipeOverlap) % half) + half);
+          setLED((max - (m_LEDIndex % half)) - half, (max - ((m_LEDIndex - LEDConstants.kSwipeOverlap) % half)) - half);
+          break;
+        case kJoin:
+          setLED(m_LEDIndex % half, (m_LEDIndex - LEDConstants.kSwipeOverlap) % half);
+          setLED(max - (m_LEDIndex % half), max - ((m_LEDIndex - LEDConstants.kSwipeOverlap) % half));
+          break;
+        case kDoubleUp:
+          setLED(m_LEDIndex % half, (m_LEDIndex - LEDConstants.kSwipeOverlap) % half);
+          setLED((m_LEDIndex % half) + half, ((m_LEDIndex - LEDConstants.kSwipeOverlap) % half) + half);
+          break;
+        case kDoubleDown:
+          setLED(max - (m_LEDIndex % half), max - ((m_LEDIndex - LEDConstants.kSwipeOverlap) % half));
+          setLED((max - (m_LEDIndex % half)) - half, (max - ((m_LEDIndex - LEDConstants.kSwipeOverlap) % half) - half));
+          break;
+        case kLowDouble:
+          setLED(m_LEDIndex % half, (m_LEDIndex - LEDConstants.kSwipeOverlap) % half);
+          setLED((max - (m_LEDIndex % half)) - half, (max - ((m_LEDIndex - LEDConstants.kSwipeOverlap) % half)) - half);
+          break;
+        case kHighDouble:
+          setLED((m_LEDIndex % half) + half, ((m_LEDIndex - LEDConstants.kSwipeOverlap) % half) + half);
+          setLED(max - (m_LEDIndex % half), max - ((m_LEDIndex - LEDConstants.kSwipeOverlap) % half));
+          break;
+        case kDoubleDouble:
+          setLED(m_LEDIndex % half, (m_LEDIndex - LEDConstants.kSwipeOverlap) % half);
+          setLED((max - (m_LEDIndex % half)) - half, (max - ((m_LEDIndex - LEDConstants.kSwipeOverlap) % half)) - half);
+          setLED((m_LEDIndex % half) + half, ((m_LEDIndex - LEDConstants.kSwipeOverlap) % half) + half);
+          setLED(max - (m_LEDIndex % half), max - ((m_LEDIndex - LEDConstants.kSwipeOverlap) % half));
+          break;
+        default:
           break;
       }
       m_LEDIndex++;
@@ -82,7 +120,23 @@ public class LEDSwipeCommand extends CommandBase {
   }
 
   @Override
+  public void end(boolean interrupted) {
+    if (m_changeColor) {
+      m_subsystem.setLED(m_r, m_g, m_b);
+    }
+  }
+
+  @Override
   public boolean isFinished() {
     return m_LEDIndex == LEDConstants.kLEDLength + LEDConstants.kSwipeOverlap;
+  }
+
+  private void setLED(int setLEDIndex, int unsetLEDIndex) {
+    if (m_LEDIndex < LEDConstants.kLEDLength) {
+      m_subsystem.setLED(setLEDIndex, m_r, m_g, m_b);
+    }
+    if (m_LEDIndex >= LEDConstants.kSwipeOverlap && !m_changeColor) {
+      m_subsystem.unsetLED(unsetLEDIndex);
+    }
   }
 }

@@ -147,7 +147,7 @@ public final class Constants {
     public static final int kLEDLength = 28;
 
     public static final double kSwipeTime = 0.02;
-    public static final int kSwipeOverlap = 3;
+    public static final int kSwipeOverlap = 4;
   }
 
   public static final class OIConstants {
