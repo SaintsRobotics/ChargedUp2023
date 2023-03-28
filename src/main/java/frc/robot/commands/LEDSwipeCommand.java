@@ -39,9 +39,9 @@ public class LEDSwipeCommand extends CommandBase {
    * 
    * @param subsystem   The required subsystem.
    * @param type        Type of swipe.
-   * @param r           Red component (0-255)
-   * @param g           Green component (0-255)
-   * @param b           Blue component (0-255)
+   * @param r           Red 0-255
+   * @param g           Green 0-255
+   * @param b           Blue 0-255
    * @param changeColor Whether the LEDs should end with the given color.
    */
   public LEDSwipeCommand(LEDSubsystem subsystem, SwipeType type, int r, int g, int b, boolean changeColor) {

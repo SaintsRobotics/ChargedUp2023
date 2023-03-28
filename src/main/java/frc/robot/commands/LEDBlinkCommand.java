@@ -23,7 +23,15 @@ public class LEDBlinkCommand extends CommandBase {
 
   private int m_counter;
 
-  /** Creates a new LEDAlternateCommand. */
+  /**
+   * Creates a new {@link LEDBlinkCommand}.
+   * 
+   * @param subsystem The required subsystem.
+   * @param type      Type of blink.
+   * @param r         Red 0-255
+   * @param g         Green 0-255
+   * @param b         Blue 0-255
+   */
   public LEDBlinkCommand(LEDSubsystem subsystem, BlinkType type, int r, int g, int b) {
     m_subsystem = subsystem;
     addRequirements(m_subsystem);
