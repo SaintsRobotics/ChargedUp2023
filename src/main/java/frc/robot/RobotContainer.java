@@ -33,8 +33,6 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.LEDCommand;
-import frc.robot.commands.LEDEffectCommand;
-import frc.robot.commands.LEDEffectCommand.EffectType;
 import frc.robot.commands.LEDTipCommand;
 import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -142,7 +140,7 @@ public class RobotContainer {
             new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
             new WaitCommand(0.5)));
 
-    m_eventMap.put("Balance", new BalanceCommand(m_robotDrive, m_LEDSubsystem, m_effectQueue));
+    m_eventMap.put("Balance", new BalanceCommand(m_robotDrive, m_LEDSubsystem));
   }
 
   /**
@@ -159,7 +157,7 @@ public class RobotContainer {
         .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
 
     new JoystickButton(m_driverController, Button.kY.value)
-        .whileTrue(new BalanceCommand(m_robotDrive, m_LEDSubsystem, m_effectQueue));
+        .whileTrue(new BalanceCommand(m_robotDrive, m_LEDSubsystem));
     new JoystickButton(m_driverController, Button.kA.value)
         .onTrue(new SnapRotateCommand(m_robotDrive));
 
@@ -191,18 +189,6 @@ public class RobotContainer {
               m_effectQueue.clear();
             }),
             new InstantCommand(m_LEDSubsystem::setCube)));
-
-    new JoystickButton(m_operatorController, Button.kStart.value)
-        .onTrue(new SequentialCommandGroup(
-            new LEDEffectCommand(m_LEDSubsystem, EffectType.swipeUp, 0, 0, 100, 0.02),
-            new LEDEffectCommand(m_LEDSubsystem, EffectType.midSplit, 0, 0, 100, 0.02),
-            new LEDEffectCommand(m_LEDSubsystem, EffectType.swipeDown, 0, 0, 100, 0.02)));
-
-    new JoystickButton(m_operatorController, Button.kBack.value)
-        .onTrue(new SequentialCommandGroup(
-            new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1),
-            new WaitCommand(0.1),
-            new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1)));
 
     new Trigger(m_robotDrive::isTipped).whileTrue(new LEDTipCommand(m_LEDSubsystem, m_robotDrive.getGyro()));
   }

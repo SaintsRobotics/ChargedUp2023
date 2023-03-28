@@ -11,7 +11,6 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.commands.LEDBlinkCommand.BlinkType;
-import frc.robot.commands.LEDEffectCommand.EffectType;
 import frc.robot.subsystems.LEDSubsystem;
 
 public class LEDCommand extends CommandBase {
@@ -44,17 +43,9 @@ public class LEDCommand extends CommandBase {
 
     if (m_effectTimer.hasElapsed(5)) {
       SequentialCommandGroup cmd = new SequentialCommandGroup(
-          new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.12),
-          new WaitCommand(0.12),
-          new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.12),
           new LEDBlinkCommand(m_LEDSubsystem, BlinkType.kAlternate, 0, 0, 100),
-          new LEDEffectCommand(m_LEDSubsystem, EffectType.swipeUp, 0, 0, 100, 0.02),
-          new LEDEffectCommand(m_LEDSubsystem, EffectType.midSplit, 0, 0, 100, 0.02),
-          new LEDEffectCommand(m_LEDSubsystem, EffectType.swipeDown, 0, 0, 100, 0.02),
-          new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.12),
-          new WaitCommand(0.12),
-          new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.12),
-          new LEDBlinkCommand(m_LEDSubsystem, BlinkType.kAlternate, 0, 0, 100));
+          new WaitCommand(0.3),
+          new LEDBlinkCommand(m_LEDSubsystem, BlinkType.kAlternate, 100, 0, 0));
 
       cmd.schedule();
       m_effectQueue.add(cmd);
