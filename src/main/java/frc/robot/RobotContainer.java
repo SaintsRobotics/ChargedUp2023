@@ -32,9 +32,13 @@ import frc.robot.Constants.DriveConstants;
 import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.BalanceCommand;
+import frc.robot.commands.LEDBlinkCommand;
 import frc.robot.commands.LEDCommand;
+import frc.robot.commands.LEDSwipeCommand;
 import frc.robot.commands.LEDTipCommand;
 import frc.robot.commands.SnapRotateCommand;
+import frc.robot.commands.LEDBlinkCommand.BlinkType;
+import frc.robot.commands.LEDSwipeCommand.SwipeType;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
@@ -211,5 +215,16 @@ public class RobotContainer {
             new PathConstraints(
                 AutonConstants.maxVelocity - (path.equals("Charger-comms") ? 0.75 : 0),
                 AutonConstants.maxAcceleration)));
+  }
+
+  /**
+   * Returns a command that does LED startup effects.
+   * 
+   * @return Startup command.
+   */
+  public Command getStartupCommand() {
+    return new SequentialCommandGroup(
+        new LEDSwipeCommand(m_LEDSubsystem, SwipeType.kUp, 0, 0, 100, true),
+        new LEDBlinkCommand(m_LEDSubsystem, BlinkType.kBlink, 0, 0, 0));
   }
 }

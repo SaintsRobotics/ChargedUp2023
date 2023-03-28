@@ -137,4 +137,9 @@ public class LEDSwipeCommand extends CommandBase {
       m_subsystem.unsetLED(unsetLEDIndex);
     }
   }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
 }

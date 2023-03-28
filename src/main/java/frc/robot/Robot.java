@@ -28,6 +28,12 @@ public class Robot extends TimedRobot {
   public void robotInit() {
     m_robotContainer = new RobotContainer();
     m_buttonTimer.start();
+
+    final Command startupCommand = m_robotContainer.getStartupCommand();
+
+    if (startupCommand != null) {
+      startupCommand.schedule();
+    }
   }
 
   @Override

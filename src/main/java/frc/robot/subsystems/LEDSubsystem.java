@@ -6,42 +6,20 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 
 public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED m_LED = new AddressableLED(LEDConstants.kLEDPort);
-  private AddressableLEDBuffer m_LEDBuffer = new AddressableLEDBuffer(LEDConstants.kLEDLength);
+  private final AddressableLEDBuffer m_LEDBuffer = new AddressableLEDBuffer(LEDConstants.kLEDLength);
 
   private int m_r, m_g, m_b;
-
-  private final Timer m_timer = new Timer();
-  private int m_startupIndex;
 
   /** Creates a new {@link LEDSubsystem}. */
   public LEDSubsystem() {
     m_LED.setLength(LEDConstants.kLEDLength);
     m_LED.setData(m_LEDBuffer);
     m_LED.start();
-    m_timer.restart();
-  }
-
-  @Override
-  public void periodic() {
-    // epic LED boot sequence
-    setLED(m_startupIndex, 0, 0, 100);
-    if (m_startupIndex > LEDConstants.kLEDLength + 8) {
-      m_timer.stop();
-    } else if (m_startupIndex > LEDConstants.kLEDLength) {
-      setLED(0, 0, ((m_startupIndex - LEDConstants.kLEDLength) / 2) % 2 == 0 ? 100 : 0);
-    }
-
-    if (m_timer.hasElapsed(0.1)) {
-      m_startupIndex++;
-      m_timer.reset();
-    }
-
   }
 
   /**
@@ -62,9 +40,10 @@ public class LEDSubsystem extends SubsystemBase {
   /**
    * Sets the rgb value for all LEDs.
    * 
-   * @param r Red 0-255
-   * @param g Green 0-255
-   * @param b Blue 0-255
+   * @param r     Red 0-255
+   * @param g     Green 0-255
+   * @param b     Blue 0-255
+   * @param store Whether to save the color.
    */
   public void setLED(int r, int g, int b, boolean store) {
     for (var i = 0; i < LEDConstants.kLEDLength; i++) {
@@ -79,6 +58,13 @@ public class LEDSubsystem extends SubsystemBase {
     }
   }
 
+  /**
+   * Sets the rgb value for all LEDs and stores the color.
+   * 
+   * @param r Red 0-255
+   * @param g Green 0-255
+   * @param b Blue 0-255
+   */
   public void setLED(int r, int g, int b) {
     setLED(r, g, b, true);
   }
@@ -97,12 +83,6 @@ public class LEDSubsystem extends SubsystemBase {
    */
   public void unsetLED() {
     setLED(m_r, m_g, m_b);
-  }
-
-  public void setLED(int i) {
-    m_r = (int) (m_LEDBuffer.getLED(i).red * 255);
-    m_b = (int) (m_LEDBuffer.getLED(i).blue * 255);
-    m_g = (int) (m_LEDBuffer.getLED(i).green * 255);
   }
 
   /** Resets the LED to the default color (yellow) */

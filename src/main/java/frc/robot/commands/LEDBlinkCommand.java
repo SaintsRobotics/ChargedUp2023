@@ -80,4 +80,9 @@ public class LEDBlinkCommand extends CommandBase {
   public boolean isFinished() {
     return m_counter >= LEDConstants.kBlinkAmount * 2;
   }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
 }
