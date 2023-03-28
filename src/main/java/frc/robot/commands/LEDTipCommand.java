@@ -45,7 +45,7 @@ public class LEDTipCommand extends CommandBase {
     m_angle = Math.max(Math.abs(m_gyro.getPitch()), Math.abs(m_gyro.getRoll()));
     if (m_angle > LEDConstants.kTipMax) {
       m_subsystem.setLED(100, 0, 0);
-    } else if (m_timer.hasElapsed(0.5 - (m_angle / 110))) {
+    } else if (m_timer.hasElapsed(0.3 - (m_angle / 185))) {
       m_subsystem.setLED(isRed ? 0 : 100, 0, 0);
       isRed = !isRed;
       m_timer.reset();

@@ -266,7 +266,6 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public boolean isTipped() {
     return Math.abs(m_gyro.getPitch()) > LEDConstants.kTipMin ||
-        Math.abs(m_gyro.getRoll()) > LEDConstants.kTipMin ||
-        Math.abs(m_gyro.getYaw()) > LEDConstants.kTipMin;
+        Math.abs(m_gyro.getRoll()) > LEDConstants.kTipMin;
   }
 }

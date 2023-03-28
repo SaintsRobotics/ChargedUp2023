@@ -150,7 +150,7 @@ public final class Constants {
     public static final int kSwipeOverlap = 4;
 
     public static final double kTipMin = 5;
-    public static final double kTipMax = 45;
+    public static final double kTipMax = 55;
   }
 
   public static final class OIConstants {
