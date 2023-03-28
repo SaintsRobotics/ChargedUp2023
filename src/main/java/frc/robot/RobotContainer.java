@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import edu.wpi.first.wpilibj2.command.button.POVButton;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.DriveConstants;
@@ -33,8 +34,9 @@ import frc.robot.commands.ArmCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.LEDCommand;
 import frc.robot.commands.LEDEffectCommand;
-import frc.robot.commands.SnapRotateCommand;
 import frc.robot.commands.LEDEffectCommand.EffectType;
+import frc.robot.commands.LEDTipCommand;
+import frc.robot.commands.SnapRotateCommand;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
@@ -201,6 +203,8 @@ public class RobotContainer {
             new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1),
             new WaitCommand(0.1),
             new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1)));
+
+    new Trigger(m_robotDrive::isTipped).whileTrue(new LEDTipCommand(m_LEDSubsystem, m_robotDrive.getGyro()));
   }
 
   /**

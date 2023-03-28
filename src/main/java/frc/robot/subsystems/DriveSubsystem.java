@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.LEDConstants;
 import frc.robot.Robot;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -232,6 +233,15 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
+   * Gets gyro
+   * 
+   * @return the gyro
+   */
+  public AHRS getGyro() {
+    return m_gyro;
+  }
+
+  /**
    * Slowly accelerates the bot to the desired speed.
    * 
    * @param currentSpeed The current speed.
@@ -255,8 +265,8 @@ public class DriveSubsystem extends SubsystemBase {
    * @return Whether the robot is tipped.
    */
   public boolean isTipped() {
-    return Math.abs(m_gyro.getPitch()) > 5 ||
-        Math.abs(m_gyro.getRoll()) > 5 ||
-        Math.abs(m_gyro.getYaw()) > 5;
+    return Math.abs(m_gyro.getPitch()) > LEDConstants.kTipMin ||
+        Math.abs(m_gyro.getRoll()) > LEDConstants.kTipMin ||
+        Math.abs(m_gyro.getYaw()) > LEDConstants.kTipMin;
   }
 }
