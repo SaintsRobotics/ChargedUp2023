@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 
@@ -17,13 +18,25 @@ public class LEDSubsystem extends SubsystemBase {
   private int m_g;
   private int m_b;
 
+  private final Timer m_timer = new Timer();
+  private int i;
+
   /** Creates a new {@link LEDSubsystem}. */
   public LEDSubsystem() {
     m_LED.setLength(LEDConstants.kLEDLength);
     m_LED.setData(m_LEDBuffer);
     m_LED.start();
+    m_timer.restart();
+  }
 
-    setCone();
+  @Override
+  public void periodic() {
+    setLED(i, 0, 0, 100);
+
+    if (m_timer.hasElapsed(0.15)) {
+      i++;
+      m_timer.reset();
+    }
   }
 
   /**
@@ -61,7 +74,7 @@ public class LEDSubsystem extends SubsystemBase {
     }
   }
 
-  public void setLED(int r, int g, int b){
+  public void setLED(int r, int g, int b) {
     setLED(r, g, b, true);
   }
 
