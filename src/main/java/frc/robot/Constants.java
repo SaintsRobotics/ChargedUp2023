@@ -109,7 +109,10 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     public static final double kMaxSpeedMetersPerSecond = 3.6576;
-    public static final double kMaxAngularSpeedRadiansPerSecond = 15.24/3;
+    public static final double kMaxAngularSpeedRadiansPerSecond = 15.24 / 3;
+
+    public static final double kMaxAccelerationMetersPerSecondSquared = kMaxSpeedMetersPerSecond * 4;
+    public static final double kMaxAngularAccelerationRadiansPerSecondSquared = kMaxAngularSpeedRadiansPerSecond * 4;
 
     public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
     public static final double kSpeedIncreasePerPeriod = 0.15;
