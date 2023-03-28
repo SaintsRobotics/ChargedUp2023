@@ -48,10 +48,10 @@ public class LEDBlinkCommand extends CommandBase {
       m_timer.restart();
     }
 
-    double e = m_counter % 2 == 0 ? 0 : 1;
+    boolean even = m_counter % 2 == 0;
     switch (m_type) {
       case kBlink:
-        if (e == 0) {
+        if (even) {
           m_subsystem.setLED(m_r, m_g, m_b, false);
         } else {
           m_subsystem.unsetLED();
@@ -59,11 +59,12 @@ public class LEDBlinkCommand extends CommandBase {
         break;
       case kAlternate:
         for (int i = 0; i < LEDConstants.kLEDLength; i++) {
-          if ((i % 2) == e) {
+          if (even) {
             m_subsystem.setLED(i, m_r, m_g, m_b);
           } else {
             m_subsystem.unsetLED(i);
           }
+          even = !even;
         }
         break;
       default:
