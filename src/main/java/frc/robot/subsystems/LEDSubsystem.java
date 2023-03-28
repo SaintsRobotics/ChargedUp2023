@@ -31,11 +31,20 @@ public class LEDSubsystem extends SubsystemBase {
 
   @Override
   public void periodic() {
+    // epic LED boot sequence
     setLED(i, 0, 0, 100);
 
-    if (m_timer.hasElapsed(0.15)) {
+    if (i > LEDConstants.kLEDLength) {
+      setLED(0, 0, ((i - LEDConstants.kLEDLength) / 2) % 2 == 0 ? 100 : 0);
+    }
+
+    if (m_timer.hasElapsed(0.1)) {
       i++;
       m_timer.reset();
+    }
+
+    if (i > LEDConstants.kLEDLength + 8) {
+      m_timer.stop();
     }
   }
 
