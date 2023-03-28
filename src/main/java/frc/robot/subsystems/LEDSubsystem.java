@@ -14,12 +14,10 @@ public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED m_LED = new AddressableLED(LEDConstants.kLEDPort);
   private AddressableLEDBuffer m_LEDBuffer = new AddressableLEDBuffer(LEDConstants.kLEDLength);
 
-  private int m_r;
-  private int m_g;
-  private int m_b;
+  private int m_r, m_g, m_b;
 
   private final Timer m_timer = new Timer();
-  private int i;
+  private int m_startupIndex;
 
   /** Creates a new {@link LEDSubsystem}. */
   public LEDSubsystem() {
@@ -32,18 +30,18 @@ public class LEDSubsystem extends SubsystemBase {
   @Override
   public void periodic() {
     // epic LED boot sequence
-    setLED(i, 0, 0, 100);
+    setLED(m_startupIndex, 0, 0, 100);
 
-    if (i > LEDConstants.kLEDLength) {
-      setLED(0, 0, ((i - LEDConstants.kLEDLength) / 2) % 2 == 0 ? 100 : 0);
+    if (m_startupIndex > LEDConstants.kLEDLength) {
+      setLED(0, 0, ((m_startupIndex - LEDConstants.kLEDLength) / 2) % 2 == 0 ? 100 : 0);
     }
 
     if (m_timer.hasElapsed(0.1)) {
-      i++;
+      m_startupIndex++;
       m_timer.reset();
     }
 
-    if (i > LEDConstants.kLEDLength + 8) {
+    if (m_startupIndex > LEDConstants.kLEDLength + 8) {
       m_timer.stop();
     }
   }
