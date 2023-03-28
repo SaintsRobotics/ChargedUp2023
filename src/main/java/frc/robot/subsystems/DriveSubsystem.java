@@ -231,4 +231,13 @@ public class DriveSubsystem extends SubsystemBase {
   public double getGyroPitch() {
     return m_gyro.getPitch();
   }
+
+  /**
+   * Stops the robot from moving
+   */
+  public void stop() {
+    m_acceleratedChassisSpeeds.reset();
+    setModuleStates(
+        DriveConstants.kDriveKinematics.toSwerveModuleStates(m_acceleratedChassisSpeeds.getCurrentSpeeds()));
+  }
 }

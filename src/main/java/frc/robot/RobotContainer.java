@@ -190,4 +190,11 @@ public class RobotContainer {
                 AutonConstants.maxVelocity - (path.equals("Charger-comms") ? 0.75 : 0),
                 AutonConstants.maxAcceleration)));
   }
+
+  /**
+   * Ensure the robot is stopped
+   */
+  public void ensureRobotStopped() {
+    m_robotDrive.stop();
+  }
 }

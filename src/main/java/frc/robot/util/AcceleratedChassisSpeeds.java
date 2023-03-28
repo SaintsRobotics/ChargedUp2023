@@ -46,4 +46,14 @@ public class AcceleratedChassisSpeeds {
         m_rotationRateLimiter.calculate(desiredSpeeds.omegaRadiansPerSecond));
     return m_currentChassisSpeeds;
   }
+
+  /**
+   * Resets the speeds to 0
+   */
+  public void reset() {
+    m_xTranslationRateLimiter.reset(0);
+    m_yTranslationRateLimiter.reset(0);
+    m_rotationRateLimiter.reset(0);
+    m_currentChassisSpeeds = new ChassisSpeeds();
+  }
 }
