@@ -4,8 +4,6 @@
 
 package frc.robot.commands;
 
-import java.util.function.BooleanSupplier;
-
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.LEDConstants;
@@ -27,17 +25,15 @@ public class LEDEffectCommand extends CommandBase {
   private double m_time;
 
   private int m_internalState;
-  private BooleanSupplier m_isTipped;
 
   /** Creates a new {@link LEDEffectCommand}. */
-  public LEDEffectCommand(LEDSubsystem subsystem, EffectType type, int r, int g, int b, double time, BooleanSupplier isTipped) {
+  public LEDEffectCommand(LEDSubsystem subsystem, EffectType type, int r, int g, int b, double time) {
     m_subsystem = subsystem;
     m_type = type;
     m_r = r;
     m_g = g;
     m_b = b;
     m_time = time;
-    m_isTipped = isTipped;
     addRequirements(m_subsystem);
   }
 
@@ -66,7 +62,7 @@ public class LEDEffectCommand extends CommandBase {
         } else if (m_internalState == 1) {
           end(false);
           m_internalState++;
-        } else if (m_internalState == 2){
+        } else if (m_internalState == 2) {
           end(false);
           cancel();
         }
@@ -99,8 +95,10 @@ public class LEDEffectCommand extends CommandBase {
         if (m_internalState < 25 && m_internalState > -4)
           m_subsystem.unsetLED(m_internalState + 3);
 
-        if (m_internalState == -4) cancel();
-        else if (m_internalState > -1) m_subsystem.setLED(m_internalState, m_r, m_g, m_b);
+        if (m_internalState == -4)
+          cancel();
+        else if (m_internalState > -1)
+          m_subsystem.setLED(m_internalState, m_r, m_g, m_b);
         m_internalState--;
     }
   }
@@ -116,7 +114,6 @@ public class LEDEffectCommand extends CommandBase {
     return (m_type == EffectType.blink && m_internalState == 2) ||
         (m_type == EffectType.swipeUp && m_internalState == LEDConstants.kLEDLength + 2) ||
         (m_type == EffectType.midSplit && m_internalState == LEDConstants.kLEDLength + 2) ||
-        (m_type == EffectType.swipeDown && m_internalState == -4) ||
-        m_isTipped.getAsBoolean();
+        (m_type == EffectType.swipeDown && m_internalState == -4);
   }
 }

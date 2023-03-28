@@ -56,13 +56,9 @@ public class BalanceCommand extends CommandBase {
     if (m_timer.hasElapsed(1) && m_PID.atSetpoint()) {
       SequentialCommandGroup cmd = new SequentialCommandGroup(
           new LEDEffectCommand(
-              m_LEDSubsystem, EffectType.swipeUp, 0, 100, 0, 0.02, () -> {
-                return false;
-              }),
+              m_LEDSubsystem, EffectType.swipeUp, 0, 100, 0, 0.02),
           new LEDEffectCommand(
-              m_LEDSubsystem, EffectType.swipeDown, 0, 100, 0, 0.02, () -> {
-                return false;
-              }));
+              m_LEDSubsystem, EffectType.swipeDown, 0, 100, 0, 0.02));
 
       cmd.schedule();
       m_effectQueue.add(cmd);
@@ -70,9 +66,7 @@ public class BalanceCommand extends CommandBase {
 
     } else if (m_timer.hasElapsed(0.6)) {
       SequentialCommandGroup cmd = new SequentialCommandGroup(new LEDEffectCommand(
-          m_LEDSubsystem, EffectType.blink, 100, 75, 0, 0.2, () -> {
-            return false;
-          }));
+          m_LEDSubsystem, EffectType.blink, 100, 75, 0, 0.2));
 
       cmd.schedule();
       m_effectQueue.add(cmd);

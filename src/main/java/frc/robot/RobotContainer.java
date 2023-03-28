@@ -116,7 +116,7 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
-    m_LEDSubsystem.setDefaultCommand(new LEDCommand(m_LEDSubsystem, m_robotDrive::isTipped, m_effectQueue));
+    m_LEDSubsystem.setDefaultCommand(new LEDCommand(m_LEDSubsystem, m_effectQueue));
 
     m_chooser.addOption("Far", "Far");
     m_chooser.addOption("Charger", "Charger");
@@ -192,16 +192,15 @@ public class RobotContainer {
 
     new JoystickButton(m_operatorController, Button.kStart.value)
         .onTrue(new SequentialCommandGroup(
-            new LEDEffectCommand(m_LEDSubsystem, EffectType.swipeUp, 0, 0, 100, 0.02, () -> m_robotDrive.isTipped()),
-            new LEDEffectCommand(m_LEDSubsystem, EffectType.midSplit, 0, 0, 100, 0.02, () -> m_robotDrive.isTipped()),
-            new LEDEffectCommand(m_LEDSubsystem, EffectType.swipeDown, 0, 0, 100, 0.02,
-                () -> m_robotDrive.isTipped())));
+            new LEDEffectCommand(m_LEDSubsystem, EffectType.swipeUp, 0, 0, 100, 0.02),
+            new LEDEffectCommand(m_LEDSubsystem, EffectType.midSplit, 0, 0, 100, 0.02),
+            new LEDEffectCommand(m_LEDSubsystem, EffectType.swipeDown, 0, 0, 100, 0.02)));
 
     new JoystickButton(m_operatorController, Button.kBack.value)
         .onTrue(new SequentialCommandGroup(
-            new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1, () -> m_robotDrive.isTipped()),
+            new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1),
             new WaitCommand(0.1),
-            new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1, () -> m_robotDrive.isTipped())));
+            new LEDEffectCommand(m_LEDSubsystem, EffectType.blink, 0, 0, 100, 0.1)));
   }
 
   /**
