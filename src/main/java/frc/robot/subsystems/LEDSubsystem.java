@@ -31,8 +31,9 @@ public class LEDSubsystem extends SubsystemBase {
   public void periodic() {
     // epic LED boot sequence
     setLED(m_startupIndex, 0, 0, 100);
-
-    if (m_startupIndex > LEDConstants.kLEDLength) {
+    if (m_startupIndex > LEDConstants.kLEDLength + 8) {
+      m_timer.stop();
+    } else if (m_startupIndex > LEDConstants.kLEDLength) {
       setLED(0, 0, ((m_startupIndex - LEDConstants.kLEDLength) / 2) % 2 == 0 ? 100 : 0);
     }
 
@@ -41,9 +42,6 @@ public class LEDSubsystem extends SubsystemBase {
       m_timer.reset();
     }
 
-    if (m_startupIndex > LEDConstants.kLEDLength + 8) {
-      m_timer.stop();
-    }
   }
 
   /**
