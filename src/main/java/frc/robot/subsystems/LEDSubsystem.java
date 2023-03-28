@@ -92,6 +92,13 @@ public class LEDSubsystem extends SubsystemBase {
     setLED(i, m_r, m_g, m_b);
   }
 
+  /**
+   * Resets all LEDs to previous value.
+   */
+  public void unsetLED() {
+    setLED(m_r, m_g, m_b);
+  }
+
   public void setLED(int i) {
     m_r = (int) (m_LEDBuffer.getLED(i).red * 255);
     m_b = (int) (m_LEDBuffer.getLED(i).blue * 255);

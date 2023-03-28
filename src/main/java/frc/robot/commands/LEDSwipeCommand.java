@@ -10,7 +10,7 @@ import frc.robot.Constants.LEDConstants;
 import frc.robot.subsystems.LEDSubsystem;
 
 public class LEDSwipeCommand extends CommandBase {
-  public enum Type {
+  public enum SwipeType {
     kUp,
     kDown,
     kDouble,
@@ -24,7 +24,7 @@ public class LEDSwipeCommand extends CommandBase {
   }
 
   private final LEDSubsystem m_subsystem;
-  private final Type m_type;
+  private final SwipeType m_type;
 
   private final int m_r, m_g, m_b;
 
@@ -44,7 +44,7 @@ public class LEDSwipeCommand extends CommandBase {
    * @param b           Blue component (0-255)
    * @param changeColor Whether the LEDs should end with the given color.
    */
-  public LEDSwipeCommand(LEDSubsystem subsystem, Type type, int r, int g, int b, boolean changeColor) {
+  public LEDSwipeCommand(LEDSubsystem subsystem, SwipeType type, int r, int g, int b, boolean changeColor) {
     m_subsystem = subsystem;
     addRequirements(m_subsystem);
 

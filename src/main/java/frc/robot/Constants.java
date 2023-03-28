@@ -149,6 +149,9 @@ public final class Constants {
     public static final double kSwipeTime = 0.02;
     public static final int kSwipeOverlap = 4;
 
+    public static final int kBlinkAmount = 3;
+    public static final double kBlinkTime = 0.2;
+
     public static final double kTipMin = 5;
     public static final double kTipMax = 55;
   }
