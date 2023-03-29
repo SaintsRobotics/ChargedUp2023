@@ -20,7 +20,7 @@ public class BalanceCommand extends CommandBase {
   private final Timer m_timer = new Timer();
 
   private boolean m_isRed;
-  private int fade = 255;
+  private int fade;
 
   /**
    * Creates a new {@link BalanceCommand}.
@@ -52,13 +52,9 @@ public class BalanceCommand extends CommandBase {
         0,
         false);
 
-    if (m_timer.hasElapsed(0.1) && m_PID.atSetpoint()) {
+    if (m_PID.atSetpoint()) {
       m_LEDSubsystem.setLED(0, fade, 0, false);
-      fade = (fade - 10) % 100;
-      if (fade < 0) {
-        fade = 100;
-      }
-      m_timer.reset();
+      fade = fade <= 0 ? 100 : fade - 2;
     } else if (m_timer.hasElapsed(0.3)) {
       fade = 100;
       m_LEDSubsystem.setLED(m_isRed ? 0 : 100, 0, 0, false);

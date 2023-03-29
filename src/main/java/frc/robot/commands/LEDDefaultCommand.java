@@ -16,7 +16,11 @@ public class LEDDefaultCommand extends CommandBase {
   private final ArrayList<Command> m_commands = new ArrayList<Command>();
   private Command m_command;
 
-  /** Creates a new {@link LEDDefaultCommand}. */
+  /**
+   * Creates a new {@link LEDDefaultCommand}.
+   * 
+   * @param subsystem The required subsystem.
+   */
   public LEDDefaultCommand(LEDSubsystem subsystem) {
     m_subsystem = subsystem;
     addRequirements(m_subsystem);
