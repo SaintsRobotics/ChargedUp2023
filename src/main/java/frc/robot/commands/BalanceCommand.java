@@ -55,6 +55,7 @@ public class BalanceCommand extends CommandBase {
     if (m_PID.atSetpoint()) {
       m_LEDSubsystem.setLED(0, fade, 0, false);
       fade = fade <= 0 ? 100 : fade - 2;
+      m_isRed = false;
     } else if (m_timer.hasElapsed(0.3)) {
       fade = 100;
       m_LEDSubsystem.setLED(m_isRed ? 0 : 100, 0, 0, false);
