@@ -61,4 +61,9 @@ public class LEDTipCommand extends CommandBase {
   public boolean isFinished() {
     return m_angle < LEDConstants.kTipMin;
   }
+
+  @Override
+  public boolean runsWhenDisabled() {
+    return true;
+  }
 }

@@ -5,8 +5,6 @@
 package frc.robot;
 
 import java.util.HashMap;
-import java.util.Queue;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
@@ -33,12 +31,12 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.LEDBlinkCommand;
-import frc.robot.commands.LEDCommand;
+import frc.robot.commands.LEDBlinkCommand.BlinkType;
+import frc.robot.commands.LEDDefaultCommand;
 import frc.robot.commands.LEDSwipeCommand;
+import frc.robot.commands.LEDSwipeCommand.SwipeType;
 import frc.robot.commands.LEDTipCommand;
 import frc.robot.commands.SnapRotateCommand;
-import frc.robot.commands.LEDBlinkCommand.BlinkType;
-import frc.robot.commands.LEDSwipeCommand.SwipeType;
 import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
@@ -59,7 +57,6 @@ public class RobotContainer {
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
-  private final Queue<SequentialCommandGroup> m_effectQueue = new LinkedBlockingDeque<SequentialCommandGroup>();
 
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
@@ -120,7 +117,7 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
-    m_LEDSubsystem.setDefaultCommand(new LEDCommand(m_LEDSubsystem, m_effectQueue));
+    m_LEDSubsystem.setDefaultCommand(new LEDDefaultCommand(m_LEDSubsystem));
 
     m_chooser.addOption("Far", "Far");
     m_chooser.addOption("Charger", "Charger");
@@ -178,21 +175,9 @@ public class RobotContainer {
         .onTrue(new ArmCommand(m_armSubsystem, 34, ArmConstants.kElevatorMinPosition));
 
     new JoystickButton(m_operatorController, Button.kLeftBumper.value)
-        .onTrue(new SequentialCommandGroup(
-            new InstantCommand(() -> {
-              for (SequentialCommandGroup i : m_effectQueue)
-                i.cancel();
-              m_effectQueue.clear();
-            }),
-            new InstantCommand(m_LEDSubsystem::setCone)));
+        .whileTrue(new RunCommand(() -> m_LEDSubsystem.setCone(), m_LEDSubsystem));
     new JoystickButton(m_operatorController, Button.kRightBumper.value)
-        .onTrue(new SequentialCommandGroup(
-            new InstantCommand(() -> {
-              for (SequentialCommandGroup i : m_effectQueue)
-                i.cancel();
-              m_effectQueue.clear();
-            }),
-            new InstantCommand(m_LEDSubsystem::setCube)));
+        .whileTrue(new RunCommand(() -> m_LEDSubsystem.setCube(), m_LEDSubsystem));
 
     new Trigger(m_robotDrive::isTipped).whileTrue(new LEDTipCommand(m_LEDSubsystem, m_robotDrive.getGyro()));
   }

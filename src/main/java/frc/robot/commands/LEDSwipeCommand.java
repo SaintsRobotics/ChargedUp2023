@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.util.Random;
+
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.LEDConstants;
@@ -20,17 +22,26 @@ public class LEDSwipeCommand extends CommandBase {
     kDoubleDown,
     kLowDouble,
     kHighDouble,
-    kDoubleDouble
+    kDoubleDouble;
+
+    private static final Random random = new Random();
+
+    public static SwipeType random() {
+      SwipeType[] type = values();
+      return type[random.nextInt(type.length)];
+    }
   }
 
   private final LEDSubsystem m_subsystem;
-  private final SwipeType m_type;
+  private SwipeType m_type;
 
-  private final int m_r, m_g, m_b;
+  private int m_r, m_g, m_b;
 
-  private final boolean m_changeColor;
+  private boolean m_changeColor;
 
   private final Timer m_timer = new Timer();
+
+  private final boolean m_random;
 
   private int m_LEDIndex;
 
@@ -55,10 +66,34 @@ public class LEDSwipeCommand extends CommandBase {
     m_b = b;
 
     m_changeColor = changeColor;
+
+    m_random = false;
+  }
+
+  /**
+   * Creates a new randomized {@link LEDSwipeCommand}.
+   * 
+   * @param subsystem The required subsystem.
+   */
+  public LEDSwipeCommand(LEDSubsystem subsystem) {
+    m_subsystem = subsystem;
+    addRequirements(m_subsystem);
+
+    m_random = true;
   }
 
   @Override
   public void initialize() {
+    if (m_random) {
+      m_type = SwipeType.random();
+
+      Random random = new Random();
+      m_r = random.nextInt(0, 100);
+      m_g = random.nextInt(0, 100);
+      m_b = random.nextInt(0, 100);
+
+      m_changeColor = random.nextBoolean();
+    }
     m_timer.restart();
     m_LEDIndex = 0;
   }
@@ -126,6 +161,32 @@ public class LEDSwipeCommand extends CommandBase {
 
   @Override
   public boolean isFinished() {
+    if (m_changeColor) {
+      switch (m_type) {
+        case kDouble:
+          return m_LEDIndex == LEDConstants.kLEDLength / 2 + LEDConstants.kSwipeOverlap;
+        case kDoubleDouble:
+          return m_LEDIndex == LEDConstants.kLEDLength / 4 + LEDConstants.kSwipeOverlap;
+        case kDoubleDown:
+          return m_LEDIndex == LEDConstants.kLEDLength / 2 + LEDConstants.kSwipeOverlap;
+        case kDoubleUp:
+          return m_LEDIndex == LEDConstants.kLEDLength / 2 + LEDConstants.kSwipeOverlap;
+        case kDown:
+          return m_LEDIndex == LEDConstants.kLEDLength + LEDConstants.kSwipeOverlap;
+        case kHighDouble:
+          return m_LEDIndex == LEDConstants.kLEDLength / 4 + LEDConstants.kSwipeOverlap;
+        case kJoin:
+          return m_LEDIndex == LEDConstants.kLEDLength / 2 + LEDConstants.kSwipeOverlap;
+        case kLowDouble:
+          return m_LEDIndex == LEDConstants.kLEDLength / 4 + LEDConstants.kSwipeOverlap;
+        case kSplit:
+          return m_LEDIndex == LEDConstants.kLEDLength / 2 + LEDConstants.kSwipeOverlap;
+        case kUp:
+          return m_LEDIndex == LEDConstants.kLEDLength + LEDConstants.kSwipeOverlap;
+        default:
+          return false;
+      }
+    }
     return m_LEDIndex == LEDConstants.kLEDLength + LEDConstants.kSwipeOverlap;
   }
 
