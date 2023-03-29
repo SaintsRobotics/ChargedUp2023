@@ -6,6 +6,7 @@ package frc.robot.subsystems;
 
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.util.Color;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.LEDConstants;
 
@@ -83,6 +84,16 @@ public class LEDSubsystem extends SubsystemBase {
    */
   public void unsetLED() {
     setLED(m_r, m_g, m_b);
+  }
+
+  /**
+   * Returns the color of the LED.
+   * 
+   * @param i Index of LED.
+   * @return Color of LED.
+   */
+  public Color getLED(int i) {
+    return m_LEDBuffer.getLED(i);
   }
 
   /** Resets the LED to the default color (yellow) */
