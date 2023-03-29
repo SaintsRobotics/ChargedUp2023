@@ -12,6 +12,7 @@ import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj.XboxController.Button;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -31,6 +32,7 @@ import frc.robot.Constants.OIConstants;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.commands.LEDBlinkCommand;
+import frc.robot.commands.LEDCountdownCommand;
 import frc.robot.commands.LEDBlinkCommand.BlinkType;
 import frc.robot.commands.LEDDefaultCommand;
 import frc.robot.commands.LEDSwipeCommand;
@@ -180,6 +182,8 @@ public class RobotContainer {
         .whileTrue(new RunCommand(() -> m_LEDSubsystem.setCube(), m_LEDSubsystem));
 
     new Trigger(m_robotDrive::isTipped).whileTrue(new LEDTipCommand(m_LEDSubsystem, m_robotDrive.getGyro()));
+    new Trigger(() -> DriverStation.getMatchTime() < 10 && DriverStation.isTeleop())
+        .whileTrue(new LEDCountdownCommand(m_LEDSubsystem));
   }
 
   /**
