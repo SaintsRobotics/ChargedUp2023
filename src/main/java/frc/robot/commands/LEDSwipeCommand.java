@@ -154,7 +154,7 @@ public class LEDSwipeCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
-    if (m_changeColor) {
+    if (m_changeColor && m_type != SwipeType.kHighDouble && m_type != SwipeType.kLowDouble) {
       m_subsystem.setLED(m_r, m_g, m_b);
     }
   }
