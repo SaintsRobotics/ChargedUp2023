@@ -26,6 +26,30 @@ import edu.wpi.first.wpilibj.DriverStation;
  * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
+  public static final class AlignConstants {
+    /** Align positions, starting from the right */
+    public static final double[] kAlignPositions = new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // TODO: put
+                                                                                                     // correct values
+
+    /** Max speed when aligning */
+    public static final double kMaxSpeedMetersPerSecond = 1;
+
+    /** How close we need to be to the align position (X) for the robot to be in a legal state */
+    public static final double kXPositionToleranceMeters = 0.1;
+
+    /** Tolerance for PID setpoint*/
+    public static final double kPIDTolerance = 0.01;
+
+    /** X position of grid align positions */
+    public static final double kXPositionGrid = 0; // TODO: put correct value
+
+    /** X position of loading align positions */
+    public static final double kXPositionLoad = 0; // TODO: put correct value
+
+    /** How long we need to be at the setpoint for the command to terminate */
+    public static final double kAtSetpointTimeSeconds = 1;
+  }
+
   public static final class ArmConstants {
     public static final int kPivotMotorPort = 36;
     public static final int kElevatorMotorPort = 34;
@@ -109,7 +133,7 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     public static final double kMaxSpeedMetersPerSecond = 3.6576;
-    public static final double kMaxAngularSpeedRadiansPerSecond = 15.24/3;
+    public static final double kMaxAngularSpeedRadiansPerSecond = 15.24 / 3;
 
     public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
     public static final double kSpeedIncreasePerPeriod = 0.15;
