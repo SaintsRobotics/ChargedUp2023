@@ -71,6 +71,19 @@ public class LEDSubsystem extends SubsystemBase {
   }
 
   /**
+   * Sets the HSV value for all LEDs.
+   * 
+   * @param i Index of LED.
+   * @param h the h value [0-180)
+   * @param s the s value [0-255]
+   * @param v the v value [0-255]
+   */
+  public void setHSV(int i, int h, int s, int v) {
+    m_LEDBuffer.setHSV(i, h, s, v);
+    m_LED.setData(m_LEDBuffer);
+  }
+
+  /**
    * Resets individual LED to previous value.
    * 
    * @param i index of LED

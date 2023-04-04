@@ -19,6 +19,8 @@ import edu.wpi.first.wpilibj2.command.CommandScheduler;
  */
 public class Robot extends TimedRobot {
   private Command m_autonomousCommand;
+  private Command m_startupCommand;
+  private Command m_idleCommand;
 
   private RobotContainer m_robotContainer;
 
@@ -29,10 +31,11 @@ public class Robot extends TimedRobot {
     m_robotContainer = new RobotContainer();
     m_buttonTimer.start();
 
-    final Command startupCommand = m_robotContainer.getStartupCommand();
+    m_startupCommand = m_robotContainer.getStartupCommand();
+    m_idleCommand = m_robotContainer.getIdleCommand();
 
-    if (startupCommand != null) {
-      startupCommand.schedule();
+    if (m_startupCommand != null) {
+      m_startupCommand.schedule();
     }
   }
 
@@ -43,6 +46,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    if (!m_startupCommand.isScheduled() && m_idleCommand != null) {
+      m_idleCommand.schedule();
+    }
   }
 
   @Override
@@ -62,6 +68,14 @@ public class Robot extends TimedRobot {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.schedule();
     }
+
+    if (m_startupCommand != null) {
+      m_startupCommand.cancel();
+    }
+
+    if (m_idleCommand != null) {
+      m_idleCommand.cancel();
+    }
   }
 
   @Override
@@ -72,6 +86,14 @@ public class Robot extends TimedRobot {
   public void teleopInit() {
     if (m_autonomousCommand != null) {
       m_autonomousCommand.cancel();
+    }
+
+    if (m_startupCommand != null) {
+      m_startupCommand.cancel();
+    }
+
+    if (m_idleCommand != null) {
+      m_idleCommand.cancel();
     }
   }
 

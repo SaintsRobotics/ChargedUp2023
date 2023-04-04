@@ -35,6 +35,7 @@ import frc.robot.commands.LEDBlinkCommand;
 import frc.robot.commands.LEDBlinkCommand.BlinkType;
 import frc.robot.commands.LEDCountdownCommand;
 import frc.robot.commands.LEDDefaultCommand;
+import frc.robot.commands.LEDRainbowCommand;
 import frc.robot.commands.LEDSwipeCommand;
 import frc.robot.commands.LEDSwipeCommand.SwipeType;
 import frc.robot.commands.LEDTipCommand;
@@ -214,6 +215,17 @@ public class RobotContainer {
   public Command getStartupCommand() {
     return new SequentialCommandGroup(
         new LEDSwipeCommand(m_LEDSubsystem, SwipeType.kUp, 0, 0, 100, true),
-        new LEDBlinkCommand(m_LEDSubsystem, BlinkType.kBlink, 0, 0, 0));
+        new LEDBlinkCommand(m_LEDSubsystem, BlinkType.kBlink, 0, 0, 0),
+        new WaitCommand(5),
+        new LEDRainbowCommand(m_LEDSubsystem));
+  }
+
+  /**
+   * Returns RGB idle command.
+   * 
+   * @return RGB idle command.
+   */
+  public Command getIdleCommand() {
+    return new LEDRainbowCommand(m_LEDSubsystem);
   }
 }
