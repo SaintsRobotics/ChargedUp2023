@@ -1,21 +1,21 @@
 package frc.robot;
 
 import java.util.HashMap;
-
 import com.pathplanner.lib.PathPlannerTrajectory;
 import com.pathplanner.lib.auto.BaseAutoBuilder;
 
+import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.trajectory.Trajectory.State;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
-import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
-import edu.wpi.first.wpilibj2.command.RunCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.Constants.ArmConstants;
-
+import frc.robot.Constants.AutonConstants;
 import frc.robot.commands.ArmCommand;
 import frc.robot.commands.BalanceCommand;
 import frc.robot.subsystems.ArmSubsystem;
@@ -28,40 +28,38 @@ public class AutoBuilder extends BaseAutoBuilder {
 	private final GrabberSubsystem m_grabberSubsystem;
 
 	public class ScheduleDrive extends CommandBase {
-		public final double m_vX;
-		public final double m_vY;
-		public final double m_vTheta;
-		public boolean m_isFinished = false;
+		private final Timer m_timer = new Timer();
+		private final Runnable m_drive;
+		private final Runnable m_stop;
+		private final double m_time;
 
 		public ScheduleDrive(DriveSubsystem subsystem, double deltaX, double deltaY, double deltaTheta, double time) {
-			m_vX = deltaX / time;
-			m_vY = deltaY / time;
-			m_vTheta = deltaTheta / time;
-
-			andThen(new ParallelDeadlineGroup(new WaitCommand(time),
-					new RunCommand(() -> m_driveSubsystem.drive(m_vX, m_vY, m_vTheta, true), m_driveSubsystem)));
-
-			m_isFinished = true;
+			m_time = time;
+			m_drive = () -> subsystem.drive(Math.min(deltaX / time, AutonConstants.maxVelocity),
+					Math.min(deltaY / time, AutonConstants.maxVelocity), deltaTheta / time, true);
+			m_stop = () -> subsystem.drive(0, 0, 0, false);
 		}
 
 		@Override
 		public void initialize() {
-			super.initialize();
+			m_drive.run();
+			m_timer.restart();
 		}
 
 		@Override
 		public void execute() {
-			super.execute();
+			if (m_timer.hasElapsed(m_time))
+				m_stop.run();
 		}
 
 		@Override
 		public void end(boolean interrupted) {
-			super.end(interrupted);
+			m_stop.run();
 		}
 
 		@Override
 		public boolean isFinished() {
-			return m_isFinished;
+			return m_timer.hasElapsed(m_time);
 		}
 	}
 
@@ -94,24 +92,66 @@ public class AutoBuilder extends BaseAutoBuilder {
 	}
 
 	public CommandBase followPath(PathPlannerTrajectory trajectory) {
-		SequentialCommandGroup driveCommand = new SequentialCommandGroup();
-		Pose2d previousPose = trajectory.getInitialPose();
-		double deltaX = 0;
-		double deltaY = 0;
-		double deltaTheta = 0;
+		PathPlannerTrajectory allianceTrajectory = PathPlannerTrajectory.transformTrajectoryForAlliance(trajectory, DriverStation.getAlliance());
 
-		for (State state : trajectory.getStates()) {
-			deltaX = state.poseMeters.getX() - previousPose.getX();
-			deltaY = state.poseMeters.getY() - previousPose.getY();
-			deltaTheta = state.poseMeters.getRotation().getRadians()
-					- previousPose.getRotation().getRadians();
+		return new CommandBase() {
+			private final Timer m_timer = new Timer();
+			private final PIDController m_xPID = new PIDController(1, 0, 0);
+			private final PIDController m_yPID = new PIDController(1, 0, 0);
+			private final PIDController m_thetaPID = new PIDController(Math.PI/6, 0, 0);
+			private double m_vX0;
+			private double m_vY0;
+			private double m_vTheta0;
 
-			driveCommand
-					.addCommands(new ScheduleDrive(m_driveSubsystem, deltaX, deltaY, deltaTheta, state.timeSeconds));
+			@Override
+			public void initialize() {
+				m_xPID.reset();
+				m_yPID.reset();
+				m_thetaPID.reset();
+				m_xPID.setTolerance(0);
+				m_yPID.setTolerance(0);
+				m_thetaPID.setTolerance(0);
+				m_vX0 = 0;
+				m_vY0 = 0;
+				m_vTheta0 = 0;
+				m_timer.restart();
+			}
 
-			previousPose = state.poseMeters;
-		}
+			@Override
+			public void execute() {
+				Pose2d actual = m_driveSubsystem.getPose();
+				Pose2d target = allianceTrajectory.sample(m_timer.get()).poseMeters;
 
-		return driveCommand;
+				double vX = MathUtil.clamp(m_xPID.calculate(actual.getX(), target.getX()), -AutonConstants.maxVelocity, AutonConstants.maxVelocity);
+				double vY = MathUtil.clamp(m_xPID.calculate(actual.getY(), target.getY()), -AutonConstants.maxVelocity, AutonConstants.maxVelocity);
+				double vTheta = MathUtil.clamp(m_xPID.calculate(actual.getRotation().getRadians(), target.getRotation().getRadians()), -AutonConstants.maxAngularVelocity, AutonConstants.maxAngularVelocity);
+				
+				if (Math.abs(vX - m_vX0) > AutonConstants.maxAcceleration) {
+					vX = m_vX0 + AutonConstants.maxAcceleration * (vX > m_vX0 ? -1 : 1);
+				}
+				else if (Math.abs(vY - m_vY0) > AutonConstants.maxAcceleration) {
+					vY = m_vY0 + AutonConstants.maxAcceleration * (vY > m_vY0 ? -1 : 1);
+				}
+				else if (Math.abs(vTheta - m_vTheta0) > AutonConstants.maxAngularAcceleration) {
+					vTheta = m_vTheta0 + AutonConstants.maxAngularAcceleration * (vTheta > m_vTheta0 ? -1 : 1);
+				}
+
+				m_vX0 = vX;
+				m_vY0 = vY;
+				m_vTheta0 = vTheta;
+
+				m_driveSubsystem.drive(vX, vY, vTheta, true);
+			}
+
+			@Override
+			public void end(boolean interrupted) {
+				m_driveSubsystem.drive(0, 0, 0, false);
+			}
+
+			@Override
+			public boolean isFinished() {
+				return m_timer.hasElapsed(allianceTrajectory.getTotalTimeSeconds());
+			}
+		};
 	}
 }
