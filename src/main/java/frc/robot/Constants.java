@@ -26,25 +26,42 @@ import edu.wpi.first.wpilibj.DriverStation;
  * wherever the constants are needed, to reduce verbosity.
  */
 public final class Constants {
+
+  /**
+   * Constants related to auto align
+   */
   public static final class AlignConstants {
     /** Align positions, starting from the right */
-    public static final double[] kAlignPositions = new double[] { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 }; // TODO: put
-                                                                                                     // correct values
+    public static final double[] kAlignPositions = new double[] {
+        0.369358333,
+        0.80856667,
+        1.412875,
+        1.6002 + 0.369358333,
+        1.6002 + 0.80856667,
+        1.6002 + 1.412875,
+        3.5814 + 0.369358333,
+        3.5814 + 0.80856667,
+        3.5814 + 1.412875,
+        5.334 + 0.2,
+        5.334 + 0.6 }; // TODO: tune align positions
 
     /** Max speed when aligning */
     public static final double kMaxSpeedMetersPerSecond = 1;
 
-    /** How close we need to be to the align position (X) for the robot to be in a legal state */
+    /**
+     * How close we need to be to the align position (X) for the robot to be in a
+     * legal state
+     */
     public static final double kXPositionToleranceMeters = 0.1;
 
-    /** Tolerance for PID setpoint*/
+    /** Tolerance for PID setpoint */
     public static final double kPIDTolerance = 0.01;
 
     /** X position of grid align positions */
-    public static final double kXPositionGrid = 0; // TODO: put correct value
+    public static final double kXPositionGrid = 1.42875; // TODO: tune grid position
 
     /** X position of loading align positions */
-    public static final double kXPositionLoad = 0; // TODO: put correct value
+    public static final double kXPositionLoad = 0.3556; // TODO: tune load position
 
     /** How long we need to be at the setpoint for the command to terminate */
     public static final double kAtSetpointTimeSeconds = 1;

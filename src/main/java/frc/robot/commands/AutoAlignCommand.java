@@ -103,16 +103,24 @@ public class AutoAlignCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
+
+    // Don't do anything if we are finished
     if (m_isFinished) {
       return;
     }
 
+    // Check if we are aligned
     if (m_PID.atSetpoint()) {
+
+      // Stop driving
       m_subsystem.drive(0, 0, 0, true);
 
+      // Check if we just got aligned
       if (!m_wasAtSetpoint) {
         m_wasAtSetpoint = true;
         m_atSetpointTimer.restart();
+
+      // Make sure we remain aligned for a certain amount of time before finishing the command
       } else if (m_atSetpointTimer.hasElapsed(AlignConstants.kAtSetpointTimeSeconds)) {
         m_isFinished = true;
       }
@@ -120,6 +128,7 @@ public class AutoAlignCommand extends CommandBase {
 
     m_wasAtSetpoint = false;
 
+    // Drive the robot to align
     m_subsystem.drive(0, MathUtil.clamp(m_PID.calculate(m_subsystem.getPose().getY()),
         -AlignConstants.kMaxSpeedMetersPerSecond, AlignConstants.kMaxSpeedMetersPerSecond), 0, true);
   }
