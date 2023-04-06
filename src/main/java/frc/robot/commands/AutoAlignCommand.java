@@ -13,6 +13,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.AlignConstants;
 import frc.robot.subsystems.DriveSubsystem;
 
+/**
+ * Aligns to the specified robot position
+ */
 public class AutoAlignCommand extends CommandBase {
 
   /**
@@ -32,7 +35,7 @@ public class AutoAlignCommand extends CommandBase {
   private boolean m_isFinished;
 
   /** PID for robot Y speed */
-  private final PIDController m_PID = new PIDController(0, 0, 0); // TODO: tune this
+  private final PIDController m_PID = new PIDController(0.75, 0, 0); // TODO: tune this
 
   /**
    * Keeps track of how long we are at the setpoint to check if the command should
