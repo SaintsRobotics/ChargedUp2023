@@ -28,18 +28,18 @@ public class AutoBuilder extends BaseAutoBuilder {
 	private final GrabberSubsystem m_grabberSubsystem;
 
 	public class ScheduleDrive extends CommandBase {
-		public final double vX;
-		public final double vY;
-		public final double vTheta;
+		public final double m_vX;
+		public final double m_vY;
+		public final double m_vTheta;
 		public boolean m_isFinished = false;
 
 		public ScheduleDrive(DriveSubsystem subsystem, double deltaX, double deltaY, double deltaTheta, double time) {
-			vX = deltaX / time;
-			vY = deltaY / time;
-			vTheta = deltaTheta / time;
+			m_vX = deltaX / time;
+			m_vY = deltaY / time;
+			m_vTheta = deltaTheta / time;
 
 			andThen(new ParallelDeadlineGroup(new WaitCommand(time),
-					new RunCommand(() -> m_driveSubsystem.drive(vX, vY, vTheta, true), m_driveSubsystem)));
+					new RunCommand(() -> m_driveSubsystem.drive(m_vX, m_vY, m_vTheta, true), m_driveSubsystem)));
 
 			m_isFinished = true;
 		}
@@ -70,7 +70,7 @@ public class AutoBuilder extends BaseAutoBuilder {
 		super(driveSubsystem::getPose, driveSubsystem::resetOdometry, new HashMap<String, Command>(),
 				DrivetrainType.HOLONOMIC,
 				true);
-				
+
 		m_driveSubsystem = driveSubsystem;
 		m_armSubsystem = armSubsystem;
 		m_grabberSubsystem = grabberSubsystem;
