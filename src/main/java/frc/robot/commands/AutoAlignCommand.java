@@ -6,7 +6,9 @@ package frc.robot.commands;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.AlignConstants;
 import frc.robot.subsystems.DriveSubsystem;
@@ -46,7 +48,22 @@ public class AutoAlignCommand extends CommandBase {
     m_subsystem = subsystem;
     addRequirements(m_subsystem);
 
-    m_direction = direction;
+    // Check if we need to invert direction because of alliance side
+    if (DriverStation.getAlliance() == Alliance.Red) {
+      switch (direction) {
+        case kLeft:
+          m_direction = Direction.kRight;
+          break;
+        case kRight:
+          m_direction = Direction.kLeft;
+          break;
+        default:
+          m_direction = Direction.kCenter;
+      }
+    }
+    else {
+      m_direction = direction;
+    }
 
     m_PID.setTolerance(AlignConstants.kPIDTolerance);
   }

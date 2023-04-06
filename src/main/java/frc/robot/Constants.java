@@ -31,19 +31,23 @@ public final class Constants {
    * Constants related to auto align
    */
   public static final class AlignConstants {
-    /** Align positions, starting from the right */
+
+    /**
+     * Align positions, starting from the right on blue side
+     */
     public static final double[] kAlignPositions = new double[] {
-        0.369358333,
-        0.80856667,
-        1.412875,
-        1.6002 + 0.369358333,
-        1.6002 + 0.80856667,
-        1.6002 + 1.412875,
-        3.5814 + 0.369358333,
-        3.5814 + 0.80856667,
-        3.5814 + 1.412875,
-        5.334 + 0.2,
-        5.334 + 0.6 }; // TODO: tune align positions
+        0.369358333, // Cone, DS 1
+        0.80856667, // Cube, DS 1
+        1.412875, // Cone, DS 1
+        1.9695583330000002, // Cone, DS 2
+        2.4087666700000003, // Cube, DS 2
+        3.013075, // Cone, DS 2
+        3.950758333, // Cone, DS 3
+        4.38996667, // Cube, DS 3
+        4.994275, // Cone, DS 3
+        5.534, // HP right most driver side
+        5.934 // HP left most driver side
+    }; // TODO: tune align positions
 
     /** Max speed when aligning */
     public static final double kMaxSpeedMetersPerSecond = 1;
