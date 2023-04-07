@@ -4,6 +4,7 @@ import org.photonvision.PhotonCamera;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.DoubleSolenoid.Value;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
@@ -34,7 +35,7 @@ public class ShuffleboardWrapper {
 
   private class GrabberSubsystemExtractor extends GrabberSubsystem {
     public double getPSI() { return pHub.getPressure(0); }
-    public boolean isOpen() { return false; } //TODO: implement this
+    public boolean isOpen() { return solenoid0.get() == Value.kReverse; }
   }
 
   private static ArmSubsystemExtractor arm;
