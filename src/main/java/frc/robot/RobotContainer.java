@@ -147,7 +147,7 @@ public class RobotContainer {
                         new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
                         new WaitCommand(0.5)));
 
-        m_eventMap.put("Balance", new BalanceCommand(m_robotDrive, m_LEDSubsystem));
+        m_eventMap.put("Balance", new BalanceCommand(m_robotDrive, m_LEDSubsystem, () -> m_lockLED));
     }
 
     /**
@@ -164,7 +164,7 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
 
         new JoystickButton(m_driverController, Button.kY.value)
-                .whileTrue(new BalanceCommand(m_robotDrive, m_LEDSubsystem));
+                .whileTrue(new BalanceCommand(m_robotDrive, m_LEDSubsystem, () -> m_lockLED));
         new JoystickButton(m_driverController, Button.kA.value)
                 .onTrue(new SnapRotateCommand(m_robotDrive));
 

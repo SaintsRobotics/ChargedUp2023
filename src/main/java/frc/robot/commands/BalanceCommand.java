@@ -4,6 +4,8 @@
 
 package frc.robot.commands;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -21,6 +23,7 @@ public class BalanceCommand extends CommandBase {
 
   private boolean m_isRed;
   private int m_fade;
+  private final BooleanSupplier m_lockLED;
 
   /**
    * Creates a new {@link BalanceCommand}.
@@ -28,11 +31,12 @@ public class BalanceCommand extends CommandBase {
    * @param driveSubsystem The required drive subsystem.
    * @param LEDSubsystem   The required LED subsystem.
    */
-  public BalanceCommand(DriveSubsystem driveSubsystem, LEDSubsystem LEDSubsystem) {
+  public BalanceCommand(DriveSubsystem driveSubsystem, LEDSubsystem LEDSubsystem, BooleanSupplier lockLED) {
     m_driveSubsystem = driveSubsystem;
     m_LEDSubsystem = LEDSubsystem;
     addRequirements(m_driveSubsystem, m_LEDSubsystem);
 
+    m_lockLED = lockLED;
     m_PID.setTolerance(DriveConstants.kToleranceBalance);
   }
 
@@ -52,11 +56,11 @@ public class BalanceCommand extends CommandBase {
         0,
         false);
 
-    if (m_PID.atSetpoint()) {
+    if (m_PID.atSetpoint() && !m_lockLED.getAsBoolean()) {
       m_LEDSubsystem.setLED(0, m_fade, 0, false);
       m_fade = m_fade <= 0 ? 100 : m_fade - 2;
       m_isRed = false;
-    } else if (m_timer.hasElapsed(0.3)) {
+    } else if (m_timer.hasElapsed(0.3) && !m_lockLED.getAsBoolean()) {
       m_fade = 100;
       m_LEDSubsystem.setLED(m_isRed ? 0 : 100, 0, 0, false);
       m_isRed = !m_isRed;
