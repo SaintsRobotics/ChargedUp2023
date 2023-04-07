@@ -62,6 +62,8 @@ public class RobotContainer {
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
   private final SendableChooser<String> m_chooser = new SendableChooser<>();
 
+  private boolean m_lockLED = false;
+
   private final HashMap<String, Command> m_eventMap = new HashMap<>();
   private final SwerveAutoBuilder m_autoBuilder = new SwerveAutoBuilder(
       m_robotDrive::getPose,
@@ -180,10 +182,10 @@ public class RobotContainer {
 
     new JoystickButton(m_operatorController, Button.kLeftBumper.value)
         .whileTrue(new RunCommand(() -> m_LEDSubsystem.setCone(), m_LEDSubsystem))
-.onFalse(new ParallelDeadlineGroup(new WaitCommand(10), new RunCommand(() -> {return;}, m_LEDSubsystem)));
+.onFalse(new SequentialCommandGroup(new InstantCommand(() -> {m_lockLED = true}, m_LEDSubsystem), WaitCommand(10), new InstantCommand(() -> {m_lockLED = false}, m_LEDSubsystem)));
     new JoystickButton(m_operatorController, Button.kRightBumper.value)
         .whileTrue(new RunCommand(() -> m_LEDSubsystem.setCube(), m_LEDSubsystem))
-.onFalse(new ParallelDeadlineGroup(new WaitCommand(10), new RunCommand(() -> {return;}, m_LEDSubsystem)));
+.onFalse(new SequentialCommandGroup(new InstantCommand(() -> {m_lockLED = true}, m_LEDSubsystem), WaitCommand(10), new InstantCommand(() -> {m_lockLED = false}, m_LEDSubsystem))):
 
     new Trigger(m_robotDrive::isTipped).whileTrue(new LEDTipCommand(m_LEDSubsystem, m_robotDrive.getGyro()));
     new Trigger(() -> DriverStation.getMatchTime() < 10 && DriverStation.isTeleop())
