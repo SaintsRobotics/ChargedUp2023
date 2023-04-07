@@ -13,6 +13,7 @@ import frc.robot.Constants.LEDConstants;
 public class LEDSubsystem extends SubsystemBase {
   private final AddressableLED m_LED = new AddressableLED(LEDConstants.kLEDPort);
   private final AddressableLEDBuffer m_LEDBuffer = new AddressableLEDBuffer(LEDConstants.kLEDLength);
+  private boolean m_criticalLED = false;
 
   /** Creates a new {@link LEDSubsystem}. */ 
   public LEDSubsystem() {
@@ -34,10 +35,21 @@ public class LEDSubsystem extends SubsystemBase {
    * @param b Blue 0-255
    */
   public void setLED(int r, int g, int b) {
+    if (m_criticalLED) return;
+
     for (var i = 0; i < LEDConstants.kLEDLength; i++) {
       m_LEDBuffer.setRGB(i, r, g, b);
     }
     m_LED.setData(m_LEDBuffer);
     SmartDashboard.putString("led", m_LEDBuffer.getLED(1).toString());
+  }
+
+  public void releaseCritical() {
+    m_criticalLED = false;
+  }
+
+  public void setCritical(int r, int g, int b) {
+    setLED(r, g, b);
+    m_criticalLED = true;
   }
 }

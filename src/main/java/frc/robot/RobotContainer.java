@@ -195,4 +195,9 @@ public class RobotContainer {
   public void setPivotMode(IdleMode mode) {
     m_armSubsystem.setPivotMode(mode);
   }
+
+  public void setLEDCriticalRed(boolean disable) {
+    if (disable) m_LEDSubsystem.releaseCritical();
+    else m_LEDSubsystem.setCritical(100, 0, 0);
+  }
 }
