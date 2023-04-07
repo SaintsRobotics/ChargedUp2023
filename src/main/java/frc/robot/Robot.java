@@ -44,7 +44,7 @@ public class Robot extends TimedRobot {
     // If User button on the RoboRIO is pressed while robot is disabled, then do not
     // start the compressor
     if (RobotController.getUserButton() && m_buttonTimer.get() > 1) {
-      m_robotContainer.grabberSubsystem.toggleCompressor();
+      m_robotContainer.togglePivotMode();
       m_buttonTimer.reset();
     }
   }

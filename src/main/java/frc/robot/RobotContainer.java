@@ -190,4 +190,8 @@ public class RobotContainer {
                 AutonConstants.maxVelocity - (path.equals("Charger-comms") ? 0.75 : 0),
                 AutonConstants.maxAcceleration)));
   }
+
+  public void togglePivotMode() {
+    m_armSubsystem.togglePivotMode();
+  }
 }
