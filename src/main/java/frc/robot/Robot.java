@@ -41,8 +41,7 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledPeriodic() {
-    // If User button on the RoboRIO is pressed while robot is disabled, then do not
-    // start the compressor
+    // If User button on the RoboRIO is pressed while robot is disabled, toggle motor idle mode
     if (RobotController.getUserButton() && m_buttonTimer.get() > 1) {
       m_robotContainer.togglePivotMode();
       m_buttonTimer.reset();
