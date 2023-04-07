@@ -137,8 +137,7 @@ public class ArmSubsystem extends SubsystemBase {
     return m_elevatorMotor.getEncoder().getPosition();
   }
 
-  public void togglePivotMode() {
-    if (m_pivotMotor.getIdleMode() == IdleMode.kBrake) m_pivotMotor.setIdleMode(IdleMode.kCoast);
-    else m_pivotMotor.setIdleMode(IdleMode.kBrake);
+  public void setPivotMode(IdleMode mode) {
+    m_pivotMotor.setIdleMode(mode);
   }
 }

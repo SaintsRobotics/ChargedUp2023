@@ -4,6 +4,8 @@
 
 package frc.robot;
 
+import com.revrobotics.CANSparkMax.IdleMode;
+
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -24,10 +26,12 @@ public class Robot extends TimedRobot {
 
   private Timer m_buttonTimer = new Timer();
 
+  private boolean m_wasClicked = false, m_clickAction = false;
+
   @Override
   public void robotInit() {
     m_robotContainer = new RobotContainer();
-    m_buttonTimer.start();
+    m_buttonTimer.restart();
   }
 
   @Override
@@ -37,14 +41,32 @@ public class Robot extends TimedRobot {
 
   @Override
   public void disabledInit() {
+    m_clickAction = m_wasClicked = false;
   }
 
   @Override
   public void disabledPeriodic() {
-    // If User button on the RoboRIO is pressed while robot is disabled, toggle motor idle mode
-    if (RobotController.getUserButton() && m_buttonTimer.get() > 1) {
-      m_robotContainer.togglePivotMode();
-      m_buttonTimer.reset();
+    // Quickly press and release user button to toggle compressor
+    // Press and hold for 5 seconds to set pivot to coastm mode
+    //  Release to set pivot to break mode
+
+    // Check if button is currently pressed
+    if (RobotController.getUserButton()) {
+      if (!m_wasClicked) { //Check if button was not already clicked
+        m_wasClicked = m_clickAction = true; // Store that button was clicked and allow button action
+        m_buttonTimer.restart(); //Start the timer
+      }
+      else if (m_clickAction && m_buttonTimer.get() > 5) { // Check if enough time has passed and there is a click action
+        m_clickAction = false; // Remove click action
+        m_robotContainer.setPivotMode(IdleMode.kCoast); // Set pivot mode to coast
+      }
+    }
+
+    // Check if button is not clicked
+    else {
+      if (m_clickAction) m_robotContainer.grabberSubsystem.toggleCompressor(); // Only toggle compressor if there is still a click action
+      else m_robotContainer.setPivotMode(IdleMode.kBrake); // If click action was used, pivot is in coast mode, so set it back to break mode
+      m_wasClicked = m_clickAction = false; // Remove click action and store that button was not clicked
     }
   }
 

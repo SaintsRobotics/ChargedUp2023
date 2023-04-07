@@ -10,6 +10,7 @@ import com.pathplanner.lib.PathConstraints;
 import com.pathplanner.lib.PathPlanner;
 import com.pathplanner.lib.auto.PIDConstants;
 import com.pathplanner.lib.auto.SwerveAutoBuilder;
+import com.revrobotics.CANSparkMax.IdleMode;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.XboxController;
@@ -191,7 +192,7 @@ public class RobotContainer {
                 AutonConstants.maxAcceleration)));
   }
 
-  public void togglePivotMode() {
-    m_armSubsystem.togglePivotMode();
+  public void setPivotMode(IdleMode mode) {
+    m_armSubsystem.setPivotMode(mode);
   }
 }
