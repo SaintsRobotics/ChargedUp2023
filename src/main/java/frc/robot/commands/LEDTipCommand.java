@@ -11,6 +11,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.subsystems.LEDSubsystem;
 
+/**
+ * Command for making the LEDs flash red when the robot is tipping
+ */
 public class LEDTipCommand extends CommandBase {
   private final LEDSubsystem m_subsystem;
   private final AHRS m_gyro;

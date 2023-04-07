@@ -11,27 +11,48 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.subsystems.LEDSubsystem;
 
+/**
+ * Command for making the LEDs blink
+ */
 public class LEDBlinkCommand extends CommandBase {
+  /**
+   * Blink type
+   */
   public enum BlinkType {
+    /** Flashing blink */
     kBlink,
+    /** Alternate blink */
     kAlternate;
 
+    /** Random for generating random integers */
     private static final Random random = new Random();
 
+    /** 
+     * Generates a random BlinkType
+     * @return The random BlinkType
+     */
     public static BlinkType random() {
       BlinkType[] type = values();
       return type[random.nextInt(type.length)];
     }
   }
 
+  /** LED subsystem */
   private final LEDSubsystem m_subsystem;
+
+  /** Timer for controlling blink intervals */
   private final Timer m_timer = new Timer();
 
+  /** Selected blink type */
   private BlinkType m_type;
+
+  /** RGB values for blink color */
   private int m_r, m_g, m_b;
 
+  /** Counter for number of iterations of blink */
   private int m_counter;
 
+  /** Use random colors? */
   private final boolean m_random;
 
   /**
@@ -70,6 +91,7 @@ public class LEDBlinkCommand extends CommandBase {
 
   @Override
   public void initialize() {
+    // Generate random color
     if (m_random) {
       m_type = BlinkType.random();
 
@@ -85,11 +107,13 @@ public class LEDBlinkCommand extends CommandBase {
 
   @Override
   public void execute() {
+    // Keep track of current blink iteration
     if (m_timer.hasElapsed(LEDConstants.kBlinkTime)) {
       m_counter++;
       m_timer.restart();
     }
 
+    // Use m_counter to determine the next blink state (on or off)
     boolean even = m_counter % 2 == 0;
     switch (m_type) {
       case kBlink:
@@ -116,16 +140,19 @@ public class LEDBlinkCommand extends CommandBase {
 
   @Override
   public void end(boolean interrupted) {
+    // Restore LEDs to previous state
     m_subsystem.unsetLED();
   }
 
   @Override
   public boolean isFinished() {
+    // Finished when we have cycled blink states enough times
     return m_counter >= LEDConstants.kBlinkAmount * 2;
   }
 
   @Override
   public boolean runsWhenDisabled() {
+    // Allows command to run when disabled
     return true;
   }
 }

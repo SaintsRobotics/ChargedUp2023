@@ -9,6 +9,9 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.subsystems.LEDSubsystem;
 
+/**
+ * Command for making the LEDs to rainbow like effects
+ */
 public class LEDRainbowCommand extends CommandBase {
   private final LEDSubsystem m_subsystem;
   private final Timer m_timer = new Timer();

@@ -11,17 +11,42 @@ import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.LEDConstants;
 import frc.robot.subsystems.LEDSubsystem;
 
+/**
+ * Command for making LEDs swipe
+ */
 public class LEDSwipeCommand extends CommandBase {
+  /**
+   * How the LEDs should swipe
+   */
   public enum SwipeType {
+    /** Bottom to top */
     kUp,
+
+    /** Top to bottom */
     kDown,
+
+    /** kUp and kDown at the same time */
     kDouble,
+
+    /** Start from the center and split around */
     kSplit,
+
+    /** kSplit backwards */
     kJoin,
+
+    /** Two kUps starting at different positions at the same time */
     kDoubleUp,
+
+    /** Two kDowns starting at different positions at the same time */
     kDoubleDown,
+
+    /** kDoubleDown on the low end of the LED strip */
     kLowDouble,
+
+    /** kDoubleUp on the high end of the LED strip */
     kHighDouble,
+
+    /** kLowDouble and kHighDouble at the same time */
     kDoubleDouble;
 
     private static final Random random = new Random();

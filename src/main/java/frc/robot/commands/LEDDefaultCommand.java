@@ -12,6 +12,9 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.subsystems.LEDSubsystem;
 
+/** 
+ * Command for creating random LED effects
+ */
 public class LEDDefaultCommand extends CommandBase {
   private final LEDSubsystem m_subsystem;
   private final ArrayList<Command> m_commands = new ArrayList<Command>();
@@ -22,6 +25,7 @@ public class LEDDefaultCommand extends CommandBase {
    * Creates a new {@link LEDDefaultCommand}.
    * 
    * @param subsystem The required subsystem.
+   * @param lockLED Supplier to boolean which determines if we can set the LED. True if LEDs cannot be changed
    */
   public LEDDefaultCommand(LEDSubsystem subsystem, BooleanSupplier lockLED) {
     m_subsystem = subsystem;
