@@ -29,42 +29,6 @@ public class AutoBuilder extends BaseAutoBuilder {
 	private final ArmSubsystem m_armSubsystem;
 	private final GrabberSubsystem m_grabberSubsystem;
 
-	public class ScheduleDrive extends CommandBase {
-		private final Timer m_timer = new Timer();
-		private final Runnable m_drive;
-		private final Runnable m_stop;
-		private final double m_time;
-
-		public ScheduleDrive(DriveSubsystem subsystem, double deltaX, double deltaY, double deltaTheta, double time) {
-			m_time = time;
-			m_drive = () -> subsystem.drive(Math.min(deltaX / time, AutonConstants.maxVelocity),
-					Math.min(deltaY / time, AutonConstants.maxVelocity), deltaTheta / time, true);
-			m_stop = () -> subsystem.drive(0, 0, 0, false);
-		}
-
-		@Override
-		public void initialize() {
-			m_drive.run();
-			m_timer.restart();
-		}
-
-		@Override
-		public void execute() {
-			if (m_timer.hasElapsed(m_time))
-				m_stop.run();
-		}
-
-		@Override
-		public void end(boolean interrupted) {
-			m_stop.run();
-		}
-
-		@Override
-		public boolean isFinished() {
-			return m_timer.hasElapsed(m_time);
-		}
-	}
-
 	public AutoBuilder(DriveSubsystem driveSubsystem, ArmSubsystem armSubsystem,
 			GrabberSubsystem grabberSubsystem) {
 		super(driveSubsystem::getPose, driveSubsystem::resetOdometry, new HashMap<String, Command>(),
@@ -98,12 +62,9 @@ public class AutoBuilder extends BaseAutoBuilder {
 
 		return new CommandBase() {
 			private final Timer m_timer = new Timer();
-			private final PIDController m_xPID = new PIDController(1, 0, 0);
-			private final PIDController m_yPID = new PIDController(1, 0, 0);
+			private final PIDController m_xPID = new PIDController(-1, 0, 0);
+			private final PIDController m_yPID = new PIDController(-1, 0, 0);
 			private final PIDController m_thetaPID = new PIDController(Math.PI, 0, 0);
-			private double m_vX0;
-			private double m_vY0;
-			private double m_vTheta0;
 
 			@Override
 			public void initialize() {
@@ -114,9 +75,6 @@ public class AutoBuilder extends BaseAutoBuilder {
 				m_yPID.setTolerance(0.2);
 				m_thetaPID.setTolerance(Math.PI/48);
 				m_thetaPID.enableContinuousInput(-Math.PI, Math.PI);
-				m_vX0 = 0;
-				m_vY0 = 0;
-				m_vTheta0 = 0;
 				m_timer.restart();
 			}
 
@@ -129,44 +87,28 @@ public class AutoBuilder extends BaseAutoBuilder {
 				Pose2d target = current.poseMeters;
 				
 				double xDynamic = m_xPID.calculate(actual.getX(), target.getX());
-				double xStatic = current.velocityMetersPerSecond * target.getRotation().getCos();
-				double vX = -xDynamic - xStatic;
+				double xStatic = current.velocityMetersPerSecond * -target.getRotation().getCos();
+				double vX = xDynamic + xStatic;
 
 				double yDynamic = m_yPID.calculate(actual.getY(), target.getY());
 				double yStatic = current.velocityMetersPerSecond * target.getRotation().getSin();
 				double vY = yStatic + yDynamic;
 
-				double thetaDynamic = m_thetaPID.calculate(actual.getRotation().getRadians(), current.holonomicRotation.getRadians());
-				double thetaStatic = current.holonomicAngularVelocityRadPerSec;
-				double vTheta = -thetaDynamic - thetaStatic;
-
-
-				if (Math.abs(vX - m_vX0) > AutonConstants.maxAcceleration) {
-					vX = m_vX0 + AutonConstants.maxAcceleration * (vX > m_vX0 ? 1 : -1);
-				}
-				else if (Math.abs(vY - m_vY0) > AutonConstants.maxAcceleration) {
-					vY = m_vY0 + AutonConstants.maxAcceleration * (vY > m_vY0 ? 1 : -1);
-				}
-				else if (Math.abs(vTheta - m_vTheta0) > AutonConstants.maxAngularAcceleration) {
-					vTheta = m_vTheta0 + AutonConstants.maxAngularAcceleration * (vTheta > m_vTheta0 ? 1 : -1);
-				}
+				double thetaDynamic = m_thetaPID.calculate(actual.getRotation().getRadians(), -current.holonomicRotation.getRadians());
+				double thetaStatic = -current.holonomicAngularVelocityRadPerSec;
+				double vTheta = thetaDynamic + thetaStatic;
 
 				MathUtil.clamp(vX, -AutonConstants.maxVelocity, AutonConstants.maxVelocity);
 				MathUtil.clamp(vY, -AutonConstants.maxVelocity, AutonConstants.maxVelocity);
 				MathUtil.clamp(vTheta, -AutonConstants.maxAngularVelocity, AutonConstants.maxAngularVelocity);
 
-				m_vX0 = vX;
-				m_vY0 = vY;
-				m_vTheta0 = vTheta;
-
-				SmartDashboard.putNumber("vX", vX);
-				SmartDashboard.putNumber("vY", vY);
-				SmartDashboard.putNumber("vTheta", vTheta);
-
-				SmartDashboard.putNumber("errX", m_xPID.getPositionError());
-				SmartDashboard.putNumber("errY", m_yPID.getPositionError());
-				SmartDashboard.putNumber("errTheta", m_thetaPID.getPositionError());
-
+				SmartDashboard.putNumber("xDynamic", xDynamic);
+				SmartDashboard.putNumber("yDynamic", yDynamic);
+				SmartDashboard.putNumber("thetaDynamic", thetaDynamic);
+				SmartDashboard.putNumber("xStatic", xStatic);
+				SmartDashboard.putNumber("yStatic", yStatic);
+				SmartDashboard.putNumber("thetaStatic", thetaStatic);
+				
 				m_driveSubsystem.drive(vX, vY, vTheta, true);
 			}
 
