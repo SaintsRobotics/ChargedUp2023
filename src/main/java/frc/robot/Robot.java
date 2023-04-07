@@ -66,7 +66,7 @@ public class Robot extends TimedRobot {
     // Check if button is not clicked
     else {
       if (m_clickAction) m_robotContainer.grabberSubsystem.toggleCompressor(); // Only toggle compressor if there is still a click action
-      else {
+      else if (m_wasClicked) {
         m_robotContainer.setPivotMode(IdleMode.kBrake); // If click action was used, pivot is in coast mode, so set it back to break mode
         m_robotContainer.setLEDCriticalRed(true);
       }

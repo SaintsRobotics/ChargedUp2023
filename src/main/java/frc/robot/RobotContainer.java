@@ -197,7 +197,10 @@ public class RobotContainer {
   }
 
   public void setLEDCriticalRed(boolean disable) {
-    if (disable) m_LEDSubsystem.releaseCritical();
+    if (disable) {
+        m_LEDSubsystem.releaseCritical();
+        m_LEDSubsystem.setLED(0, 100, 0);
+    }
     else m_LEDSubsystem.setCritical(100, 0, 0);
   }
 }
