@@ -39,7 +39,7 @@ public class LEDDefaultCommand extends CommandBase {
     }
 
     else {
-      m_commands = new CommandBase() {
+      m_command = new CommandBase() {
         @Override
         public boolean isFinished() {
           return true;
