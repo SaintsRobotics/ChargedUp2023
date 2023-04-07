@@ -138,7 +138,7 @@ public final class Constants {
 
     public static final int kCompressorModuleID = 1;
 
-    public static final int kCompressorMinimumPressure = 85;
+    public static final int kCompressorMinimumPressure = 100;
     public static final int kCompressorMaximumPressure = 110;
   }
 
