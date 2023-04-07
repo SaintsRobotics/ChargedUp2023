@@ -2,6 +2,7 @@ package frc.robot;
 
 import java.util.HashMap;
 import com.pathplanner.lib.PathPlannerTrajectory;
+import com.pathplanner.lib.PathPlannerTrajectory.PathPlannerState;
 import com.pathplanner.lib.auto.BaseAutoBuilder;
 
 import edu.wpi.first.math.MathUtil;
@@ -9,6 +10,7 @@ import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -98,7 +100,7 @@ public class AutoBuilder extends BaseAutoBuilder {
 			private final Timer m_timer = new Timer();
 			private final PIDController m_xPID = new PIDController(1, 0, 0);
 			private final PIDController m_yPID = new PIDController(1, 0, 0);
-			private final PIDController m_thetaPID = new PIDController(Math.PI/6, 0, 0);
+			private final PIDController m_thetaPID = new PIDController(Math.PI, 0, 0);
 			private double m_vX0;
 			private double m_vY0;
 			private double m_vTheta0;
@@ -108,9 +110,10 @@ public class AutoBuilder extends BaseAutoBuilder {
 				m_xPID.reset();
 				m_yPID.reset();
 				m_thetaPID.reset();
-				m_xPID.setTolerance(0);
-				m_yPID.setTolerance(0);
-				m_thetaPID.setTolerance(0);
+				m_xPID.setTolerance(0.2);
+				m_yPID.setTolerance(0.2);
+				m_thetaPID.setTolerance(Math.PI/48);
+				m_thetaPID.enableContinuousInput(-Math.PI, Math.PI);
 				m_vX0 = 0;
 				m_vY0 = 0;
 				m_vTheta0 = 0;
@@ -119,26 +122,50 @@ public class AutoBuilder extends BaseAutoBuilder {
 
 			@Override
 			public void execute() {
-				Pose2d actual = m_driveSubsystem.getPose();
-				Pose2d target = allianceTrajectory.sample(m_timer.get()).poseMeters;
+				double now = m_timer.get();
+				PathPlannerState current = (PathPlannerState)allianceTrajectory.sample(now);
 
-				double vX = MathUtil.clamp(m_xPID.calculate(actual.getX(), target.getX()), -AutonConstants.maxVelocity, AutonConstants.maxVelocity);
-				double vY = MathUtil.clamp(m_xPID.calculate(actual.getY(), target.getY()), -AutonConstants.maxVelocity, AutonConstants.maxVelocity);
-				double vTheta = MathUtil.clamp(m_xPID.calculate(actual.getRotation().getRadians(), target.getRotation().getRadians()), -AutonConstants.maxAngularVelocity, AutonConstants.maxAngularVelocity);
+				Pose2d actual = m_driveSubsystem.getPose();
+				Pose2d target = current.poseMeters;
 				
+				double xDynamic = m_xPID.calculate(actual.getX(), target.getX());
+				double xStatic = current.velocityMetersPerSecond * target.getRotation().getCos();
+				double vX = -xDynamic - xStatic;
+
+				double yDynamic = m_yPID.calculate(actual.getY(), target.getY());
+				double yStatic = current.velocityMetersPerSecond * target.getRotation().getSin();
+				double vY = yStatic + yDynamic;
+
+				double thetaDynamic = m_thetaPID.calculate(actual.getRotation().getRadians(), current.holonomicRotation.getRadians());
+				double thetaStatic = current.holonomicAngularVelocityRadPerSec;
+				double vTheta = -thetaDynamic - thetaStatic;
+
+
 				if (Math.abs(vX - m_vX0) > AutonConstants.maxAcceleration) {
-					vX = m_vX0 + AutonConstants.maxAcceleration * (vX > m_vX0 ? -1 : 1);
+					vX = m_vX0 + AutonConstants.maxAcceleration * (vX > m_vX0 ? 1 : -1);
 				}
 				else if (Math.abs(vY - m_vY0) > AutonConstants.maxAcceleration) {
-					vY = m_vY0 + AutonConstants.maxAcceleration * (vY > m_vY0 ? -1 : 1);
+					vY = m_vY0 + AutonConstants.maxAcceleration * (vY > m_vY0 ? 1 : -1);
 				}
 				else if (Math.abs(vTheta - m_vTheta0) > AutonConstants.maxAngularAcceleration) {
-					vTheta = m_vTheta0 + AutonConstants.maxAngularAcceleration * (vTheta > m_vTheta0 ? -1 : 1);
+					vTheta = m_vTheta0 + AutonConstants.maxAngularAcceleration * (vTheta > m_vTheta0 ? 1 : -1);
 				}
+
+				MathUtil.clamp(vX, -AutonConstants.maxVelocity, AutonConstants.maxVelocity);
+				MathUtil.clamp(vY, -AutonConstants.maxVelocity, AutonConstants.maxVelocity);
+				MathUtil.clamp(vTheta, -AutonConstants.maxAngularVelocity, AutonConstants.maxAngularVelocity);
 
 				m_vX0 = vX;
 				m_vY0 = vY;
 				m_vTheta0 = vTheta;
+
+				SmartDashboard.putNumber("vX", vX);
+				SmartDashboard.putNumber("vY", vY);
+				SmartDashboard.putNumber("vTheta", vTheta);
+
+				SmartDashboard.putNumber("errX", m_xPID.getPositionError());
+				SmartDashboard.putNumber("errY", m_yPID.getPositionError());
+				SmartDashboard.putNumber("errTheta", m_thetaPID.getPositionError());
 
 				m_driveSubsystem.drive(vX, vY, vTheta, true);
 			}

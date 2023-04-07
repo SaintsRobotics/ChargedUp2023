@@ -175,6 +175,8 @@ public class DriveSubsystem extends SubsystemBase {
       m_headingCorrectionTimer.reset();
     }
 
+    SmartDashboard.putNumber("xs", xSpeed);
+
     double rotation = rot;
 
     double currentAngle = MathUtil.angleModulus(m_gyro.getRotation2d().getRadians());

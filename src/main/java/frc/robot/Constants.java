@@ -156,7 +156,7 @@ public final class Constants {
   }
 
   public static final class AutonConstants {
-    public static final double maxVelocity = 2;
+    public static final double maxVelocity = 3.6576;
     public static final double maxAcceleration = 1.5;
     public static final double maxAngularVelocity = 1; //TODO: tune these:
     public static final double maxAngularAcceleration = 1;
