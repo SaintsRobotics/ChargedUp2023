@@ -6,6 +6,7 @@ package frc.robot.commands;
 
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
@@ -15,29 +16,43 @@ public class LEDDefaultCommand extends CommandBase {
   private final LEDSubsystem m_subsystem;
   private final ArrayList<Command> m_commands = new ArrayList<Command>();
   private Command m_command;
+  private final BooleanSupplier m_lockLED;
 
   /**
    * Creates a new {@link LEDDefaultCommand}.
    * 
    * @param subsystem The required subsystem.
    */
-  public LEDDefaultCommand(LEDSubsystem subsystem) {
+  public LEDDefaultCommand(LEDSubsystem subsystem, BooleanSupplier lockLED) {
     m_subsystem = subsystem;
     addRequirements(m_subsystem);
 
+    m_lockLED = lockLED;
     m_commands.add(new LEDSwipeCommand(m_subsystem));
     m_commands.add(new LEDBlinkCommand(m_subsystem));
   }
 
   @Override
   public void initialize() {
-    m_command = m_commands.get(new Random().nextInt(0, m_commands.size()));
+    if (!m_lockLED.getAsBoolean()) {
+      m_command = m_commands.get(new Random().nextInt(0, m_commands.size()));
+    }
+
+    else {
+      m_commands = new CommandBase() {
+        @Override
+        public boolean isFinished() {
+          return true;
+        }
+      };
+    }
+
     m_command.schedule();
   }
 
   @Override
   public void execute() {
-    if (m_command.isFinished()) {
+    if (m_command.isFinished() && !m_lockLED.getAsBoolean()) {
       m_command = m_commands.get(new Random().nextInt(0, m_commands.size()));
       m_command.schedule();
     }

@@ -123,7 +123,7 @@ public class RobotContainer {
                 !m_driverController.getRightBumper()),
             m_robotDrive));
 
-    m_LEDSubsystem.setDefaultCommand(new LEDDefaultCommand(m_LEDSubsystem));
+    m_LEDSubsystem.setDefaultCommand(new LEDDefaultCommand(m_LEDSubsystem, () -> m_lockLED));
 
     m_chooser.addOption("Far", "Far");
     m_chooser.addOption("Charger", "Charger");
@@ -187,8 +187,8 @@ public class RobotContainer {
         .whileTrue(new RunCommand(() -> m_LEDSubsystem.setCube(), m_LEDSubsystem))
 .onFalse(new SequentialCommandGroup(new InstantCommand(() -> {m_lockLED = true;}, m_LEDSubsystem), new WaitCommand(10), new InstantCommand(() -> {m_lockLED = false;}, m_LEDSubsystem)));
 
-    new Trigger(m_robotDrive::isTipped).whileTrue(new LEDTipCommand(m_LEDSubsystem, m_robotDrive.getGyro()));
-    new Trigger(() -> DriverStation.getMatchTime() < 10 && DriverStation.isTeleop())
+    new Trigger(() -> {m_robotDrive.isTipped && !m_lockLED;}).whileTrue(new LEDTipCommand(m_LEDSubsystem, m_robotDrive.getGyro()));
+    new Trigger(() -> {DriverStation.getMatchTime() < 10 && DriverStation.isTeleop() && !m_lockLED})
         .whileTrue(new LEDCountdownCommand(m_LEDSubsystem));
   }
 
@@ -218,6 +218,7 @@ public class RobotContainer {
    * @return Startup command.
    */
   public Command getStartupCommand() {
+    if (m_lockLED) return new SequentialCommandGroup();
     return new SequentialCommandGroup(
         new LEDSwipeCommand(m_LEDSubsystem, SwipeType.kUp, 0, 0, 100, true),
         new LEDBlinkCommand(m_LEDSubsystem, BlinkType.kBlink, 0, 0, 0),
@@ -231,6 +232,7 @@ public class RobotContainer {
    * @return RGB idle command.
    */
   public Command getIdleCommand() {
+    if (m_lockLED) return new SequentialCommandGroup();
     return new LEDRainbowCommand(m_LEDSubsystem);
   }
 }
