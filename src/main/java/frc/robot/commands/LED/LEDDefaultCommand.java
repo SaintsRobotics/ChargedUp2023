@@ -10,6 +10,8 @@ import java.util.function.BooleanSupplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandBase;
+import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
+import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.subsystems.LEDSubsystem;
 
 /** 
@@ -31,9 +33,19 @@ public class LEDDefaultCommand extends CommandBase {
     m_subsystem = subsystem;
     addRequirements(m_subsystem);
 
+    Command foreverRainbowCommand = new LEDRainbowCommand(subsystem) {
+      @Override
+      public boolean isFinished() {
+        return false;
+      }
+    };
+
     m_lockLED = lockLED;
     m_commands.add(new LEDSwipeCommand(m_subsystem));
     m_commands.add(new LEDBlinkCommand(m_subsystem));
+    m_commands.add(new LEDSwipeCommand(m_subsystem)); //Add duplicate commands to increase their weight in the random draw
+    m_commands.add(new LEDBlinkCommand(m_subsystem));
+    m_commands.add(new ParallelDeadlineGroup(new WaitCommand(new Random().nextInt(1, 2)), foreverRainbowCommand));
   }
 
   @Override
