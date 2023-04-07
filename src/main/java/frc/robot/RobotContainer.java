@@ -187,8 +187,8 @@ public class RobotContainer {
         .whileTrue(new RunCommand(() -> m_LEDSubsystem.setCube(), m_LEDSubsystem))
 .onFalse(new SequentialCommandGroup(new InstantCommand(() -> {m_lockLED = true;}, m_LEDSubsystem), new WaitCommand(10), new InstantCommand(() -> {m_lockLED = false;}, m_LEDSubsystem)));
 
-    new Trigger(() -> {m_robotDrive.isTipped && !m_lockLED;}).whileTrue(new LEDTipCommand(m_LEDSubsystem, m_robotDrive.getGyro()));
-    new Trigger(() -> {DriverStation.getMatchTime() < 10 && DriverStation.isTeleop() && !m_lockLED})
+    new Trigger(() -> m_robotDrive.isTipped && !m_lockLED).whileTrue(new LEDTipCommand(m_LEDSubsystem, m_robotDrive.getGyro()));
+    new Trigger(() -> DriverStation.getMatchTime() < 10 && DriverStation.isTeleop() && !m_lockLED)
         .whileTrue(new LEDCountdownCommand(m_LEDSubsystem));
   }
 
