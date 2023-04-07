@@ -7,6 +7,7 @@ package frc.robot.subsystems;
 import com.ctre.phoenix.sensors.AbsoluteSensorRange;
 import com.ctre.phoenix.sensors.CANCoder;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMax.IdleMode;
 import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 
 import edu.wpi.first.math.MathUtil;
@@ -134,5 +135,9 @@ public class ArmSubsystem extends SubsystemBase {
    */
   public double getElevatorPosition() {
     return m_elevatorMotor.getEncoder().getPosition();
+  }
+
+  public void setPivotMode(IdleMode mode) {
+    m_pivotMotor.setIdleMode(mode);
   }
 }
