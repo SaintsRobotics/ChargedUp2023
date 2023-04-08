@@ -34,6 +34,7 @@ import frc.robot.subsystems.ArmSubsystem;
 import frc.robot.subsystems.DriveSubsystem;
 import frc.robot.subsystems.GrabberSubsystem;
 import frc.robot.subsystems.LEDSubsystem;
+import frc.robot.subsystems.RubberDuck;
 
 /*
  * This class is where the bulk of the robot should be declared.  Since Command-based is a
@@ -46,6 +47,7 @@ public class RobotContainer {
   private final DriveSubsystem m_robotDrive = new DriveSubsystem();
   public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
   private final LEDSubsystem m_LEDSubsystem = new LEDSubsystem();
+  public final RubberDuck rubberDuck = new RubberDuck();
 
   private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
   private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
