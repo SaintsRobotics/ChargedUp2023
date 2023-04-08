@@ -4,6 +4,9 @@
 
 package frc.robot.subsystems;
 
+import java.time.LocalTime;
+import java.util.Random;
+
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.util.Color;
@@ -15,6 +18,8 @@ public class LEDSubsystem extends SubsystemBase {
   private final AddressableLEDBuffer m_LEDBuffer = new AddressableLEDBuffer(LEDConstants.kLEDLength);
 
   private int m_r, m_g, m_b;
+  
+  private static final int[][] m_colors = new int[][] {{100, 0, 0}, {0, 100, 0}, {0, 0, 100}, {100, 100, 0}, {0, 100, 100}, {100, 0, 100}};
 
   /** Creates a new {@link LEDSubsystem}. */
   public LEDSubsystem() {
@@ -116,5 +121,9 @@ public class LEDSubsystem extends SubsystemBase {
 
   public void setCube() {
     setLED(100, 0, 100);
+  }
+
+  public static int[] generateRandomColor() {
+    return m_colors[new Random(LocalTime.now().getSecond()).nextInt(0, m_colors.length)];
   }
 }

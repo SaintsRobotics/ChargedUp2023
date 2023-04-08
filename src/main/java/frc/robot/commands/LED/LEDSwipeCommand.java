@@ -4,6 +4,7 @@
 
 package frc.robot.commands.LED;
 
+import java.time.LocalTime;
 import java.util.Random;
 
 import edu.wpi.first.wpilibj.Timer;
@@ -49,7 +50,7 @@ public class LEDSwipeCommand extends CommandBase {
     /** kLowDouble and kHighDouble at the same time */
     kDoubleDouble;
 
-    private static final Random random = new Random();
+    private static final Random random = new Random(LocalTime.now().getSecond());
 
     public static SwipeType random() {
       SwipeType[] type = values();
@@ -112,12 +113,12 @@ public class LEDSwipeCommand extends CommandBase {
     if (m_random) {
       m_type = SwipeType.random();
 
-      Random random = new Random();
-      m_r = random.nextInt(0, 100);
-      m_g = random.nextInt(0, 100);
-      m_b = random.nextInt(0, 100);
+      int[] col = LEDSubsystem.generateRandomColor();
+      m_r = col[0];
+      m_g = col[1];
+      m_b = col[2];
 
-      m_changeColor = random.nextBoolean();
+      m_changeColor = new Random(LocalTime.now().getSecond()).nextBoolean();
     }
     m_timer.restart();
     m_LEDIndex = 0;

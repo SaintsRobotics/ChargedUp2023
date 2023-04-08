@@ -4,6 +4,7 @@
 
 package frc.robot.commands.LED;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.function.BooleanSupplier;
@@ -45,13 +46,17 @@ public class LEDDefaultCommand extends CommandBase {
     m_commands.add(new LEDBlinkCommand(m_subsystem));
     m_commands.add(new LEDSwipeCommand(m_subsystem)); //Add duplicate commands to increase their weight in the random draw
     m_commands.add(new LEDBlinkCommand(m_subsystem));
-    m_commands.add(new ParallelDeadlineGroup(new WaitCommand(new Random().nextInt(1, 2)), foreverRainbowCommand));
+    m_commands.add(new LEDSwipeCommand(m_subsystem)); //Add duplicate commands to increase their weight in the random draw
+    m_commands.add(new LEDBlinkCommand(m_subsystem));
+    m_commands.add(new LEDSwipeCommand(m_subsystem)); //Add duplicate commands to increase their weight in the random draw
+    m_commands.add(new LEDBlinkCommand(m_subsystem));
+    m_commands.add(new ParallelDeadlineGroup(new WaitCommand(new Random(LocalTime.now().getSecond()).nextInt(1, 2)), foreverRainbowCommand));
   }
 
   @Override
   public void initialize() {
     if (!m_lockLED.getAsBoolean()) {
-      m_command = m_commands.get(new Random().nextInt(0, m_commands.size()));
+      m_command = m_commands.get(new Random(LocalTime.now().getSecond()).nextInt(0, m_commands.size()));
     }
 
     else {
@@ -69,7 +74,7 @@ public class LEDDefaultCommand extends CommandBase {
   @Override
   public void execute() {
     if (m_command.isFinished() && !m_lockLED.getAsBoolean()) {
-      m_command = m_commands.get(new Random().nextInt(0, m_commands.size()));
+      m_command = m_commands.get(new Random(LocalTime.now().getSecond()).nextInt(0, m_commands.size()));
       m_command.schedule();
     }
   }
