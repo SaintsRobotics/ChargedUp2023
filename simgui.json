@@ -22,6 +22,9 @@
       }
     },
     "RoboRIO": {
+      "6V Rail": {
+        "open": true
+      },
       "window": {
         "visible": true
       }

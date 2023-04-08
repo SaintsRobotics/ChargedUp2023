@@ -56,7 +56,7 @@ public class RobotContainer {
     private final ArmSubsystem m_armSubsystem = new ArmSubsystem();
     private final DriveSubsystem m_robotDrive = new DriveSubsystem();
     public final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
-    private final LEDSubsystem m_LEDSubsystem = new LEDSubsystem();
+    public final LEDSubsystem LEDSubsystem = new LEDSubsystem();
 
     private final XboxController m_driverController = new XboxController(OIConstants.kDriverControllerPort);
     private final XboxController m_operatorController = new XboxController(OIConstants.kOperatorControllerPort);
@@ -123,7 +123,7 @@ public class RobotContainer {
                                 !m_driverController.getRightBumper()),
                         m_robotDrive));
 
-        m_LEDSubsystem.setDefaultCommand(new LEDDefaultCommand(m_LEDSubsystem, () -> m_lockLED));
+        LEDSubsystem.setDefaultCommand(new LEDDefaultCommand(LEDSubsystem, () -> m_lockLED));
 
         m_chooser.addOption("Far", "Far");
         m_chooser.addOption("Charger", "Charger");
@@ -147,7 +147,7 @@ public class RobotContainer {
                         new InstantCommand(grabberSubsystem::toggle, grabberSubsystem),
                         new WaitCommand(0.5)));
 
-        m_eventMap.put("Balance", new BalanceCommand(m_robotDrive, m_LEDSubsystem, () -> m_lockLED));
+        m_eventMap.put("Balance", new BalanceCommand(m_robotDrive, LEDSubsystem, () -> m_lockLED));
     }
 
     /**
@@ -164,7 +164,7 @@ public class RobotContainer {
                 .onTrue(new InstantCommand(m_robotDrive::zeroHeading, m_robotDrive));
 
         new JoystickButton(m_driverController, Button.kY.value)
-                .whileTrue(new BalanceCommand(m_robotDrive, m_LEDSubsystem, () -> m_lockLED));
+                .whileTrue(new BalanceCommand(m_robotDrive, LEDSubsystem, () -> m_lockLED));
         new JoystickButton(m_driverController, Button.kA.value)
                 .onTrue(new SnapRotateCommand(m_robotDrive));
 
@@ -181,29 +181,29 @@ public class RobotContainer {
                 .onTrue(new ArmCommand(m_armSubsystem, 34, ArmConstants.kElevatorMinPosition));
 
         new JoystickButton(m_operatorController, Button.kLeftBumper.value)
-                .whileTrue(new RunCommand(() -> m_LEDSubsystem.setCone(), m_LEDSubsystem))
+                .whileTrue(new RunCommand(() -> LEDSubsystem.setCone(), LEDSubsystem))
                 .onFalse(new SequentialCommandGroup(new InstantCommand(() -> {
                     m_lockLED = true;
-                }, m_LEDSubsystem), new WaitCommand(10), new InstantCommand(() -> {
+                }, LEDSubsystem), new WaitCommand(10), new InstantCommand(() -> {
                     m_lockLED = false;
-                }, m_LEDSubsystem)));
+                }, LEDSubsystem)));
         new JoystickButton(m_operatorController, Button.kRightBumper.value)
-                .whileTrue(new RunCommand(() -> m_LEDSubsystem.setCube(), m_LEDSubsystem))
+                .whileTrue(new RunCommand(() -> LEDSubsystem.setCube(), LEDSubsystem))
                 .onFalse(new SequentialCommandGroup(new InstantCommand(() -> {
                     m_lockLED = true;
-                }, m_LEDSubsystem), new WaitCommand(10), new InstantCommand(() -> {
+                }, LEDSubsystem), new WaitCommand(10), new InstantCommand(() -> {
                     m_lockLED = false;
-                }, m_LEDSubsystem)));
+                }, LEDSubsystem)));
 
         new Trigger(() -> m_robotDrive.isTipped() && !m_lockLED)
-                .whileTrue(new LEDTipCommand(m_LEDSubsystem, m_robotDrive.getGyro()));
+                .whileTrue(new LEDTipCommand(LEDSubsystem, m_robotDrive.getGyro()));
         new Trigger(() -> DriverStation.getMatchTime() < 10 && DriverStation.isTeleop() && !m_lockLED && Robot.isReal()) // TODO:
                                                                                                                          // test
                                                                                                                          // this
                                                                                                                          // on
                                                                                                                          // real
                                                                                                                          // robot
-                .whileTrue(new LEDCountdownCommand(m_LEDSubsystem));
+                .whileTrue(new LEDCountdownCommand(LEDSubsystem));
     }
 
     /**
@@ -232,13 +232,11 @@ public class RobotContainer {
      * @return Startup command.
      */
     public Command getStartupCommand() {
-        if (m_lockLED)
-            return new SequentialCommandGroup();
         return new SequentialCommandGroup(
-                new LEDSwipeCommand(m_LEDSubsystem, SwipeType.kUp, 0, 0, 100, true),
-                new LEDBlinkCommand(m_LEDSubsystem, BlinkType.kBlink, 0, 0, 0),
-                new WaitCommand(5),
-                new LEDRainbowCommand(m_LEDSubsystem));
+                new LEDSwipeCommand(LEDSubsystem, SwipeType.kUp, 0, 0, 100, true),
+                new LEDBlinkCommand(LEDSubsystem, BlinkType.kBlink, 0, 0, 0),
+                new WaitCommand(1),
+                new LEDRainbowCommand(LEDSubsystem));
     }
 
     /**
@@ -247,7 +245,7 @@ public class RobotContainer {
      * @return RGB idle command.
      */
     public Command getIdleCommand() {
-        return new LEDRainbowCommand(m_LEDSubsystem);
+        return new LEDRainbowCommand(LEDSubsystem);
     }
 
     public void unlockLED() {
@@ -261,10 +259,10 @@ public class RobotContainer {
     public void setLEDCriticalRed(boolean disable) {
         if (disable) {
             m_lockLED = false;
-            m_LEDSubsystem.setLED(0, 100, 0);
+            LEDSubsystem.setLED(0, 100, 0);
         } else {
             m_lockLED = true;
-            m_LEDSubsystem.setLED(100, 0, 0);
+            LEDSubsystem.setLED(100, 0, 0);
         }
     }
 }
