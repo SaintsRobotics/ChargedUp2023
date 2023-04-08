@@ -160,6 +160,11 @@ public final class Constants {
     public static final double maxAcceleration = 1.5;
   }
 
+  public static final class DuckConstants {
+    public static final int kMotorPort = -1; //TODO: put correct value
+    public static final double kDuckSpeed = 0.1; //TODO: put better value
+  }
+
   public static final class VisionConstants {
 
     public static final String kCameraName = "Microsoft_LifeCam_HD-3000";
