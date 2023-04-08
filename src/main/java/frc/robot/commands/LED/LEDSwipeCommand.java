@@ -48,7 +48,10 @@ public class LEDSwipeCommand extends CommandBase {
     kHighDouble,
 
     /** kLowDouble and kHighDouble at the same time */
-    kDoubleDouble;
+    kDoubleDouble,
+    
+    /** kSwipeDown with rainbow colors - ignores r, g, and b*/
+    kRainbowUp;
 
     private static final Random random = new Random(LocalTime.now().getSecond());
 
@@ -70,6 +73,7 @@ public class LEDSwipeCommand extends CommandBase {
   private final boolean m_random;
 
   private int m_LEDIndex;
+  private int m_hue;
 
   /**
    * Creates a new {@link LEDSwipeCommand}.
@@ -122,6 +126,7 @@ public class LEDSwipeCommand extends CommandBase {
     }
     m_timer.restart();
     m_LEDIndex = 0;
+    m_hue = 0;
   }
 
   @Override
@@ -170,6 +175,12 @@ public class LEDSwipeCommand extends CommandBase {
           setLED((m_LEDIndex % half) + half);
           setLED(max - (m_LEDIndex % half));
           break;
+        case kRainbowUp:
+          if (m_LEDIndex - 3 >= 0) setLED(m_LEDIndex - 3, m_hue  + 2 * (m_LEDIndex - 3));
+          if (m_LEDIndex - 2 >= 0 && m_LEDIndex - 2 < LEDConstants.kLEDLength) setLED(m_LEDIndex - 2, m_hue  + 2 * (m_LEDIndex - 2));
+          if (m_LEDIndex - 1 >= 0 && m_LEDIndex - 1 < LEDConstants.kLEDLength) setLED(m_LEDIndex - 1, m_hue  + 2 * (m_LEDIndex - 1));
+          if (m_LEDIndex < LEDConstants.kLEDLength) setLED(m_LEDIndex, m_hue  + 2 * (m_LEDIndex));
+          break;
         default:
           break;
       }
@@ -209,6 +220,8 @@ public class LEDSwipeCommand extends CommandBase {
           return m_LEDIndex == LEDConstants.kLEDLength / 2;
         case kUp:
           return m_LEDIndex == LEDConstants.kLEDLength;
+        case kRainbowUp:
+          return m_LEDIndex == LEDConstants.kLEDLength + 3;
         default:
           return false;
       }
@@ -219,6 +232,14 @@ public class LEDSwipeCommand extends CommandBase {
   private void setLED(int i) {
     if (m_changeColor) {
       m_subsystem.setLED(i, m_r, m_g, m_b);
+    } else {
+      new LEDTimerCommand(m_subsystem, i, m_r, m_g, m_b).schedule();
+    }
+  }
+
+  private void setLED(int i, int hue) {
+    if (m_changeColor) {
+      m_subsystem.setHSV(i, hue, 255, 100);
     } else {
       new LEDTimerCommand(m_subsystem, i, m_r, m_g, m_b).schedule();
     }
