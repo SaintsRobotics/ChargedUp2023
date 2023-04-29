@@ -109,9 +109,9 @@ public final class Constants {
         new Translation2d(-kWheelBase / 2, -kTrackWidth / 2));
 
     public static final double kMaxSpeedMetersPerSecond = 3.6576;
-    public static final double kMaxAngularSpeedRadiansPerSecond = 15.24/3;
+    public static final double kMaxAngularSpeedRadiansPerSecond = 15.24 / 3;
 
-    public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
+    public static final double kTurningStopTime = 0.2;
     public static final double kSpeedIncreasePerPeriod = 0.15;
 
     public static final double kPSnapRotate = 6;
@@ -145,6 +145,15 @@ public final class Constants {
   public static final class LEDConstants {
     public static final int kLEDPort = 0;
     public static final int kLEDLength = 28;
+
+    public static final double kSwipeTime = 0.02;
+    public static final double kLEDOnTime = 0.3;
+
+    public static final int kBlinkAmount = 3;
+    public static final double kBlinkTime = 0.2;
+
+    public static final double kTipMin = 5;
+    public static final double kTipMax = 55;
   }
 
   public static final class OIConstants {
@@ -168,7 +177,7 @@ public final class Constants {
     public static final Transform3d kCameraOffset = new Transform3d(new Translation3d(0.5, 0, 0.5),
         new Rotation3d(0, 0, 0));
     // Currently set as cam mounted facing forward, half a meter forward of center,
-    // half a meter up from center. // TODO adjust vision offset values
+    // half a meter up from center.
 
     public static final AprilTagFieldLayout kAprilTagFieldLayout = loadFieldLayout();
 

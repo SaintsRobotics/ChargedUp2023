@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.Constants.LEDConstants;
 import frc.robot.Robot;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -59,7 +60,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final AHRS m_gyro = new AHRS();
   private double m_gyroAngle;
 
-  private final PIDController m_headingCorrectionPID = new PIDController(5, 0, 0); // TODO: tune this
+  private final PIDController m_headingCorrectionPID = new PIDController(5, 0, 0);
   private final Timer m_headingCorrectionTimer;
 
   private final SwerveDrivePoseEstimator m_swervePoseEstimator;
@@ -232,6 +233,15 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
+   * Gets gyro
+   * 
+   * @return the gyro
+   */
+  public AHRS getGyro() {
+    return m_gyro;
+  }
+
+  /**
    * Slowly accelerates the bot to the desired speed.
    * 
    * @param currentSpeed The current speed.
@@ -247,5 +257,15 @@ public class DriveSubsystem extends SubsystemBase {
     } else {
       return currentSpeed + DriveConstants.kSpeedIncreasePerPeriod;
     }
+  }
+
+  /**
+   * Returns whether the robot is tipped.
+   * 
+   * @return Whether the robot is tipped.
+   */
+  public boolean isTipped() {
+    return Math.abs(m_gyro.getPitch()) > LEDConstants.kTipMin ||
+        Math.abs(m_gyro.getRoll()) > LEDConstants.kTipMin;
   }
 }

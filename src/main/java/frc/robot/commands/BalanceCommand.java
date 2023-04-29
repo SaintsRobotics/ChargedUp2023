@@ -4,44 +4,73 @@
 
 package frc.robot.commands;
 
+import java.util.function.BooleanSupplier;
+
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 import frc.robot.Constants.DriveConstants;
 import frc.robot.subsystems.DriveSubsystem;
+import frc.robot.subsystems.LEDSubsystem;
 
 /** Uses a PID and the gyroscope to balance the robot on the charger. */
 public class BalanceCommand extends CommandBase {
-  private final DriveSubsystem m_subsystem;
+  private final DriveSubsystem m_driveSubsystem;
+  private final LEDSubsystem m_LEDSubsystem;
+
   private final PIDController m_PID = new PIDController(0.025, 0, 0);
+  private final Timer m_timer = new Timer();
+
+  private boolean m_isRed;
+  private int m_fade;
+  private final BooleanSupplier m_lockLED;
 
   /**
    * Creates a new {@link BalanceCommand}.
    * 
-   * @param subsystem The required subsystem.
+   * @param driveSubsystem The required drive subsystem.
+   * @param LEDSubsystem   The required LED subsystem.
    */
-  public BalanceCommand(DriveSubsystem subsystem) {
-    m_subsystem = subsystem;
-    addRequirements(m_subsystem);
+  public BalanceCommand(DriveSubsystem driveSubsystem, LEDSubsystem LEDSubsystem, BooleanSupplier lockLED) {
+    m_driveSubsystem = driveSubsystem;
+    m_LEDSubsystem = LEDSubsystem;
+    addRequirements(m_driveSubsystem, m_LEDSubsystem);
 
+    m_lockLED = lockLED;
     m_PID.setTolerance(DriveConstants.kToleranceBalance);
   }
 
   @Override
+  public void initialize() {
+    m_timer.restart();
+    m_fade = 100;
+    m_isRed = true;
+    m_LEDSubsystem.setLED(100, 0, 0);
+  }
+
+  @Override
   public void execute() {
-    m_subsystem.drive(
-        m_PID.calculate(m_subsystem.getGyroPitch(), 0),
+    m_driveSubsystem.drive(
+        m_PID.calculate(m_driveSubsystem.getGyroPitch(), 0),
         0,
         0,
         false);
+
+    if (m_PID.atSetpoint() && !m_lockLED.getAsBoolean()) {
+      m_LEDSubsystem.setLED(0, m_fade, 0, false);
+      m_fade = m_fade <= 0 ? 100 : m_fade - 2;
+      m_isRed = false;
+    } else if (m_timer.hasElapsed(0.3) && !m_lockLED.getAsBoolean()) {
+      m_fade = 100;
+      m_LEDSubsystem.setLED(m_isRed ? 0 : 100, 0, 0, false);
+      m_isRed = !m_isRed;
+      m_timer.reset();
+    }
   }
 
   @Override
   public void end(boolean interrupted) {
-    m_subsystem.drive(0, 0, 0, false);
-  }
-
-  @Override
-  public boolean isFinished() {
-    return false;
+    m_driveSubsystem.drive(0, 0, 0, false);
+    m_LEDSubsystem.unsetLED();
   }
 }
