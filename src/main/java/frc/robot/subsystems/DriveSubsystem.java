@@ -13,6 +13,7 @@ import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.estimator.SwerveDrivePoseEstimator;
+import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -20,7 +21,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
-import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
@@ -59,8 +59,7 @@ public class DriveSubsystem extends SubsystemBase {
   private final AHRS m_gyro = new AHRS();
   private double m_gyroAngle;
 
-  private final PIDController m_headingCorrectionPID = new PIDController(5, 0, 0); // TODO: tune this
-  private final Timer m_headingCorrectionTimer;
+  private final PIDController m_headingCorrectionPID = new PIDController(5, 0, 0);
 
   private final SwerveDrivePoseEstimator m_swervePoseEstimator;
   private final PhotonCameraWrapper m_photonCamera = new PhotonCameraWrapper();
@@ -78,8 +77,11 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final Field2d m_field = new Field2d();
 
-  private double m_currentXSpeed = 0;
-  private double m_currentYSpeed = 0;
+  private final SlewRateLimiter m_xLimiter = new SlewRateLimiter(DriveConstants.kMaxDirectionalAcceleration);
+  private final SlewRateLimiter m_yLimiter = new SlewRateLimiter(DriveConstants.kMaxDirectionalAcceleration);
+  private final SlewRateLimiter m_rotLimiter = new SlewRateLimiter(DriveConstants.kMaxRotationalAcceleration);
+
+  private boolean m_wasFieldRelative;
 
   /** Creates a new {@link DriveSubsystem}. */
   public DriveSubsystem() {
@@ -87,8 +89,6 @@ public class DriveSubsystem extends SubsystemBase {
 
     m_headingCorrectionPID.enableContinuousInput(-Math.PI, Math.PI);
     m_headingCorrectionPID.setSetpoint(MathUtil.angleModulus(m_gyro.getRotation2d().getRadians()));
-    m_headingCorrectionTimer = new Timer();
-    m_headingCorrectionTimer.start();
 
     m_swervePoseEstimator = new SwerveDrivePoseEstimator(DriveConstants.kDriveKinematics, m_gyro.getRotation2d(),
         m_swerveModulePositions, m_odometry.getPoseMeters());
@@ -171,29 +171,29 @@ public class DriveSubsystem extends SubsystemBase {
    *                      field.
    */
   public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
+    // Limits acceleration
+    xSpeed = m_xLimiter.calculate(xSpeed);
+    ySpeed = m_yLimiter.calculate(ySpeed);
+    rot = m_rotLimiter.calculate(rot);
+
+    // Holds heading when not rotating
     if (rot != 0) {
-      m_headingCorrectionTimer.reset();
-    }
-
-    double rotation = rot;
-
-    double currentAngle = MathUtil.angleModulus(m_gyro.getRotation2d().getRadians());
-
-    m_currentXSpeed = calculateAcceleration(m_currentXSpeed, xSpeed);
-    m_currentYSpeed = calculateAcceleration(m_currentYSpeed, ySpeed);
-
-    if ((m_currentXSpeed == 0 && m_currentYSpeed == 0)
-        || m_headingCorrectionTimer.get() < DriveConstants.kTurningStopTime) {
-      m_headingCorrectionPID.setSetpoint(currentAngle);
+      m_headingCorrectionPID.setSetpoint(m_gyro.getRotation2d().getRadians());
     } else {
-      rotation = m_headingCorrectionPID.calculate(currentAngle);
+      rot = m_headingCorrectionPID.calculate(m_gyro.getRotation2d().getRadians());
     }
+
+    // Must stop robot before switching to field relative.
+    if (m_wasFieldRelative != fieldRelative && (xSpeed != 0 || ySpeed != 0)) {
+      fieldRelative = m_wasFieldRelative;
+    }
+    m_wasFieldRelative = fieldRelative;
 
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
         fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(m_currentXSpeed, m_currentYSpeed, rotation,
+            ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rot,
                 Robot.isReal() ? m_gyro.getRotation2d() : new Rotation2d(m_gyroAngle))
-            : new ChassisSpeeds(m_currentXSpeed, m_currentYSpeed, rotation));
+            : new ChassisSpeeds(xSpeed, ySpeed, rot));
     setModuleStates(swerveModuleStates);
   }
 
@@ -229,23 +229,5 @@ public class DriveSubsystem extends SubsystemBase {
    */
   public double getGyroPitch() {
     return m_gyro.getPitch();
-  }
-
-  /**
-   * Slowly accelerates the bot to the desired speed.
-   * 
-   * @param currentSpeed The current speed.
-   * @param desiredSpeed The desired speed.
-   * 
-   * @return The new speed to use.
-   */
-  private double calculateAcceleration(double currentSpeed, double desiredSpeed) {
-    if (Math.abs(currentSpeed - desiredSpeed) < DriveConstants.kSpeedIncreasePerPeriod) {
-      return desiredSpeed;
-    } else if (currentSpeed > desiredSpeed) {
-      return currentSpeed - DriveConstants.kSpeedIncreasePerPeriod;
-    } else {
-      return currentSpeed + DriveConstants.kSpeedIncreasePerPeriod;
-    }
   }
 }
