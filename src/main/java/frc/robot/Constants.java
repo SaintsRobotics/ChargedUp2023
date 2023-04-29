@@ -96,9 +96,8 @@ public final class Constants {
     public static final boolean kFrontRightDriveMotorReversed = true;
     public static final boolean kRearRightDriveMotorReversed = true;
 
-    public static final double maxVelocity = 2;
-    public static final double maxDirectionalAcceleration = Math.sin(Math.sqrt(Math.PI + Math.E)) * Math.PI * Math.E;
-    public static final double maxRotationalAcceleration = Math.sqrt(Math.E) * Math.PI + (Math.PI + Math.E) / Math.E;
+    public static final double kMaxDirectionalAcceleration = 20;
+    public static final double kMaxRotationalAcceleration = 20;
 
     /** Distance between centers of right and left wheels on robot (in meters). */
     public static final double kTrackWidth = 0.48;
@@ -114,8 +113,6 @@ public final class Constants {
 
     public static final double kMaxSpeedMetersPerSecond = 3.6576;
     public static final double kMaxAngularSpeedRadiansPerSecond = 15.24 / 3;
-
-    public static final double kTurningStopTime = 0.2; // TODO: tune heading correction stop time
 
     public static final double kPSnapRotate = 6;
 
