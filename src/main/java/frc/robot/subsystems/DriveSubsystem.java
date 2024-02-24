@@ -25,6 +25,7 @@ import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.DriveConstants;
+import frc.robot.util.AcceleratedChassisSpeeds;
 import frc.robot.Robot;
 
 public class DriveSubsystem extends SubsystemBase {
@@ -78,8 +79,9 @@ public class DriveSubsystem extends SubsystemBase {
 
   private final Field2d m_field = new Field2d();
 
-  private double m_currentXSpeed = 0;
-  private double m_currentYSpeed = 0;
+  private AcceleratedChassisSpeeds m_acceleratedChassisSpeeds = new AcceleratedChassisSpeeds(
+      DriveConstants.kMaxAccelerationMetersPerSecondSquared,
+      DriveConstants.kMaxAngularAccelerationRadiansPerSecondSquared);
 
   /** Creates a new {@link DriveSubsystem}. */
   public DriveSubsystem() {
@@ -170,30 +172,29 @@ public class DriveSubsystem extends SubsystemBase {
    * @param fieldRelative Whether the provided x and y speeds are relative to the
    *                      field.
    */
-  public void drive(double xSpeed, double ySpeed, double rot, boolean fieldRelative) {
-    if (rot != 0) {
+  public void drive(double xSpeed, double ySpeed, double rotation, boolean fieldRelative) {
+    if (rotation != 0) {
       m_headingCorrectionTimer.reset();
     }
 
-    double rotation = rot;
+    Rotation2d gyroRotation = m_gyro.getRotation2d();
 
-    double currentAngle = MathUtil.angleModulus(m_gyro.getRotation2d().getRadians());
-
-    m_currentXSpeed = calculateAcceleration(m_currentXSpeed, xSpeed);
-    m_currentYSpeed = calculateAcceleration(m_currentYSpeed, ySpeed);
-
-    if ((m_currentXSpeed == 0 && m_currentYSpeed == 0)
+    ChassisSpeeds currentSpeeds = m_acceleratedChassisSpeeds.getCurrentSpeeds();
+    double currentAngle = MathUtil.angleModulus(gyroRotation.getRadians());
+    if ((currentSpeeds.vxMetersPerSecond == 0 && currentSpeeds.vyMetersPerSecond == 0)
         || m_headingCorrectionTimer.get() < DriveConstants.kTurningStopTime) {
       m_headingCorrectionPID.setSetpoint(currentAngle);
     } else {
       rotation = m_headingCorrectionPID.calculate(currentAngle);
     }
 
+    ChassisSpeeds desiredSpeeds = fieldRelative
+        ? ChassisSpeeds.fromFieldRelativeSpeeds(xSpeed, ySpeed, rotation,
+            Robot.isReal() ? gyroRotation : new Rotation2d(m_gyroAngle))
+        : new ChassisSpeeds(xSpeed, ySpeed, rotation);
+
     var swerveModuleStates = DriveConstants.kDriveKinematics.toSwerveModuleStates(
-        fieldRelative
-            ? ChassisSpeeds.fromFieldRelativeSpeeds(m_currentXSpeed, m_currentYSpeed, rotation,
-                Robot.isReal() ? m_gyro.getRotation2d() : new Rotation2d(m_gyroAngle))
-            : new ChassisSpeeds(m_currentXSpeed, m_currentYSpeed, rotation));
+        m_acceleratedChassisSpeeds.calculateNewSpeeds(desiredSpeeds));
     setModuleStates(swerveModuleStates);
   }
 
@@ -232,20 +233,11 @@ public class DriveSubsystem extends SubsystemBase {
   }
 
   /**
-   * Slowly accelerates the bot to the desired speed.
-   * 
-   * @param currentSpeed The current speed.
-   * @param desiredSpeed The desired speed.
-   * 
-   * @return The new speed to use.
+   * Stops the robot from moving
    */
-  private double calculateAcceleration(double currentSpeed, double desiredSpeed) {
-    if (Math.abs(currentSpeed - desiredSpeed) < DriveConstants.kSpeedIncreasePerPeriod) {
-      return desiredSpeed;
-    } else if (currentSpeed > desiredSpeed) {
-      return currentSpeed - DriveConstants.kSpeedIncreasePerPeriod;
-    } else {
-      return currentSpeed + DriveConstants.kSpeedIncreasePerPeriod;
-    }
+  public void stop() {
+    m_acceleratedChassisSpeeds.reset();
+    setModuleStates(
+        DriveConstants.kDriveKinematics.toSwerveModuleStates(m_acceleratedChassisSpeeds.getCurrentSpeeds()));
   }
 }
